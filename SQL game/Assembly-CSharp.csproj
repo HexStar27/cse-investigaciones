@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{E83C1E55-725C-683E-556F-97DDECB21120}</ProjectGuid>
+    <ProjectGuid>{B5384E05-4D44-2D26-FB59-5DE93596E088}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -63,12 +63,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Bloques\BloqueDeConsulta.cs" />
+    <Compile Include="Assets\Scripts\Bloques\ScriptableBlock.cs" />
+    <Compile Include="Assets\Scripts\Bloques\Slot.cs" />
+    <Compile Include="Assets\Scripts\Contenedores\ObjectPool.cs" />
     <Compile Include="Assets\Scripts\Controladores\AgentController.cs" />
     <Compile Include="Assets\Scripts\Controladores\GameManager.cs" />
     <Compile Include="Assets\Scripts\Controladores\MainMenuOp.cs" />
+    <Compile Include="Assets\Scripts\Controladores\SlotController.cs" />
     <Compile Include="Assets\Scripts\Otros\Arrastrable.cs" />
     <Compile Include="Assets\Scripts\Otros\Boton.cs" />
     <Compile Include="Assets\Scripts\Otros\CasoMapaItem.cs" />
+    <Compile Include="Assets\Scripts\Otros\DesplazadorVertical.cs" />
     <Compile Include="Assets\Scripts\Otros\Interactuable1.cs" />
     <Compile Include="Assets\Scripts\Otros\MousePosDetector.cs" />
     <Compile Include="Assets\Scripts\Otros\MultipleClueNoteSelector.cs" />
@@ -282,13 +288,13 @@
       <HintPath>C:/Program Files/UnityVersions/2019.4.20f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Assets/Libraries/Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Assets/Libraries/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="TinCan-net45-signed">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Assets/Libraries/TinCan-net45-signed.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Assets/Libraries/TinCan-net45-signed.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Data.Sqlite">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Assets/Plugins/Mono.Data.Sqlite.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/UnityVersions/2019.4.20f1/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -645,85 +651,85 @@
       <HintPath>C:/Program Files/UnityVersions/2019.4.20f1/Editor/Data/MonoBleedingEdge/lib/mono/unityscript/Boo.Lang.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Animation.Runtime">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Animation.Runtime.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Animation.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.PixelPerfect.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.PixelPerfect.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.PixelPerfect.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VSCode.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.SpriteShape.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.SpriteShape.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.SpriteShape.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Path.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Path.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Path.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Animation.Triangle.Runtime">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Animation.Triangle.Runtime.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Animation.Triangle.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="PsdPlugin">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/PsdPlugin.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/PsdPlugin.dll</HintPath>
     </Reference>
     <Reference Include="Unity.CollabProxy.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.CollabProxy.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Rider.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Mathematics">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Psdimporter.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Psdimporter.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Psdimporter.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.InternalAPIEngineBridge.001">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.InternalAPIEngineBridge.001.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.InternalAPIEngineBridge.001.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Common.Runtime">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Common.Runtime.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Common.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Tilemap.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Tilemap.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.SpriteShape.Runtime">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.SpriteShape.Runtime.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.SpriteShape.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.PixelPerfect">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.PixelPerfect.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.PixelPerfect.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Animation.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Animation.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Animation.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Mathematics.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.Mathematics.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.Mathematics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Common.Editor">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.2D.Common.Editor.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.2D.Common.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.InternalAPIEditorBridge.001">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/Unity.InternalAPIEditorBridge.001.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/Unity.InternalAPIEditorBridge.001.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
-      <HintPath>C:/Users/frand/Desktop/Proyectos/SQL game test/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+      <HintPath>C:/Users/frand/Desktop/Proyectos/CSE Investigations/cse-investigaciones/SQL game/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup></ItemGroup>

@@ -37,7 +37,7 @@ public class Arrastrable : MonoBehaviour
         }
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         if(isHeld)
         {
@@ -54,18 +54,18 @@ public class Arrastrable : MonoBehaviour
             else if (finalPos.y > posicion.y + height)
                 finalPos.y = posicion.y + height;
             
-            transform.localPosition = finalPos;
+            transform.position = finalPos;
         }
     }
 
-    private void OnMouseDown()
+    protected virtual void OnMouseDown()
     {
         mousePos = MousePosDetector.MousePos();
-        startPos = new Vector3(mousePos.x - transform.localPosition.x, mousePos.y - transform.localPosition.y, 0);
+        startPos = new Vector3(mousePos.x - transform.position.x, mousePos.y - transform.localPosition.y, 0);
         isHeld = true;
     }
 
-    private void OnMouseUp()
+    protected virtual void OnMouseUp()
     {
         isHeld = false;
     }
@@ -73,7 +73,7 @@ public class Arrastrable : MonoBehaviour
     public void ForceDrag()
     {
         mousePos = MousePosDetector.MousePos();
-        startPos = new Vector3(mousePos.x - transform.localPosition.x, mousePos.y - transform.localPosition.y, 0);
+        startPos = new Vector3(mousePos.x - transform.position.x, mousePos.y - transform.localPosition.y, 0);
         isHeld = true;
     }
 

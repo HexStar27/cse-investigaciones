@@ -76,7 +76,7 @@ public class UnionHilo : MonoBehaviour
         //Comprobar que haya objeto con tag pin usando raycast y que no sea él mismo
         //Poner la posicion del segundo punto al del objeto
         
-        rayCast = Physics2D.Raycast(mousePos - Vector3.forward * cPrincipal.transform.position.z, mousePos, 15, capaInteractuable);
+        rayCast = Physics2D.Raycast(mousePos, Vector2.zero, 15, capaInteractuable);
 
         //Punto predeterminado
         lr.SetPosition(1, transform.position);

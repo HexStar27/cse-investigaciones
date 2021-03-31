@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8c8a17761300a47a3d3aa6320c0a96, type: 3}
+  m_Name: Select
+  m_EditorClassIdentifier: 
+  releaseSprite: {fileID: 21300000, guid: b8c17f396783e124fbbd9ce65a569ce5, type: 3}
+  grabSprite: {fileID: 21300000, guid: 4dad2035e378fe346bb372644090c45d, type: 3}
+  cadena: 'SELECT '
+  tipoBloque: 0
