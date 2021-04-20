@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8c8a17761300a47a3d3aa6320c0a96, type: 3}
   m_Name: Select
   m_EditorClassIdentifier: 
-  releaseSprite: {fileID: 21300000, guid: b8c17f396783e124fbbd9ce65a569ce5, type: 3}
+  releaseSprite: {fileID: 21300000, guid: a0f232ab665eae04db921566842ca255, type: 3}
   grabSprite: {fileID: 21300000, guid: 4dad2035e378fe346bb372644090c45d, type: 3}
   cadena: 'SELECT '
   tipoBloque: 0
