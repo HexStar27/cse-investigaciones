@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0795c1e2663c4349830b0bc14f763fe, type: 3}
+  m_Name: N_Duk'Zarist
+  m_EditorClassIdentifier: 
+  ventajasDesventajas:
+  - Resistencias excepcionales ~
+  - Desequilibrio hacia la oscuridad (+10 res contra oscuridad)
+  - Aguante a la muerte (siempre supera el estado de entre la vida y la muerte)
+  - "Curaci\xF3n r\xE1pida ~"
+  - Necesidades limitadas (tiene menos necesidad de comer y dormir)
+  - Presentir los oscuro y luminoso
+  - "Visi\xF3n nocturna (1/2 penalizaci\xF3n a oercepci\xF3n mientras est\xE9 en
+    la oscuridad)"
+  - "Devoci\xF3n al fuego (Si ps\xEDquico DEBE tener piroquinesis)"
+  - Cuerpos perfectos ~
+  - Alergia al metal (debe superar un control de 60/80 usando su presencia al tocar
+    el metal)
+  - Alma Inmortal

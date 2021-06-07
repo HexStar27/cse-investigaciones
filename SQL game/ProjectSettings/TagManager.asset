@@ -19,8 +19,8 @@ TagManager:
   - pin
   - nota
   - bloques
-  - listaUI
-  - 
+  - listaPistasUI
+  - consolaUI
   - 
   - 
   - 
@@ -41,6 +41,30 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Fondos
+    uniqueID: 1792395195
+    locked: 0
+  - name: Botones
+    uniqueID: 4048840269
+    locked: 0
+  - name: Elementos
+    uniqueID: 4237943335
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Ventanas
+    uniqueID: 1745649329
+    locked: 0
+  - name: Elem_Seleccionados
+    uniqueID: 3206645047
+    locked: 0
+  - name: Dialogo
+    uniqueID: 3636053475
+    locked: 0
+  - name: BotonesDeVentana
+    uniqueID: 513286929
+    locked: 0
+  - name: Pausa
+    uniqueID: 3566079229
     locked: 0

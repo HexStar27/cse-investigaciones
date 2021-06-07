@@ -8,11 +8,13 @@ public class Arrastrable2 : InteractuableSecuencia
     Vector3 startPos;
     Vector3 finalPos;
 
-    bool isHeld, limitEnabled;
+    bool isHeld;
 
     [Header("Límites de desplazamiento")]
     public Transform objetivo;
     private Vector3 posicion;
+    public bool usarWidth = false;
+    public bool usarHeight = false;
     public float width;
     public float height;
 
@@ -21,12 +23,8 @@ public class Arrastrable2 : InteractuableSecuencia
 
     protected virtual void OnEnable()
     {
-        if (objetivo != null)
-        {
-            posicion = objetivo.position;
-            limitEnabled = true;
-        }
-        else limitEnabled = false;
+        if (objetivo != null) posicion = objetivo.position;
+        else usarWidth = usarHeight = false;
     }
 
     protected virtual void Update()
@@ -35,14 +33,16 @@ public class Arrastrable2 : InteractuableSecuencia
         {
             mousePos = MousePosDetector.MousePos();
             finalPos = new Vector3(mousePos.x, mousePos.y, posZ) - startPos;
-            
-            if (limitEnabled)
+
+            if (usarWidth)
             {
                 if (finalPos.x < posicion.x - width)
                     finalPos.x = posicion.x - width;
                 else if (finalPos.x > posicion.x + width)
                     finalPos.x = posicion.x + width;
-
+            }
+            if (usarHeight)
+            {
                 if (finalPos.y < posicion.y - height)
                     finalPos.y = posicion.y - height;
                 else if (finalPos.y > posicion.y + height)

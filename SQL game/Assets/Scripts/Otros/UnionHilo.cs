@@ -36,6 +36,7 @@ public class UnionHilo : MonoBehaviour
                 Debug.LogWarning("Ese objeto debería poseer un LineRenderer. No pasa nada, ya lo he creado pero en un principio esto es un error de diseño y debería notificarse");
             }
         }
+        lr.positionCount = 2;
     }
 
     private void Update()

@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 319b33df33eb7664a90627a748a6d843, type: 3}
+  m_Name: DificultadGenerica
+  m_EditorClassIdentifier: 
+  intervalos: 140000002800000050000000780000008c000000b4000000f00000001801000040010000b8010000
+  descripciones:
+  - Son acciones normales, que todos realizamos a la primera sin ni siquiera tener
+    la necesidad de saber hacerlas.
+  - Cosas que todos estamos acostumbrados a realizar, como abrir una cerradura oxidada
+    sin problemas o recordar un simple tarareo.
+  - "Son cosas que la mera suerte no siempre te permite hacer y s\xF3lo alguien que
+    tenga conocimientos en la materia podr\xE1 realizar com\xFAnmente."
+  - Son actividades complejas por naturaleza, como subir por una pared escarpada
+    sin ayuda o realizar malabares circenses.
+  - "Es el l\xEDmite de dificultad que pueden alcanzar las personas normales. S\xF3lo
+    los mejores expertos podr\xE1n realizarlas sin problemas, y siempre dejando boquiabiertos
+    a quienes les observen."
+  - "\xDAnicamente los grandes campeones o los superdotados podr\xEDan llegar a realizarlas
+    con habitualidad, aunque no sin cierto esfuerzo."
+  - "Son actos que s\xF3lo un gran campe\xF3n o el h\xE9roe de la pel\xEDcula consiguen
+    en el momento cr\xEDtico, como correr por un puente que se derrumba apoy\xE1ndose
+    en las piedras que est\xE1n cayendo y realizar un incre\xEDble salto final."
+  - "Un experto necesitar\xE1 tener el momento m\xE1s brillante de su carrera para
+    conseguir algo imposible, como correr los cien metros por debajo de 8 segundos
+    con cota de mallas o esquivar una bala no por suerte, sino vi\xE9ndola venir
+    y calculando su trayectoria."
+  - "Son cosas que van en contra de la l\xF3gica de una manera limitada, como levantar
+    una camioneta a pulso, subir a un tercer piso de un salto o correr entre una
+    lluvia de balas de alta velocidad esquiv\xE1ndolas sin problemas."
+  - "Son actos que de por s\xED rompen totalmente la l\xF3gica de aquello que llamamos
+    realidad, como recorrer m\xE1s de mil metros por debajo de un segundo o saltarlos
+    verticalmente sin preparaci\xF3n."

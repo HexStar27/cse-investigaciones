@@ -64,6 +64,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Bloques\BloqueDeConsulta.cs" />
+    <Compile Include="Assets\Scripts\Bloques\BloqueElemento.cs" />
+    <Compile Include="Assets\Scripts\Bloques\QueryReader.cs" />
     <Compile Include="Assets\Scripts\Bloques\ScriptableBlock.cs" />
     <Compile Include="Assets\Scripts\Bloques\Slot.cs" />
     <Compile Include="Assets\Scripts\Botones\Arrastrable.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Assets\Scripts\Otros\MultipleClueNoteSelector.cs" />
     <Compile Include="Assets\Scripts\Otros\NotaElemento.cs" />
     <Compile Include="Assets\Scripts\Otros\PositionLimiter.cs" />
+    <Compile Include="Assets\Scripts\Otros\TransformModifier.cs" />
     <Compile Include="Assets\Scripts\Otros\UnionHilo.cs" />
     <Compile Include="Assets\Scripts\Sobre Camara\CameraDisplacement.cs" />
     <Compile Include="Assets\Scripts\Sobre Camara\CanvasSmoothMove.cs" />

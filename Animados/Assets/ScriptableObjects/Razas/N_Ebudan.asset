@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0795c1e2663c4349830b0bc14f763fe, type: 3}
+  m_Name: N_Ebudan
+  m_EditorClassIdentifier: 
+  ventajasDesventajas:
+  - Or'Inie (+30 resistencia contra elementos que impidan realizarse)
+  - "Alas de Seraf\xEDn (Vuelo 12 cuando haya alcanzado su sue\xF1o)"
+  - "Esencia celestial (Invulnerable a cualquier ataque natural cuando haya alcanzado
+    su sue\xF1o)"
+  - Alma Inmortal

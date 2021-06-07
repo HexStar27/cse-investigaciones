@@ -10,4 +10,6 @@ public interface IListaUIElement
     void AsignarLista(ListaUI lui);
 
     void DesreferenciarLista();
+
+    GameObject Contenido();
 }
