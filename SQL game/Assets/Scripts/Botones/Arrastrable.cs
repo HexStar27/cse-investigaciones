@@ -6,6 +6,7 @@ public class Arrastrable : MonoBehaviour
     public float posZ = 0;
 
     [Header("Límites de desplazamiento")]
+    public bool usarLimite = false;
     public Transform objetivo;
     private Vector3 posicion;
     public float width;
@@ -25,7 +26,7 @@ public class Arrastrable : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Este objeto debería tener una referencia a un transform para poder fijar el límite del desplazamiento");
+            if(usarLimite) Debug.LogError("Este objeto debería tener una referencia a un transform para poder fijar el límite del desplazamiento");
             posicion = Vector3.zero;
         }
     }
@@ -37,15 +38,18 @@ public class Arrastrable : MonoBehaviour
             mousePos = MousePosDetector.MousePos();
             finalPos = new Vector3(mousePos.x, mousePos.y, posZ) - startPos;
 
-            if(finalPos.x < posicion.x - width)
-                finalPos.x = posicion.x - width;
-            else if(finalPos.x > posicion.x + width)
-                finalPos.x = posicion.x + width;
-            
-            if (finalPos.y < posicion.y - height)
-                finalPos.y = posicion.y - height;
-            else if (finalPos.y > posicion.y + height)
-                finalPos.y = posicion.y + height;
+            if(usarLimite)
+            {
+                if (finalPos.x < posicion.x - width)
+                    finalPos.x = posicion.x - width;
+                else if (finalPos.x > posicion.x + width)
+                    finalPos.x = posicion.x + width;
+
+                if (finalPos.y < posicion.y - height)
+                    finalPos.y = posicion.y - height;
+                else if (finalPos.y > posicion.y + height)
+                    finalPos.y = posicion.y + height;
+            }
             
             transform.position = finalPos;
         }

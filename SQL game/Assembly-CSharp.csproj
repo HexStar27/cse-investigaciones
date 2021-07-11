@@ -63,11 +63,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Bloques\Bloque.cs" />
+    <Compile Include="Assets\Scripts\Bloques\BloqueController.cs" />
     <Compile Include="Assets\Scripts\Bloques\BloqueDeConsulta.cs" />
-    <Compile Include="Assets\Scripts\Bloques\BloqueElemento.cs" />
+    <Compile Include="Assets\Scripts\Bloques\IBloque.cs" />
     <Compile Include="Assets\Scripts\Bloques\QueryReader.cs" />
     <Compile Include="Assets\Scripts\Bloques\ScriptableBlock.cs" />
     <Compile Include="Assets\Scripts\Bloques\Slot.cs" />
+    <Compile Include="Assets\Scripts\Bloques\TextoBloque.cs" />
+    <Compile Include="Assets\Scripts\Bloques\Tipos de bloques\BloqueElemento.cs" />
+    <Compile Include="Assets\Scripts\Bloques\Tipos de bloques\BloqueFuncion.cs" />
+    <Compile Include="Assets\Scripts\Bloques\Tipos de bloques\BloqueOperador.cs" />
     <Compile Include="Assets\Scripts\Botones\Arrastrable.cs" />
     <Compile Include="Assets\Scripts\Botones\Arrastrable2.cs" />
     <Compile Include="Assets\Scripts\Botones\Boton.cs" />
@@ -75,6 +81,8 @@
     <Compile Include="Assets\Scripts\Botones\Interactuable1.cs" />
     <Compile Include="Assets\Scripts\Botones\InteractuableSecuencia.cs" />
     <Compile Include="Assets\Scripts\Botones\Interruptor.cs" />
+    <Compile Include="Assets\Scripts\Camara\CameraDisplacement.cs" />
+    <Compile Include="Assets\Scripts\Camara\CanvasSmoothMove.cs" />
     <Compile Include="Assets\Scripts\Contenedores\ListaUI\ListaUI.cs" />
     <Compile Include="Assets\Scripts\Contenedores\ListaUI\ListaUIElement.cs" />
     <Compile Include="Assets\Scripts\Contenedores\ObjectPool.cs" />
@@ -89,8 +97,6 @@
     <Compile Include="Assets\Scripts\Otros\PositionLimiter.cs" />
     <Compile Include="Assets\Scripts\Otros\TransformModifier.cs" />
     <Compile Include="Assets\Scripts\Otros\UnionHilo.cs" />
-    <Compile Include="Assets\Scripts\Sobre Camara\CameraDisplacement.cs" />
-    <Compile Include="Assets\Scripts\Sobre Camara\CanvasSmoothMove.cs" />
     <Compile Include="Assets\Scripts\TinCan\StatementSenderExample.cs" />
     <Compile Include="Assets\Scripts\Uso de SQLite\SQLiteTest.cs" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

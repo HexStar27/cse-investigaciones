@@ -41,6 +41,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Elem_Colocados
+    uniqueID: 1932299477
+    locked: 0
   - name: Fondos
     uniqueID: 1792395195
     locked: 0

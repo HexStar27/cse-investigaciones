@@ -24,7 +24,7 @@ public class BloqueDeConsulta : Arrastrable
 
         if (slotFijado)
         {
-            spriteRenderer.sprite = contenidoBloque.releaseSprite;
+            spriteRenderer.sprite = contenidoBloque.dropSprite;
             bc.size = sizeWhileReleased;
         }
         else
@@ -84,7 +84,7 @@ public class BloqueDeConsulta : Arrastrable
 
         if (slotFijado)
         {
-            spriteRenderer.sprite = contenidoBloque.releaseSprite;
+            spriteRenderer.sprite = contenidoBloque.dropSprite;
             bc.size = sizeWhileReleased;
         }
     }
@@ -116,25 +116,7 @@ public class BloqueDeConsulta : Arrastrable
     {
         string trozoConsulta = contenidoBloque.cadena;
 
-        //También debe unir el resto de parted del bloque según el tipo
-
-        switch(contenidoBloque.tipoBloque)
-        {
-            case ScriptableBlock.TipoBloque.CampoColumna:
-                //Añade a trozoConsulta los nombres de las columnas
-
-                break;
-            case ScriptableBlock.TipoBloque.CampoTabla:
-                //Añade a trozoConsulta los nombres de las tablas
-                
-                break;
-            case ScriptableBlock.TipoBloque.CampoBloque:
-                //Añade a trozoConsulta el conjunto de trozos de los bloques anidados
-                
-                break;
-            default: //Aquí en tra el tipo "sin campo" porque no necesita cambios
-                break;
-        }
+        //También debe unir el resto de parte del bloque según el tipo
 
         slot.AsignarTrozoConsulta(trozoConsulta);
     }
