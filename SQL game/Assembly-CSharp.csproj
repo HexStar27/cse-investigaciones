@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\Bloques\Bloque.cs" />
     <Compile Include="Assets\Scripts\Bloques\BloqueController.cs" />
     <Compile Include="Assets\Scripts\Bloques\BloqueDeConsulta.cs" />
+    <Compile Include="Assets\Scripts\Bloques\FlechaNido.cs" />
     <Compile Include="Assets\Scripts\Bloques\IBloque.cs" />
     <Compile Include="Assets\Scripts\Bloques\QueryReader.cs" />
     <Compile Include="Assets\Scripts\Bloques\ScriptableBlock.cs" />
@@ -90,6 +91,8 @@
     <Compile Include="Assets\Scripts\Controladores\GameManager.cs" />
     <Compile Include="Assets\Scripts\Controladores\MainMenuOp.cs" />
     <Compile Include="Assets\Scripts\Controladores\SlotController.cs" />
+    <Compile Include="Assets\Scripts\Controladores\Sonido\BankSound.cs" />
+    <Compile Include="Assets\Scripts\Controladores\Sonido\VolumeControl.cs" />
     <Compile Include="Assets\Scripts\Otros\CasoMapaItem.cs" />
     <Compile Include="Assets\Scripts\Otros\MousePosDetector.cs" />
     <Compile Include="Assets\Scripts\Otros\MultipleClueNoteSelector.cs" />

@@ -9,4 +9,5 @@ public class ScriptableBlock : ScriptableObject
     public Sprite dropSprite;
     public Sprite grabSprite;
     public string cadena;
+    public string finDelimitador;
 }

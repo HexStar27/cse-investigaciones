@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
 
 public class Bloque : Arrastrable2
 {
@@ -9,8 +11,8 @@ public class Bloque : Arrastrable2
     private SpriteRenderer sr;
     private BoxCollider2D bc;
 
-    protected static string elemento = "Elementos";
-    protected static string elementoColocado = "Elem_Colocados";
+    public static string elemento = "Elementos";
+    public static string elementoColocado = "Elem_Colocados";
     protected static string bloqueLayer = "bloques";
 
     /// Funciones a implementar:
@@ -26,6 +28,8 @@ public class Bloque : Arrastrable2
 
     protected override void OnEnable()
     {
+        if (accionAlInteractuar_.Count < 2) accionAlInteractuar_ = new List<UnityEvent>(2);
+
         base.OnEnable();
 
         if (sr == null) if (!TryGetComponent(out sr)) sr = gameObject.AddComponent<SpriteRenderer>();

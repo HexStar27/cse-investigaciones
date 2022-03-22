@@ -73,11 +73,15 @@ public class BloqueElemento : Bloque , IBloque
             if (transform.GetChild(0).TryGetComponent(out contenido)) cad = contenido.Texto();
         }
         else if (contenido != null) cad = contenido.Texto();
-        
-        cad += " ";
 
         if (Siguiente() != null)
+        {
+            if (Siguiente() is BloqueElemento) cad += ", ";
+            else cad += " ";
+
             cad += Siguiente().TrozoCadena();
+        }
+        else cad += " ";
         //Este bloque no tiene anidados así que no hace falta ponerlo aquí
 
         return cad;
@@ -133,7 +137,12 @@ public class BloqueElemento : Bloque , IBloque
                 b.CambiarSpriteLayer(elemento);
             }
         }
-        if (este.Anterior() == null) MostrarTexto(false);
+        if (este.Anterior() == null) 
+        {
+            if (BloqueController.UnidoA(este)) MostrarTexto(true);
+            else MostrarTexto(false);
+        }
         else MostrarTexto(true);
+
     }
 }

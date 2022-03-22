@@ -65,11 +65,14 @@ public class BloqueOperador : Bloque, IBloque
 
     public string TrozoCadena()
     {
-        string cad = scriptableBlock.cadena + " ";
+        string cad = "";
         if (Anidado(0) != null)
             cad += Anidado(0).TrozoCadena();
+
+        cad += scriptableBlock.cadena + " ";
+        
         if (Anidado(1) != null)
-            cad += Anidado(1).Longitud();
+            cad += Anidado(1).TrozoCadena();
 
         if (Siguiente() != null)
             cad += Siguiente().TrozoCadena();

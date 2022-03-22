@@ -56,6 +56,8 @@ public class BloqueFuncion : Bloque, IBloque
         if (Anidado() != null)
             cad += Anidado().TrozoCadena();
 
+        cad += scriptableBlock.finDelimitador;
+
         if (Siguiente() != null)
             cad += Siguiente().TrozoCadena();
 
