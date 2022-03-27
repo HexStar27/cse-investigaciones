@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6818434306905307480}
   - component: {fileID: 7579604855491294973}
   - component: {fileID: 5680408283269202487}
+  - component: {fileID: 8027589701332174949}
   m_Layer: 0
   m_Name: Reloj
   m_TagString: Untagged
@@ -86,6 +87,20 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &8027589701332174949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6184604802779784162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54711a0078cecbe49bf690ae2bf891f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  contenedor: {fileID: 6419116683787281265}
+  contenido: 
 --- !u!1 &6419116683787281264
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,8 @@ using UnityEngine.Events;
 public class CameraState : MonoBehaviour
 {
     [System.Serializable]
-    public class OnFinished : UnityEvent { }
+    public class OnVoid : UnityEvent { }
+    public class OnState : UnityEvent<int> { }
 
     [System.Serializable]
     private struct Estado
@@ -17,7 +18,8 @@ public class CameraState : MonoBehaviour
     [SerializeField] private Transform cam;
     public float speed = 1.0f;
     [SerializeField] private List<Estado> estados = new List<Estado>();
-    public OnFinished onFinished;
+    public OnVoid onFinished = new OnVoid();
+    public OnState onStarting = new OnState();
 
     private int objetivo;
     private Estado oldE;
@@ -38,6 +40,7 @@ public class CameraState : MonoBehaviour
         objetivo = estado;
         timer = 0.0f;
         finished = false;
+        onStarting.Invoke(estado);
     }
 
     public int GetState()
