@@ -2,20 +2,21 @@
 /// Al cambiar el estado se está indicando que se está pasando a ese evento del juego.
 ////////////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using UnityEngine;
-using UnityEngine.Events;
 
 public class GameplayCycle : MonoBehaviour
 {
-	public class CoreEvent : UnityEvent { };
-	CoreEvent[] coreBehabiour;
+	[SerializeField] DayCounter _dayCounter;
+
+	Action[] _coreBehabiour = new Action[3];
 	int estadoActual = 0;
 	
 	public void SetState(int estado)
 	{
-		if (estado > 0 && estado < coreBehabiour.Length) {
+		if (estado >= 0 && estado < _coreBehabiour.Length) {
 			estadoActual = estado;
-			coreBehabiour[estado].Invoke();
+			_coreBehabiour[estado]();
 		}
 	}
 
@@ -26,13 +27,13 @@ public class GameplayCycle : MonoBehaviour
 
 	private void InicioDia()
 	{
-		int dia = ResourceManager.Dia;
+		int dia = ++ResourceManager.Dia;
 		//MostrarDía => al terminar... => Saludo de NPC
-		
+		_dayCounter.InitAnimation(dia-1,dia);
 		//Cargar casos disponibles
 
-		//Establecer número de agentes al inicial el día
-		if (dia == 0)
+		//Establecer número de agentes al inicial el primer día
+		if (dia == 1)
 		{
 			ResourceManager.AgentesDisponibles = ResourceManager.agentesInciales;
 		}
@@ -50,18 +51,10 @@ public class GameplayCycle : MonoBehaviour
 
 	}
 
-	private void OnEnable()
+	private void Awake()
 	{
-		coreBehabiour[0].AddListener(InicioDia);
-		coreBehabiour[1].AddListener(InicioCaso);
-		coreBehabiour[2].AddListener(FinCaso);
-	}
-
-	private void OnDisable()
-	{
-		foreach (var evento in coreBehabiour)
-		{
-			evento.RemoveAllListeners();
-		}
+		_coreBehabiour[0] = InicioDia;
+		_coreBehabiour[1] = InicioCaso;
+		_coreBehabiour[2] = FinCaso;
 	}
 }

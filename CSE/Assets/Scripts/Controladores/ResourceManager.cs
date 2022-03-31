@@ -14,63 +14,63 @@ public class ResourceManager : MonoBehaviour
     private static int dia;
 
     public class OnEvent : UnityEvent { }
-    public static OnEvent OnOutOfAgents;
-    public static OnEvent OnOutOfQueries;
+    public static OnEvent OnOutOfAgents = new OnEvent();
+    public static OnEvent OnOutOfQueries = new OnEvent();
 
     public static int AgentesDisponibles
     {
         get => agentesDisponibles; set
         {
+            agentesDisponibles = value;
             if (agentesDisponibles <= 0)
             {
                 agentesDisponibles = 0;
                 OnOutOfAgents.Invoke();
             }
-            else agentesDisponibles = value;
         }
     }
     public static int ConsultasDisponibles
     {
         get => consultasDisponibles; set
         {
-            if(consultasDisponibles <= 0)
+            consultasDisponibles = value;
+            if (consultasDisponibles <= 0)
             {
                 consultasDisponibles = 0;
                 OnOutOfQueries.Invoke();
             }
-            else consultasDisponibles = value;
         }
     }
     public static int ConsultasMaximas
     {
         get => consultasMaximas; set
         {
-            if (consultasMaximas <= 0) consultasMaximas = 0;
-            else consultasMaximas = value;
+            consultasMaximas = value;
+            if (consultasMaximas < 0) consultasMaximas = 0;
         }
     }
     public static int CasosCompletados
     {
         get => casosCompletados; set
         {
-            if (casosCompletados <= 0) casosCompletados = 0;
-            else casosCompletados = value;
+            casosCompletados = value;
+            if (casosCompletados < 0) casosCompletados = 0;
         }
     }
     public static int DificultadActual
     {
         get => dificultadActual; set
         {
-            if (dificultadActual <= 0) dificultadActual = 0;
-            else dificultadActual = value;
+            dificultadActual = value;
+            if (dificultadActual < 0) dificultadActual = 0;
         }
     }
     public static int Puntuacion
     {
         get => puntuacion; set
         {
-            if (puntuacion <= 0) puntuacion = 0;
-            else puntuacion = value;
+            puntuacion = value;
+            if (puntuacion < 0) puntuacion = 0;
         }
     }
     public static int Dia
@@ -78,8 +78,8 @@ public class ResourceManager : MonoBehaviour
         get => dia;
         set
         {
+            dia = value;
             if (dia < 0) dia = 0;
-            else dia = value;
         }
     }
 

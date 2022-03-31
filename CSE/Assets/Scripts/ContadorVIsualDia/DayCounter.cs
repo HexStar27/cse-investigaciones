@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
@@ -7,7 +6,7 @@ public class DayCounter : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI actual,siguiente;
     [SerializeField] Animator anim;
-    public string start = "Play", shrink = "Shrink";
+    public string start = "Play";
 
     private bool locked = false;
 
@@ -18,12 +17,6 @@ public class DayCounter : MonoBehaviour
         siguiente.text = toDay.ToString();
         anim.enabled = true;
         anim.SetTrigger(start);
-    }
-
-    public void InitShrink()
-    {
-        anim.enabled = true;
-        anim.SetTrigger(shrink);
     }
 
     public void TestFunc()
