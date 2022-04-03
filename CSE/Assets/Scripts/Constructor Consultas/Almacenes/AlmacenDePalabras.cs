@@ -26,6 +26,9 @@ namespace Hexstar.CSE
             palabras[1][2] = "vnt_id";
             palabras[1][3] = "Tabla: clientes";
             palabras[1][4] = "clt_id";
+            palabras[2] = new string[2];
+            palabras[2][0] = "Pista Debug";
+            palabras[2][1] = "Ekisde";
         }
 
         public string[] GetLista(TabType tab)

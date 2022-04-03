@@ -3,7 +3,27 @@ guid: bee9ef0244f2bb3419525557ca1eb62d
 ModelImporter:
   serializedVersion: 19301
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EscritorioCSE #1
+    second: {fileID: 2100000, guid: b47809a23e81572489dbcfbe6b2ebffb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EscritorioCSE #6
+    second: {fileID: 2100000, guid: f5d9bb1c62720f940bb6e7a28f8bc94a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EscritorioCSE #7
+    second: {fileID: 2100000, guid: 5a9230b1acd40f54ebeaa7a484107a87, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EscritorioCSE #8
+    second: {fileID: 2100000, guid: b77c4b26563240d40aad026ba854aa8a, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
