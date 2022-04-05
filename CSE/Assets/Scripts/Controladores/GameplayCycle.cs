@@ -4,6 +4,7 @@
 
 using System;
 using UnityEngine;
+using Hexstar.CSE;
 
 public class GameplayCycle : MonoBehaviour
 {
@@ -54,7 +55,7 @@ public class GameplayCycle : MonoBehaviour
 		//Cambiar la música (probablemente)
 
 		//Mostrar pistas en cajón de pistas
-
+		CajonPistas.instancia.RellenarCajonConCasoActivo();
 	}
 
 	private void FinCaso()

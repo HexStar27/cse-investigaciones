@@ -19,5 +19,8 @@ MonoBehaviour:
   titulo: Caso de Prueba
   resumen: Este caso sirve para pver si el resto de cosas funcionan bien.
   pistas:
-  - Pista de prueba
+  - titulo: Titulo de pista de prueba
+    descripcion: "Esta pista es una pista de prueba, y esto es espec\xEDficamente
+      su descripci\xF3n"
+    palabra: "Oleeeee, VIVA ESPA\xD1A, COJONMEEE"
   efectos: 00000000

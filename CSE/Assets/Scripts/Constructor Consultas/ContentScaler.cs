@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿///Reordena y coloca verticalmente todos sus hijos equidistantemente :v
+
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(RectTransform))]

@@ -33,7 +33,9 @@ public class InscryptionLikeCameraState : MonoBehaviour
     {
         if (ready)
         {
-            if (Input.GetKeyDown(KeyCode.W))
+            float scrollDelta = Input.mouseScrollDelta.y;
+
+            if (Input.GetKeyDown(KeyCode.W) || scrollDelta > 0)
             {
                 int n = camS.States();
                 estadoActual++;
@@ -45,7 +47,7 @@ public class InscryptionLikeCameraState : MonoBehaviour
                 camS.Transition(estadoActual);
                 ready = false;
             }
-            else if (Input.GetKeyDown(KeyCode.S))
+            else if (Input.GetKeyDown(KeyCode.S) || scrollDelta < 0)
             {
                 int n = camS.States();
                 estadoActual--;

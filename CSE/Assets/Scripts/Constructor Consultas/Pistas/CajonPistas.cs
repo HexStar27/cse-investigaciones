@@ -10,7 +10,9 @@ namespace Hexstar.CSE
         public static CajonPistas instancia;
         private List<ElementoPista> pistas = new List<ElementoPista>();
         public ContentScaler content;
+        public Transform content2;
         public DescripcionPista descripcionMesh;
+        public GameObject pistaPrefab;
 
         private void Awake()
         {
@@ -46,11 +48,27 @@ namespace Hexstar.CSE
             descripcionMesh.gameObject.SetActive(false);
         }
 
-        public void IntroducirPista(ElementoPista pista, bool actualizar = false)
+        public void RellenarCajonConCasoActivo()
+        {
+            int n = PuzzleManager.Instance.casoActivo.pistas.Length;
+            ElementoPista o;
+
+            Transform t = content!=null ? content.transform : content2;
+
+            for (int i = 0; i < n; i++)
+            {
+                o = Instantiate(pistaPrefab,t).GetComponent<ElementoPista>();
+                o.Inicializar(PuzzleManager.Instance.casoActivo.pistas[i]);
+                IntroducirPista(o, t);
+            }
+            //ActualizarElementosRelacionados(); //TODO: Descomentar cuando tenga peusto el Selector de palabras
+        }
+
+        public void IntroducirPista(ElementoPista pista, Transform t, bool actualizar = false)
         {
             pistas.Add(pista);
-            pista.transform.SetParent(content.transform);
-            content.Actualizar();
+            pista.transform.SetParent(t);
+            if(content !=null) content.Actualizar();
             if (actualizar) ActualizarElementosRelacionados();
         }
 
@@ -58,7 +76,7 @@ namespace Hexstar.CSE
         {
             pistas.Remove(pista);
             Destroy(pista.gameObject);
-            content.Actualizar();
+            if (content != null) content.Actualizar();
             if(actualizar)ActualizarElementosRelacionados();
         }
 
@@ -71,8 +89,10 @@ namespace Hexstar.CSE
                 Destroy(pistas[i].gameObject);
             }
             pistas.Clear();
-            content.Actualizar();
+            if (content != null) content.Actualizar();
             ActualizarElementosRelacionados();
+
+            //TODO: No eliminar los casos que sean de historia
         }
 
         //Tanto introducir como eliminar pista se van a encargar de modificar 

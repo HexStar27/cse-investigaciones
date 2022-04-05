@@ -9,8 +9,9 @@ using UnityEngine;
 using Hexstar.CSE;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
-public class CasoMapa : MonoBehaviour
+public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 	public Caso caso;
 	[HideInInspector] public CasoDescripcion menuHover;
@@ -22,16 +23,26 @@ public class CasoMapa : MonoBehaviour
 		if(SePuedeComprar())
 		{
 			int p = (int)TabType.Pistas;
-			int n = almacenPalabras.palabras[p].Length;
-			caso.pistas.CopyTo(almacenPalabras.palabras[p], n);
+			int n = caso.pistas.Length;
+			int m = almacenPalabras.palabras[p].Length;
+			string[] palabras = new string[n+m];
+			for(int i = 0; i < n; i++)
+			{
+				palabras[i] = caso.pistas[i].palabra;
+			}
+			almacenPalabras.palabras[p].CopyTo(palabras, n);
+			almacenPalabras.palabras[p] = palabras;	
 
+			menuHover.Abrir(false);
 			PuzzleManager.Instance.casoActivo = caso;
+			ResourceManager.AgentesDisponibles -= caso.coste;
 			GameplayCycle.Instance.SetState(1); // Inicio Caso
 
 			Destroy(gameObject);
 		}
 		else
 		{
+			Debug.Log("No se puede :(");
 			// Todo: Efecto de sonido o algo indicando que no puede hacer la acción.
 		}
 	}
@@ -41,20 +52,20 @@ public class CasoMapa : MonoBehaviour
 		return caso.coste <= ResourceManager.AgentesDisponibles;
 	}
 
-	private void OnMouseEnter()
-	{
-		Debug.Log("Ekis");
-		menuHover.LeerCaso(caso);
-		menuHover.Abrir(true);
-	}
-	private void OnMouseExit()
-	{
-		menuHover.Abrir(false);
-		Debug.Log("De");
-	}
 	public void EstablecerSprite(Sprite sprite)
 	{
 		GetComponent<Image>().sprite = sprite;
 		coste.SetText(caso.coste.ToString());
+	}
+
+	public void OnPointerEnter(PointerEventData eventData)
+	{
+		menuHover.LeerCaso(caso);
+		menuHover.Abrir(true);
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		menuHover.Abrir(false);
 	}
 }
