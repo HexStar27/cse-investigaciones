@@ -22,11 +22,19 @@ public class PuzzleManager : MonoBehaviour
 
 	public GameObject casoMapaPrefab;
 
+	/// <summary>
+	/// Añade casos a la lista
+	/// </summary>
+	/// <param name="n"></param>
 	public void LoadCasos(int n)
 	{
 		//1º Acceder a servidor pidiendo n casos ( usando el ConexionHanlder )
 		//2º Parsear datos
 		//3º Crear casos
+		for(int i = 0; i < n; i++)
+		{
+			casosCargados.Add(new Caso()); //Esto habrá que cambiarlo para que meta los casos obtenidos.
+		}
 	}
 
 	public void LoadCasoExamen()

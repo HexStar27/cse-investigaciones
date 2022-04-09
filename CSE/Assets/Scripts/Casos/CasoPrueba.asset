@@ -17,7 +17,7 @@ MonoBehaviour:
   coste: 1
   examen: 0
   titulo: Caso de Prueba
-  resumen: Este caso sirve para pver si el resto de cosas funcionan bien.
+  resumen: Este caso sirve para ver si el resto de cosas funcionan bien.
   pistas:
   - titulo: Titulo de pista de prueba
     descripcion: "Esta pista es una pista de prueba, y esto es espec\xEDficamente

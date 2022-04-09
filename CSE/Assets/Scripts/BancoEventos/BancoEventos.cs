@@ -7,7 +7,7 @@ namespace Hexstar
 	class BancoEventos:MonoBehaviour
 	{
 
-		protected Dictionary<string, object> banco = new Dictionary<string, object>();
+		protected List<Evento> banco = new List<Evento>();
 
 		private static BancoEventos instance_;
 		public static BancoEventos instance() { return instance_; }
@@ -22,10 +22,9 @@ namespace Hexstar
 		/// </summary>
 		/// <param name="eventName">name of the event</param>
 		/// <returns>value</returns>
-		public object Get(string eventName)
+		public Evento Get(int eventIndex)
 		{
-			if(banco.TryGetValue(eventName, out object value)) return value;
-			else return null;
+			return banco[eventIndex];
 		}
 
 		/// <summary>
@@ -33,41 +32,22 @@ namespace Hexstar
 		/// </summary>
 		/// <param name="eventName">name of event</param>
 		/// <param name="value">value of event</param>
-		public void Set(string eventName, object value = null)
+		public void Set( Evento newEvent)
 		{
-			if (banco.ContainsKey(eventName)) banco[eventName] = value;
-			else banco.Add(eventName, value);
-		}
-
-		/// <summary>
-		/// Delete the event from the bank
-		/// </summary>
-		/// <param name="eventName">name of event</param>
-		/// <returns>Whether the event was found or not</returns>
-		public bool Delete(string eventName)
-		{
-			return banco.Remove(eventName);
-		}
-
-		/// <summary>
-		/// Save the data of the bank in a file (possibly in /Documents xD)
-		/// </summary>
-		/// <param name="fileName">name of the file :v</param>
-		/// <returns>Whether was possible to save into a file or not</returns>
-		public bool Save(string fileName)
-		{
-			//Implementar algo pa que guarde en los documentos los valores de cada evento (probablemente serializado o algo)
-
-			return false;
+			banco.Add(newEvent);
 		}
 
 		/// <summary>
 		/// Delete all event in the bank
 		/// </summary>
-		public void DeleteAll()
+		public void Clear()
 		{
 			banco.Clear();
 		}
 
+		public int Count()
+		{
+			return banco.Count;
+		}
 	}
 }

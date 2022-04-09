@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 392489137639133958}
   - component: {fileID: 596190820490782978}
   - component: {fileID: 1566547577}
+  - component: {fileID: 8892970283677600362}
   m_Layer: 0
   m_Name: MANAGER
   m_TagString: Untagged
@@ -71,17 +72,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   almacen: {fileID: 596190820490782978}
-  casoActivo:
-    id: 0
-    dif: 0
-    coste: 0
-    examen: 0
-    titulo: 
-    resumen: 
-    pistas: []
-    efectos: 
+  casosCargados:
+  - {fileID: 11400000, guid: 015679049fb3a1a449e3cacf420c63a8, type: 2}
+  casoActivo: {fileID: 0}
   _map: {fileID: 0}
   _descriptor: {fileID: 0}
   spriteCaso: {fileID: 21300038, guid: fd419bef7a36af8459a810bc72573105, type: 3}
   spriteCasoExamen: {fileID: 21300030, guid: fd419bef7a36af8459a810bc72573105, type: 3}
-  casoMapaPrefab: {fileID: 0}
+  casoMapaPrefab: {fileID: 3357576507491219680, guid: fbdb36eb7430d3848b80820f4edf025d,
+    type: 3}
+--- !u!114 &8892970283677600362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7738949445842451286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403281dc6827ebf4ca2e5a5a3cd50252, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

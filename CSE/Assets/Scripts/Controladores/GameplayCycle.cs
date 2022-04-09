@@ -30,24 +30,33 @@ public class GameplayCycle : MonoBehaviour
 
 	private void InicioDia()
 	{
+		//Creo que voy a tener que hacer esta parte con async y demás, para tener las cosas más en orden
 		int dia = ++ResourceManager.Dia;
-		//MostrarDía => al terminar... => Saludo de NPC
-		_dayCounter.InitAnimation(dia-1,dia);
 
-		//Establecer número de agentes al inicial el primer día
 		if (dia == 1)
 		{
+			ResourceManager.ConsultasMaximas = 4;
+			OperacionesGameplay.Instancia.CargarEventos();
+			//Establecer número de agentes al inicial el primer día
 			ResourceManager.AgentesDisponibles = ResourceManager.agentesInciales;
 		}
+		else //El resto de días
+		{
+			OperacionesGameplay.Instancia.EjecutarEventoAleatorio();
+		}
+
+		//MostrarDía => al terminar... => Saludo de NPC
+		_dayCounter.InitAnimation(dia - 1, dia);
+
 		//Establecer consultas disponibles
 		ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
 
 		//Cargar los casos disponibles
-		PuzzleManager.Instance.LoadCasos(4 + ResourceManager.DificultadActual);
+		PuzzleManager.Instance.QuitarTodos();
+		PuzzleManager.Instance.LoadCasos(ResourceManager.ConsultasMaximas);
 		PuzzleManager.Instance.MostrarCasosEnPantalla();
 		
 		//Cargar caso examen si necesario
-
 	}
 
 	private void InicioCaso()
@@ -60,10 +69,21 @@ public class GameplayCycle : MonoBehaviour
 
 	private void FinCaso()
 	{
+		//Creo que voy a tener que hacer esta parte con async y demás, para tener las cosas más en orden
+
 		//Ver si lo ha completado o no
 
 		//Otorgar efectos correspondientes
 
+		//Rellenar mapa con el caso que falta
+		PuzzleManager.Instance.LoadCasos(1);
+		PuzzleManager.Instance.MostrarCasosEnPantalla();
+
+		//Iniciar siguiente día si no quedan consultas disponibles después de aplicar efectos
+		if(ResourceManager.ConsultasDisponibles == 0)
+		{
+			SetState(0);
+		}
 	}
 
 	private void Awake()

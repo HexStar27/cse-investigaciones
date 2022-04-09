@@ -61,7 +61,7 @@ namespace Hexstar.CSE
                 o.Inicializar(PuzzleManager.Instance.casoActivo.pistas[i]);
                 IntroducirPista(o, t);
             }
-            //ActualizarElementosRelacionados(); //TODO: Descomentar cuando tenga peusto el Selector de palabras
+            //ActualizarElementosRelacionados(); //TODO: Descomentar cuando tenga puesto el Selector de palabras
         }
 
         public void IntroducirPista(ElementoPista pista, Transform t, bool actualizar = false)

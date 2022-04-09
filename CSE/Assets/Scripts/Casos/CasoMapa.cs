@@ -18,11 +18,14 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	[HideInInspector] public AlmacenDePalabras almacenPalabras;
 	public TextMeshProUGUI coste;
 
+	private static readonly int casoEmpezado = 1;
+
 	public void Comprar()
 	{
 		if(SePuedeComprar())
 		{
 			int p = (int)TabType.Pistas;
+			if (caso.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
 			int n = caso.pistas.Length;
 			int m = almacenPalabras.palabras[p].Length;
 			string[] palabras = new string[n+m];
@@ -49,7 +52,7 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 	private bool SePuedeComprar()
 	{
-		return caso.coste <= ResourceManager.AgentesDisponibles;
+		return caso.coste <= ResourceManager.AgentesDisponibles && GameplayCycle.Instance.GetState() != casoEmpezado;
 	}
 
 	public void EstablecerSprite(Sprite sprite)
