@@ -3,6 +3,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Hexstar.CSE;
+using Hexstar;
+using UnityEngine.Networking;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -29,19 +31,40 @@ public class PuzzleManager : MonoBehaviour
 	public void LoadCasos(int n)
 	{
 		//1º Acceder a servidor pidiendo n casos ( usando el ConexionHanlder )
-		//2º Parsear datos
-		//3º Crear casos
-		for(int i = 0; i < n; i++)
+		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
+		Dictionary<string, string> header = new Dictionary<string, string>
 		{
-			casosCargados.Add(new Caso()); //Esto habrá que cambiarlo para que meta los casos obtenidos.
+			{ "dif", ResourceManager.DificultadActual.ToString() },
+			{ "casos", n.ToString() }
+		};
+
+		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl+"case",header));
+	}
+
+	private void ParsearJsonACasos(DownloadHandler download)
+	{
+		//2º Parsear datos
+		string json = ConexionHandler.ExtraerJson(download.text);
+		List<Caso> casos = JsonConverter.PasarJsonAObjeto<List<Caso>>(json);
+		//3º Crear casos
+		int n = casos.Count;
+		for (int i = 0; i < n; i++)
+		{
+			casosCargados.Add(casos[i]);
 		}
+		ConexionHandler.onFinishRequest.RemoveListener(ParsearJsonACasos);
 	}
 
 	public void LoadCasoExamen()
 	{
 		//1º Acceder a servidor pidiendo un caso examen ( usando el ConexionHanlder ) según la dificultad actual
-		//2º Parsear caso
-		//3º Crear caso
+		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
+		Dictionary<string, string> header = new Dictionary<string, string>
+		{
+			{ "dif", ResourceManager.DificultadActual.ToString() }
+		};
+
+		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "case/exam",header));
 	}
 
 	public void QuitarTodos()

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 namespace Hexstar
 {
@@ -24,10 +25,18 @@ namespace Hexstar
             StartCoroutine(Post(url, form));
         }
 
-        public static IEnumerator Get(string url)
+        public static IEnumerator Get(string url, Dictionary<string,string> header = null)
         {
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
+                if (header != null)
+                {
+                    foreach (var par in header)
+                    {
+                        request.SetRequestHeader(par.Key, par.Value);
+                    }
+                }
+
                 yield return request.SendWebRequest();
 
                 if (debugMode)
@@ -52,6 +61,31 @@ namespace Hexstar
                 }
                 onFinishRequest.Invoke(request.downloadHandler);
             }
+        }
+
+        public static string ExtraerJson(string download)
+        {
+            int i = 0;
+            int n = download.Length;
+            bool correcto;
+
+            i = download.IndexOf("Correcto");
+            correcto = i != -1 && i < 25; //Cuidao con el 25...
+
+            if(correcto)
+            {
+                i = download.IndexOf("res");
+                if (i != -1)
+                {
+                    i += 5;
+                    n = n - i - 1;
+                    return download.Substring(i, n);
+                }
+                else Debug.LogError("Ha habido un error leyendo \"res\" en la respuesta recibida");
+            }
+            else Debug.LogError("El servidor no ha aceptado la petición :(");
+            
+            return "{}";
         }
 
 

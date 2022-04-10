@@ -54,9 +54,12 @@ public class GameplayCycle : MonoBehaviour
 		//Cargar los casos disponibles
 		PuzzleManager.Instance.QuitarTodos();
 		PuzzleManager.Instance.LoadCasos(ResourceManager.ConsultasMaximas);
-		PuzzleManager.Instance.MostrarCasosEnPantalla();
-		
 		//Cargar caso examen si necesario
+		if (ResourceManager.CasosCompletados >= 4 * ResourceManager.DificultadActual)
+		{
+			PuzzleManager.Instance.LoadCasoExamen();
+		}
+		PuzzleManager.Instance.MostrarCasosEnPantalla();
 	}
 
 	private void InicioCaso()
