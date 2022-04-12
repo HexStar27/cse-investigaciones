@@ -28,14 +28,16 @@ public class OperacionesGameplay : MonoBehaviour
             //Se ha completado el caso?
             // TODO
             bool completado = false;
-            if(completado)
+            if (completado)
             {
                 //Informar de que es correcto
+                TempMessageController.Instancia.InsetarMensajeEnCola("EUREKA");
                 ResourceManager.CasosCompletados++;
             }
             else
             {
                 //Informar de que no es correcto
+                TempMessageController.Instancia.InsetarMensajeEnCola("Sin discrepancias...");
             }
 
             ResourceManager.ConsultasDisponibles--;
@@ -44,33 +46,46 @@ public class OperacionesGameplay : MonoBehaviour
 
     public void SinConsultas()
     {
-        if(GameplayCycle.Instance.GetState()==1) GameplayCycle.Instance.SetState(2);
+        if (GameplayCycle.Instance.GetState() == 1) GameplayCycle.Instance.SetState(2);
         else GameplayCycle.Instance.SetState(0);
     }
 
+    /// <summary>
+    /// Introduce los eventos recividos del servidor al banco de eventos del juego
+    /// (No los ejecuta, solo los almacena)
+    /// </summary>
     public void CargarEventos()
     {
         //1º Acceder a servidor y pedir eventos según el nivel de dificultad
         int nEventos = 0;
         Evento[] eventos = new Evento[0];
+        //StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "event");
         //2º Añadir cada evento al banco de eventos
-        BancoEventos banco = BancoEventos.instance();
+        BancoEventos banco = BancoEventos.Instance();
         if (banco != null) banco.Clear();
         else Debug.Log("El banco de eventos no está inicializado...");
-        for(int i = 0; i < nEventos; i++)
+        for (int i = 0; i < nEventos; i++)
         {
-            banco.Set(eventos[i]);
+            banco.Add(eventos[i]);
         }
+    }
+
+    /// <summary>
+    /// Crea un punto de guardado con los datos actuales
+    /// </summary>
+    public void Snapshot()
+    {
+
     }
 
     public void EjecutarEventoAleatorio()
     {
         // 1º Obtener el evento
-        int nEventos = BancoEventos.instance().Count();
+        int nEventos = BancoEventos.Instance().Count();
         int e = UnityEngine.Random.Range(0,nEventos);
-        Evento evento = BancoEventos.instance().Get(e);
+        Evento evento = BancoEventos.Instance().Get(e);
         // 2º Realizar cambios del evento
-        // TODO
+        BancoEventos.Instance().Activate(evento);
     }
 
     public void AplicarEfectosCaso(Caso caso, bool ganado, int consultasUsadas, float tiempoEmpleado)
@@ -166,6 +181,7 @@ public class OperacionesGameplay : MonoBehaviour
         LUTEfectos[5] = () => //MasDificultad
         {
             ResourceManager.DificultadActual++;
+            //PuntoGuardado.Fijar();
             TempMessageController.Instancia.InsetarMensajeEnCola("LA DIFICULTAD HA SIDO AUMENTADA");
         };
         LUTEfectos[6] = () => //FinDelJuego...

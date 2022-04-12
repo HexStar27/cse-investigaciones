@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using Hexstar.CSE;
+﻿using Hexstar.CSE;
 
 [System.Serializable]
 public class Caso

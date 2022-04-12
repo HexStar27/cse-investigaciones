@@ -14,10 +14,11 @@ public class GameplayCycle : MonoBehaviour
 
 	Action[] _coreBehabiour = new Action[3];
 	int estadoActual = 0;
+	bool gameover = false;
 
 	public void SetState(int estado)
 	{
-		if (estado >= 0 && estado < _coreBehabiour.Length) {
+		if (estado >= 0 && estado < _coreBehabiour.Length && !gameover) {
 			estadoActual = estado;
 			_coreBehabiour[estado]();
 		}
@@ -42,6 +43,13 @@ public class GameplayCycle : MonoBehaviour
 		}
 		else //El resto de días
 		{
+			if(ResourceManager.AgentesDisponibles <= 0)
+			{
+				//Fin del juego
+				gameover = true;
+				GameOver();
+			}
+
 			OperacionesGameplay.Instancia.EjecutarEventoAleatorio();
 		}
 
@@ -87,6 +95,11 @@ public class GameplayCycle : MonoBehaviour
 		{
 			SetState(0);
 		}
+	}
+
+	public void GameOver()
+	{
+		// TODO!
 	}
 
 	private void Awake()
