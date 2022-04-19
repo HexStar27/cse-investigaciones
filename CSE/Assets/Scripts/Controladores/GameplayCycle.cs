@@ -43,12 +43,7 @@ public class GameplayCycle : MonoBehaviour
 		}
 		else //El resto de días
 		{
-			if(ResourceManager.AgentesDisponibles <= 0)
-			{
-				//Fin del juego
-				gameover = true;
-				GameOver();
-			}
+			if(ResourceManager.AgentesDisponibles <= 0) GameOver(); //Fin del juego
 
 			OperacionesGameplay.Instancia.EjecutarEventoAleatorio();
 		}
@@ -83,6 +78,7 @@ public class GameplayCycle : MonoBehaviour
 		//Creo que voy a tener que hacer esta parte con async y demás, para tener las cosas más en orden
 
 		//Ver si lo ha completado o no
+		bool completado = PuzzleManager.Instance.solucionCorrecta;
 
 		//Otorgar efectos correspondientes
 
@@ -99,7 +95,11 @@ public class GameplayCycle : MonoBehaviour
 
 	public void GameOver()
 	{
+		gameover = true;
 		// TODO!
+		//1º Oscurecer Pantalla con animación (como con el cambio de día)
+		//2º Mostrar boton de volver al menú y cargar último punto de guardado
+		//Ambos botones vuelven a cargar una escena, ya sea la misma u otra diferente.
 	}
 
 	private void Awake()

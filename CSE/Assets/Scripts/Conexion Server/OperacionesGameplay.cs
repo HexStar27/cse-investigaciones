@@ -1,6 +1,6 @@
 ﻿/// Esta clase se va a encargar de mandar peticiones específicas del juego al servidor a través del Conexión Handler
 
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Hexstar;
 using System;
@@ -14,7 +14,6 @@ public class OperacionesGameplay : MonoBehaviour
 
     public void RealizarConsulta()
     {
-        Debug.Log("Realizando consulta...");
         // TODO
         ResourceManager.ConsultasDisponibles--;
     }
@@ -24,15 +23,19 @@ public class OperacionesGameplay : MonoBehaviour
         //Sólo comprueba el caso si hay uno activo
         if (GameplayCycle.Instance.GetState() == 1)
         {
-            Debug.Log("Comprobando caso...");
             //Se ha completado el caso?
-            // TODO
+            //StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "case/solve",new Dictionary<string, string>()
+            //{ 
+            //Poner aquí los elementos a pasar por el header...
+            //}));
             bool completado = false;
+            PuzzleManager.Instance.solucionCorrecta = completado;
             if (completado)
             {
                 //Informar de que es correcto
                 TempMessageController.Instancia.InsetarMensajeEnCola("EUREKA");
                 ResourceManager.CasosCompletados++;
+                TerminarCaso();
             }
             else
             {
@@ -41,6 +44,29 @@ public class OperacionesGameplay : MonoBehaviour
             }
 
             ResourceManager.ConsultasDisponibles--;
+        }
+    }
+
+    private void TerminarCaso()
+    {
+        if (GameplayCycle.Instance.GetState() == 1)
+        {
+            PuzzleManager.Instance.casoActivo = null;
+            GameplayCycle.Instance.SetState(2);
+        }
+    }
+
+    public void Rendirse()
+    {
+        if(GameplayCycle.Instance.GetState() == 1)
+        {
+            PuzzleManager.Instance.solucionCorrecta = false;
+            TerminarCaso();
+            TempMessageController.Instancia.InsetarMensajeEnCola("Dejando caso... :(");
+        }
+        else
+        {
+            TempMessageController.Instancia.InsetarMensajeEnCola("No se puede descartar caso, no hay casos activos.");
         }
     }
 

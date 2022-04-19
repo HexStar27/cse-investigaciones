@@ -15,6 +15,7 @@ public class PuzzleManager : MonoBehaviour
 	Caso casoExamen;
 
 	public Caso casoActivo;
+	public bool solucionCorrecta = false;
 
 	[SerializeField] RectTransform _map;
 	[SerializeField] CasoDescripcion _descriptor;

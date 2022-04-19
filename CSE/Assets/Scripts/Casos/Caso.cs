@@ -21,6 +21,7 @@ public class Caso
 	{
 		public Condiciones condicion;
 		public Efectos efecto;
+		public int cantidad;
 	};
 
 	public EventoCaso[] eventosCaso;
