@@ -8,8 +8,8 @@ namespace Hexstar
 {
     public class ConexionHandler : MonoBehaviour
     {
-        public readonly static string baseUrl = "http://giidb.uca.es:443/";
-        public static bool debugMode = false;
+        public readonly static string baseUrl = "https://giibd.uca.es/";
+        public static bool debugMode = true;
 
         public class DownloadEvent : UnityEvent<DownloadHandler> { }
         public static DownloadEvent onFinishRequest = new DownloadEvent();
@@ -25,18 +25,10 @@ namespace Hexstar
             StartCoroutine(Post(url, form));
         }
 
-        public static IEnumerator Get(string url, Dictionary<string,string> header = null)
+        public static IEnumerator Get(string url)
         {
             using (UnityWebRequest request = UnityWebRequest.Get(url))
             {
-                if (header != null)
-                {
-                    foreach (var par in header)
-                    {
-                        request.SetRequestHeader(par.Key, par.Value);
-                    }
-                }
-
                 yield return request.SendWebRequest();
 
                 if (debugMode)

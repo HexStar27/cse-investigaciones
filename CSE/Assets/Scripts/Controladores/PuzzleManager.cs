@@ -39,7 +39,7 @@ public class PuzzleManager : MonoBehaviour
 			{ "casos", n.ToString() }
 		};
 
-		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl+"case",header));
+		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl+"case"));
 	}
 
 	private void ParsearJsonACasos(DownloadHandler download)
@@ -65,7 +65,7 @@ public class PuzzleManager : MonoBehaviour
 			{ "dif", ResourceManager.DificultadActual.ToString() }
 		};
 
-		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "case/exam",header));
+		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "case/exam"));
 	}
 
 	public void QuitarTodos()

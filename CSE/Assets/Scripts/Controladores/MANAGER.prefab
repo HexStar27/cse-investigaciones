@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 50328634812844260}
   - component: {fileID: 392489137639133958}
   - component: {fileID: 596190820490782978}
+  - component: {fileID: 4133907181550038237}
   - component: {fileID: 1566547577}
   - component: {fileID: 8892970283677600362}
   - component: {fileID: 8953707238696084833}
@@ -60,6 +61,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1341d0746741d14a844da3b578e55c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4133907181550038237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7738949445842451286}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cde7482b02b5bd44946bdbc07d98673, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  datosBloques: []
 --- !u!114 &1566547577
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,6 +107,7 @@ MonoBehaviour:
     pistas: []
     eventosCaso: []
     eventoId: 0
+  solucionCorrecta: 0
   _map: {fileID: 0}
   _descriptor: {fileID: 0}
   spriteCaso: {fileID: 21300038, guid: fd419bef7a36af8459a810bc72573105, type: 3}
