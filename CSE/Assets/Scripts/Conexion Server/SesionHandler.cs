@@ -1,5 +1,6 @@
 ﻿/// Esta clase se va a encargar del inicio de sesión, y de mantener la sesión iniciada durante la partida.
 using System;
+using System.Collections;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -9,29 +10,39 @@ namespace Hexstar
 {
 	public class SesionHandler : MonoBehaviour
 	{
-		public static string KEY;
+		public static string KEY = "";
 		public static string ciphKey;
 		public static string ciphIv;
+		[SerializeField] private string key,iv;
+		public static SesionHandler Instance { get; set; }
 
 		/// <summary>
 		/// Manda petición para obtener la KEY al servidor enviando el correo y la contraseña cifrada
 		/// </summary>
 		/// <param name="username"></param>
 		/// <param name="password"></param>
-		public void IniciarSesion(string email, string password)
+		public IEnumerator IniciarSesion(string email, string password)
 		{
 			string url = ConexionHandler.baseUrl + "login";
 			WWWForm formulario = new WWWForm();
 			formulario.AddField("username", email);
 			formulario.AddField("password", Cifrar(password));
-			ConexionHandler.onFinishRequest.AddListener(SetKey);
-			StartCoroutine(ConexionHandler.Post(url,formulario));
+			yield return StartCoroutine(ConexionHandler.Post(url,formulario));
+			SetKey(ConexionHandler.download);
 		}
 
-		private static void SetKey(DownloadHandler dh)
+		private static void SetKey(string dh)
 		{
-			KEY = dh.text;
-			ConexionHandler.onFinishRequest.RemoveListener(SetKey);
+			int s = dh.IndexOf("\"token\":\"");
+			if(s < 0)
+			{
+				KEY = "";
+				return;
+			}
+			s += 9;
+			int i;
+			for (i = s; i < dh.Length && (dh[i] != '\"' || dh[i] != '\''); i++){}
+			KEY = dh.Substring(s,i-s-2);
 		}
 
 		/// <summary>
@@ -54,6 +65,17 @@ namespace Hexstar
 
 			byte[] result = trnsfrm.TransformFinalBlock(txtByteData, 0, txtByteData.Length);
 			return Convert.ToBase64String(result);
+		}
+
+		private void Awake()
+		{
+			if (Instance == null)
+			{
+				ciphIv = iv;
+				ciphKey = key;
+				Instance = this;
+			}
+			DontDestroyOnLoad(gameObject);
 		}
 	}
 }

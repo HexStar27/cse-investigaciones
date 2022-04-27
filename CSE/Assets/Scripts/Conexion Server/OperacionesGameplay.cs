@@ -104,6 +104,11 @@ public class OperacionesGameplay : MonoBehaviour
 
     }
 
+    public void LoadSave(PuntoGuardado pg)
+    {
+
+    }
+
     public void EjecutarEventoAleatorio()
     {
         // 1º Obtener el evento
@@ -164,7 +169,7 @@ public class OperacionesGameplay : MonoBehaviour
 
     private void Awake()
     {
-        Instancia = this;
+        if(Instancia == null) Instancia = this;
         InicializarLUTEventos();
     }
 

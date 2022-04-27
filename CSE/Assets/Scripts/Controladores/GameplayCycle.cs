@@ -21,6 +21,7 @@ public class GameplayCycle : MonoBehaviour
 		if (estado >= 0 && estado < _coreBehabiour.Length && !gameover) {
 			estadoActual = estado;
 			_coreBehabiour[estado]();
+			_coreBehabiour[estado]();
 		}
 	}
 
@@ -104,7 +105,7 @@ public class GameplayCycle : MonoBehaviour
 
 	private void Awake()
 	{
-		Instance = this;
+		if(Instance == null) Instance = this;
 		_coreBehabiour[0] = InicioDia;
 		_coreBehabiour[1] = InicioCaso;
 		_coreBehabiour[2] = FinCaso;

@@ -13,6 +13,7 @@ namespace Hexstar
 
         public class DownloadEvent : UnityEvent<DownloadHandler> { }
         public static DownloadEvent onFinishRequest = new DownloadEvent();
+        public static string download;
 
         public void GET(string url)
         {
@@ -36,6 +37,7 @@ namespace Hexstar
                     if (request.isNetworkError) Debug.Log("Error: " + request.error);
                     else Debug.Log("Received: " + request.downloadHandler.text);
                 }
+                download = request.downloadHandler.text;
                 onFinishRequest.Invoke(request.downloadHandler);
             }
         }
@@ -49,15 +51,15 @@ namespace Hexstar
                 if (debugMode)
                 {
                     if (request.isNetworkError || request.isHttpError) Debug.Log(request.error);
-                    else Debug.Log("Form upload complete!");
                 }
+                download = request.downloadHandler.text;
                 onFinishRequest.Invoke(request.downloadHandler);
             }
         }
 
         public static string ExtraerJson(string download)
         {
-            int i = 0;
+            int i;
             int n = download.Length;
             bool correcto;
 
@@ -75,7 +77,7 @@ namespace Hexstar
                 }
                 else Debug.LogError("Ha habido un error leyendo \"res\" en la respuesta recibida");
             }
-            else Debug.LogError("El servidor no ha aceptado la petición :(");
+            else Debug.LogError("El servidor no ha aceptado la petición :(\n"+download);
             
             return "{}";
         }
