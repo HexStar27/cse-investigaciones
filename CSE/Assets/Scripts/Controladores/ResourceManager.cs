@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 public class ResourceManager : MonoBehaviour
 {
+    public static PuntoGuardado checkpoint = new PuntoGuardado();
     public static readonly int agentesInciales = 3;
     private static int agentesDisponibles;
     private static int consultasDisponibles;

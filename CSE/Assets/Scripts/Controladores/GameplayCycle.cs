@@ -92,6 +92,13 @@ public class GameplayCycle : MonoBehaviour
 		{
 			SetState(0);
 		}
+
+		if(completado && PuzzleManager.Instance.casoActivo == PuzzleManager.Instance.casoExamen)
+		{
+			ResourceManager.DificultadActual++;
+		}
+
+		PuzzleManager.Instance.casoActivo = null;
 	}
 
 	public void GameOver()

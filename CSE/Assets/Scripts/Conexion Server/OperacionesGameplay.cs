@@ -101,12 +101,7 @@ public class OperacionesGameplay : MonoBehaviour
     /// </summary>
     public void Snapshot()
     {
-
-    }
-
-    public void LoadSave(PuntoGuardado pg)
-    {
-
+        ResourceManager.checkpoint.Fijar();
     }
 
     public void EjecutarEventoAleatorio()

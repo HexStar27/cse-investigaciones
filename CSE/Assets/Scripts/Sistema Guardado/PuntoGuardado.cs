@@ -1,9 +1,6 @@
 ﻿///Esta clase se encarga de guardar los datos relevantes de la partida.
-
-using UnityEngine;
-
 [System.Serializable]
-public class PuntoGuardado : MonoBehaviour
+public class PuntoGuardado
 {
 	private int _agentesDisponibles;
     private int _consultasDisponibles;
@@ -12,21 +9,34 @@ public class PuntoGuardado : MonoBehaviour
 	private int _dificultadActual;
 	private int _puntuacion;
 	private int _dia;
-	private Caso _casoEnCurso;
-	private Evento[] _eventosActivos;
+	private int _casoEnCurso;
+	private int[] _eventosActivos;
 	//Y demás cosillas por aquí...
 
-	public void Fijar(int ad, int cd, int cm, int cc, int da, int p, int d, Caso caso, Evento[] eventos)
+	public PuntoGuardado()
 	{
-		_agentesDisponibles = ad;
-		_consultasDisponibles = cd;
-		_consultasMaximas = cm;
-		_casosCompletados = cc;
-		_dificultadActual = da;
-		_puntuacion = p;
-		_dia = d;
-		_casoEnCurso = caso;
-		_eventosActivos = eventos;
+		_agentesDisponibles = 3;
+		_consultasDisponibles = 4;
+		_consultasMaximas = 4;
+		_casosCompletados = 0;
+		_dificultadActual = 1;
+		_puntuacion = 0;
+		_dia = 0;
+		_casoEnCurso = -1;
+		_eventosActivos = new int[0];
+	}
+
+	public void Fijar()
+	{
+		_agentesDisponibles = ResourceManager.AgentesDisponibles;
+		_consultasDisponibles = ResourceManager.ConsultasDisponibles;
+		_consultasMaximas = ResourceManager.ConsultasMaximas;
+		_casosCompletados = ResourceManager.CasosCompletados;
+		_dificultadActual = ResourceManager.DificultadActual;
+		_puntuacion = ResourceManager.Puntuacion;
+		_dia = ResourceManager.Dia;
+		_casoEnCurso = PuzzleManager.Instance.casoActivo.id;
+		_eventosActivos = new int[0]; //Falta por ponerlo...
 	}
 
 	public void Cargar()
@@ -38,7 +48,8 @@ public class PuntoGuardado : MonoBehaviour
 		ResourceManager.DificultadActual = _dificultadActual;
 		ResourceManager.Puntuacion = _puntuacion;
 		ResourceManager.Dia = _dia;
-		PuzzleManager.Instance.casoActivo = _casoEnCurso;
-		if (_casoEnCurso != null) GameplayCycle.Instance.SetState(1);
+		//Cargar los casos indicados
+		//PuzzleManager.Instance.casoActivo = _casoEnCurso;
+		if (_casoEnCurso >= 0) GameplayCycle.Instance.SetState(1);
 	}
 }

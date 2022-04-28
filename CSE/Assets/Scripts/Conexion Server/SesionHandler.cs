@@ -13,7 +13,6 @@ namespace Hexstar
 		public static string KEY = "";
 		public static string ciphKey;
 		public static string ciphIv;
-		[SerializeField] private string key,iv;
 		public static SesionHandler Instance { get; set; }
 
 		/// <summary>
@@ -71,8 +70,16 @@ namespace Hexstar
 		{
 			if (Instance == null)
 			{
-				ciphIv = iv;
-				ciphKey = key;
+				TextAsset data = Resources.Load ("Secreto/key") as TextAsset;
+				string t = data.text;
+				int n = t.Length;
+				int corte = -1;
+				for (int i = 0; i < n; i++)
+				{
+					if (t[i] == '\n') corte = i;
+				}
+				ciphIv = t.Substring(corte + 1);
+				ciphKey = t.Substring(0, corte - 1);
 				Instance = this;
 			}
 			DontDestroyOnLoad(gameObject);

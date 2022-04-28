@@ -12,7 +12,7 @@ public class PuzzleManager : MonoBehaviour
 	public AlmacenDePalabras almacen;
 
 	[SerializeField] List<Caso> casosCargados = new List<Caso>();
-	Caso casoExamen;
+	public Caso casoExamen;
 
 	public Caso casoActivo;
 	public bool solucionCorrecta = false;
