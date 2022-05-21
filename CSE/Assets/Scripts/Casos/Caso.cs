@@ -24,7 +24,6 @@ public class Caso
 		public int cantidad;
 	};
 
-	public EventoCaso[] eventosCaso;
-	
 	public int eventoId;
+	public EventoCaso[] eventosCaso;
 }

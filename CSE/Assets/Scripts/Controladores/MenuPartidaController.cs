@@ -1,25 +1,47 @@
 ﻿using UnityEngine;
 using Hexstar;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class MenuPartidaController : MonoBehaviour
 {
-    public bool existePartida = false;
-    private bool cerrojo = false;
+    public static bool existePartida = false;
+    private static bool cerrojo = false;
 
+    // Cargar Partida
     public void CargarPartidaGuardada()
     {
         if (!cerrojo)
         {
-            StartCoroutine(TryGetSavedFile(existePartida));
+            TryGetSavedFile(existePartida);
+        }
+    }
+    public static void CargarPartidaGuardada_S()
+    {
+        if (!cerrojo)
+        {
+            TryGetSavedFile(existePartida);
         }
     }
 
-    private void Start()
+    // Guardar Partida
+    public void GuardarPartidaEnCurso()
     {
-        StartCoroutine(TryGetSavedFile(false));
+        if(!cerrojo)
+        {
+            GuardarPartidaEnServer();
+        }
     }
 
+    public static void GuardarPartidaEnCurso_S()
+    {
+        if (!cerrojo)
+        {
+            GuardarPartidaEnServer();
+        }
+    }
+
+    // Crear Partida
     public void CrearPartidaNueva()
     {
         PuntoGuardado pg = new PuntoGuardado();
@@ -29,7 +51,22 @@ public class MenuPartidaController : MonoBehaviour
         GameManager.Instancia.CargarEscena(2);
     }
 
-    private IEnumerator TryGetSavedFile(bool loadScene)
+    public static void CrearPartidaNueva_S()
+    {
+        PuntoGuardado pg = new PuntoGuardado();
+        ResourceManager.checkpoint = pg;
+        pg.Cargar();
+        existePartida = true;
+        GameManager.Instancia.CargarEscena(2);
+    }
+
+
+    private void Start()
+    {
+        TryGetSavedFile(false);
+    }
+
+    private static async void TryGetSavedFile(bool loadScene)
     {
         if(!existePartida)
         {
@@ -38,15 +75,17 @@ public class MenuPartidaController : MonoBehaviour
             WWWForm form = new WWWForm();
             form.AddField("authorization", SesionHandler.KEY);
             form.AddField("user", GameManager.user);
-            yield return StartCoroutine(ConexionHandler.Post(ConexionHandler.baseUrl + "load", form));
+            await ConexionHandler.APost(ConexionHandler.baseUrl + "load", form);
             string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
 
             if (json.Length > 5) // Valor arbitrario lo suficientemente grande
             {
                 pg = JsonConverter.PasarJsonAObjeto<PuntoGuardado>(json);
-                Debug.Log("Archivo encontrado");
             }
-            else pg = new PuntoGuardado();
+            else
+            {
+                pg = new PuntoGuardado();
+            }
 
             ResourceManager.checkpoint = pg;
             pg.Cargar();
@@ -56,14 +95,17 @@ public class MenuPartidaController : MonoBehaviour
         }
 
         if(loadScene) GameManager.Instancia.CargarEscena(2);
+        await Task.Yield();
     }
 
-    public IEnumerator GuardarPartidaEnServer()
+    private static async void GuardarPartidaEnServer()
     {
+        cerrojo = true;
         WWWForm form = new WWWForm();
         form.AddField("authorization", SesionHandler.KEY);
         form.AddField("user", GameManager.user);
         form.AddField("save", JsonConverter.ConvertirAJson(ResourceManager.checkpoint));
-        yield return StartCoroutine(ConexionHandler.Post(ConexionHandler.baseUrl +"/save", form));
+        await ConexionHandler.APost(ConexionHandler.baseUrl +"save", form);
+        cerrojo = false;
     }
 }

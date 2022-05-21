@@ -15,7 +15,7 @@ public class CasoDescripcion : MonoBehaviour
         _resumen.SetText(c.resumen);
 
         //Quedaría poner los efectos
-        _efectos.SetText("WIP:\n-Próximamente\n-Efectos super xulos");
+        _efectos.SetText("WIP:\n-Próximamente\n-Efectos super xulos\n-Recompensas\n\nY mucho más.");
     }
 
     public void Abrir(bool value)

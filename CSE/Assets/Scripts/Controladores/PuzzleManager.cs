@@ -5,6 +5,7 @@ using UnityEngine;
 using Hexstar.CSE;
 using Hexstar;
 using UnityEngine.Networking;
+using System.Threading.Tasks;
 
 public class PuzzleManager : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class PuzzleManager : MonoBehaviour
 	public AlmacenDePalabras almacen;
 
 	[SerializeField] List<Caso> casosCargados = new List<Caso>();
+	private GameObject[] casosGO = new GameObject[0];
 	public Caso casoExamen;
 
 	public Caso casoActivo;
@@ -29,24 +31,32 @@ public class PuzzleManager : MonoBehaviour
 	/// Añade casos a la lista
 	/// </summary>
 	/// <param name="n"></param>
-	public void LoadCasos(int n)
+	public async Task LoadCasos(int n)
 	{
 		//1º Acceder a servidor pidiendo n casos ( usando el ConexionHanlder )
 		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
-		Dictionary<string, string> header = new Dictionary<string, string>
-		{
-			{ "dif", ResourceManager.DificultadActual.ToString() },
-			{ "casos", n.ToString() }
-		};
+		WWWForm form = new WWWForm();
+		form.AddField("authorization", SesionHandler.KEY);
+		form.AddField("dif", ResourceManager.DificultadActual);
+		form.AddField("casos", n);
 
-		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl+"case"));
+		await ConexionHandler.APost(ConexionHandler.baseUrl+"case",form);
 	}
 
 	private void ParsearJsonACasos(DownloadHandler download)
 	{
 		//2º Parsear datos
 		string json = ConexionHandler.ExtraerJson(download.text);
-		List<Caso> casos = JsonConverter.PasarJsonAObjeto<List<Caso>>(json);
+		json = json.Substring(1, json.Length - 2);
+		var cads = json.Split('#');
+		
+		List<Caso> casos = new List<Caso>();
+		foreach (var t in cads)
+		{
+			Caso c = JsonConverter.PasarJsonAObjeto<Caso>(t);
+			casos.Add(c);
+		}
+		
 		//3º Crear casos
 		int n = casos.Count;
 		for (int i = 0; i < n; i++)
@@ -54,28 +64,40 @@ public class PuzzleManager : MonoBehaviour
 			casosCargados.Add(casos[i]);
 		}
 		ConexionHandler.onFinishRequest.RemoveListener(ParsearJsonACasos);
+
+		//MostrarCasosEnPantalla();
 	}
 
-	public void LoadCasoExamen()
+	public async Task LoadCasoExamen()
 	{
 		//1º Acceder a servidor pidiendo un caso examen ( usando el ConexionHanlder ) según la dificultad actual
 		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
-		Dictionary<string, string> header = new Dictionary<string, string>
-		{
-			{ "dif", ResourceManager.DificultadActual.ToString() }
-		};
+		WWWForm form = new WWWForm();
+		form.AddField("authorization", SesionHandler.KEY);
+		form.AddField("dif", ResourceManager.DificultadActual);
 
-		StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "case/exam"));
+		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/exam",form);
 	}
 
 	public void QuitarTodos()
 	{
+		int n = casosGO.Length;
+		for(int i = 0; i < n; i++)
+		{
+			Destroy(casosGO[i]);
+		}
 		casosCargados.Clear();
 		casoExamen = null;
 	}
 	public void QuitarCaso(Caso c)
 	{
+		int i = casosCargados.IndexOf(c);
 		casosCargados.Remove(c);
+		if(casosGO[i] != null)
+		{
+			Destroy(casosGO[i]);
+			casosGO[i] = null;
+		}
 	}
 
 	public void MostrarCasosEnPantalla()
@@ -85,6 +107,10 @@ public class PuzzleManager : MonoBehaviour
 		Vector2 size = 0.5f*_map.sizeDelta;
 		int n = casosCargados.Count;
 		Vector2[] posiciones = new Vector2[n];
+
+		int N = n + (casoExamen!=null?1:0);
+		casosGO = new GameObject[N];
+
 		for (int i = 0; i < n; i++)
 		{
 			posiciones[i].x = UnityEngine.Random.Range(offset - size.x, size.x - 2*offset);
@@ -103,6 +129,7 @@ public class PuzzleManager : MonoBehaviour
 									UnityEngine.Random.Range(offset, size.y - offset));
 			//3º Posicionar
 			o.transform.localPosition = p;
+			casosGO[n] = o;
 		}
 		GameObject objeto;
 		CasoMapa casoM;
@@ -116,6 +143,7 @@ public class PuzzleManager : MonoBehaviour
 			casoM.EstablecerSprite(spriteCaso);
 			//3º Posicionar
 			objeto.transform.localPosition = posiciones[i];
+			casosGO[i] = objeto;
 		}
 	}
 

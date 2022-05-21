@@ -395,7 +395,6 @@ GameObject:
   - component: {fileID: 479082821}
   - component: {fileID: 479082822}
   - component: {fileID: 479082820}
-  - component: {fileID: 479082824}
   - component: {fileID: 479082823}
   m_Layer: 0
   m_Name: Manager
@@ -416,7 +415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6c9f7c2586fa1742abb147def7a10ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  existePartida: 0
 --- !u!4 &479082821
 Transform:
   m_ObjectHideFlags: 0
@@ -461,19 +459,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2bfb7dd40c74f341887efae86552d4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &479082824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 479082819}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 403281dc6827ebf4ca2e5a5a3cd50252, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventoId: 0
 --- !u!1 &480013356
 GameObject:
   m_ObjectHideFlags: 0
@@ -2403,7 +2388,7 @@ GameObject:
   - component: {fileID: 1618976368}
   - component: {fileID: 1618976370}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: Botones
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

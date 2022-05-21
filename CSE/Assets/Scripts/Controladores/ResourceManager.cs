@@ -1,8 +1,7 @@
 ﻿/// Esta clase se encarga de controlar los recursos del jugador
-using UnityEngine;
 using UnityEngine.Events;
 
-public class ResourceManager : MonoBehaviour
+public static class ResourceManager
 {
     public static PuntoGuardado checkpoint = new PuntoGuardado();
     public static readonly int agentesInciales = 3;

@@ -19,6 +19,8 @@ public class TempMessageController : MonoBehaviour
     [SerializeField] string nombreAnimacion1 = "Mostrar";
     [SerializeField] string nombreAnimacion2 = "Cerrar";
 
+    private bool terminado = true;
+
     public void InsetarMensajeEnCola(string mensaje)
     {
         cola.Enqueue(mensaje);
@@ -36,11 +38,16 @@ public class TempMessageController : MonoBehaviour
         ConsumirMensajes();
     }
 
+    public int SemaphoreState() { return semaforo.CurrentCount; }
+    public bool Terminado() { return terminado; }
+
     private async void ConsumirMensajes()
     {
         while (true)
         {
+            terminado = true;
             await semaforo.WaitAsync();
+            terminado = false;
             string mensaje = cola.Dequeue();
             _texto.SetText(mensaje);
             _anim.Play(nombreAnimacion1);

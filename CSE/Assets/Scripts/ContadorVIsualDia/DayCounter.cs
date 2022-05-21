@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Threading.Tasks;
 
 public class DayCounter : MonoBehaviour
 {
@@ -10,13 +11,28 @@ public class DayCounter : MonoBehaviour
 
     private bool locked = false;
 
-    public void InitAnimation(int fromDay, int toDay)
+    public async Task InitAnimation(int fromDay, int toDay)
     {
         if (locked) return;
+
+        bool viaLibre;
+        do{
+            await Task.Delay(100);
+            viaLibre = TempMessageController.Instancia.SemaphoreState() != 0 && !TempMessageController.Instancia.Terminado();
+        }
+        while (viaLibre);
+
+
         actual.text = fromDay.ToString();
         siguiente.text = toDay.ToString();
         anim.enabled = true;
         anim.SetTrigger(start);
+
+
+        do { 
+            await Task.Delay(100);
+        }
+        while (anim.GetCurrentAnimatorStateInfo(0).IsName(start));
     }
 
     public void TestFunc()

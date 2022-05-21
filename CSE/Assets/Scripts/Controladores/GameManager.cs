@@ -29,6 +29,10 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(escenaId);
     }
+    public static void CargarEscena_S(int escenaId)
+    {
+        SceneManager.LoadScene(escenaId);
+    }
 
     public void CargarEscenaConPCarga(int escenaId)
     {

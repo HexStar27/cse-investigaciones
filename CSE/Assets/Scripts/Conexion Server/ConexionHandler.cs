@@ -3,6 +3,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System;
+using System.Threading.Tasks;
+using Robo;
 
 namespace Hexstar
 {
@@ -42,11 +46,42 @@ namespace Hexstar
             }
         }
 
+        public static async Task AGet(string url)
+        {
+            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            {
+                await request.SendWebRequest();
+
+                if (debugMode)
+                {
+                    if (request.isNetworkError) Debug.Log("Error: " + request.error);
+                    else Debug.Log("Received: " + request.downloadHandler.text);
+                }
+                download = request.downloadHandler.text;
+                onFinishRequest.Invoke(request.downloadHandler);
+            }
+        }
+
         public static IEnumerator Post(string url, WWWForm form)
         {
             using (UnityWebRequest request = UnityWebRequest.Post(url, form))
             {
                 yield return request.SendWebRequest();
+
+                if (debugMode)
+                {
+                    if (request.isNetworkError || request.isHttpError) Debug.Log(request.error);
+                }
+                download = request.downloadHandler.text;
+                onFinishRequest.Invoke(request.downloadHandler);
+            }
+        }
+
+        public static async Task APost(string url, WWWForm form)
+        {
+            using (UnityWebRequest request = UnityWebRequest.Post(url, form))
+            {
+                await request.SendWebRequest();
 
                 if (debugMode)
                 {
@@ -95,6 +130,43 @@ namespace Hexstar
             //Bastante OP
             ClaseSucia dic = JsonConverter.PasarJsonAObjeto<ClaseSucia>(descarga.text);
             Debug.Log(dic.i + "," + dic.h + ". " + dic.f[0]);
+        }
+    }
+}
+
+namespace Robo
+{
+    public class UnityWebRequestAwaiter : INotifyCompletion
+    {
+        private UnityWebRequestAsyncOperation asyncOp;
+        private Action continuation;
+
+        public UnityWebRequestAwaiter(UnityWebRequestAsyncOperation asyncOp)
+        {
+            this.asyncOp = asyncOp;
+            asyncOp.completed += OnRequestCompleted;
+        }
+
+        public bool IsCompleted { get { return asyncOp.isDone; } }
+
+        public void GetResult() { }
+
+        public void OnCompleted(Action continuation)
+        {
+            this.continuation = continuation;
+        }
+
+        private void OnRequestCompleted(AsyncOperation obj)
+        {
+            continuation();
+        }
+    }
+
+    public static class ExtensionMethods
+    {
+        public static UnityWebRequestAwaiter GetAwaiter(this UnityWebRequestAsyncOperation asyncOp)
+        {
+            return new UnityWebRequestAwaiter(asyncOp);
         }
     }
 }

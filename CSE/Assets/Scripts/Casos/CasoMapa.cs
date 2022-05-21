@@ -27,14 +27,12 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 			int p = (int)TabType.Pistas;
 			if (caso.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
 			int n = caso.pistas.Length;
-			int m = almacenPalabras.palabras[p].Length;
-			string[] palabras = new string[n+m];
+			string[] palabras = new string[n];
 			for(int i = 0; i < n; i++)
 			{
 				palabras[i] = caso.pistas[i].palabra;
 			}
-			almacenPalabras.palabras[p].CopyTo(palabras, n);
-			almacenPalabras.palabras[p] = palabras;	
+			almacenPalabras.palabras[p] = palabras;
 
 			menuHover.Abrir(false);
 			PuzzleManager.Instance.casoActivo = caso;
@@ -45,8 +43,8 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		}
 		else
 		{
-			Debug.Log("No se puede :(");
-			// Todo: Efecto de sonido o algo indicando que no puede hacer la acción.
+			TempMessageController.Instancia.InsetarMensajeEnCola("Necesitas más agentes para desbloquear el caso");
+			// Todo: Efecto de sonido
 		}
 	}
 

@@ -7,18 +7,27 @@ using System;
 
 public class OperacionesGameplay : MonoBehaviour
 {
-    public static OperacionesGameplay Instancia { get; private set; }
-
     private static Action[] LUTEfectos = new Action[16];
-    public int eventoId = 0;
+    public static int eventoId = 0;
 
-    public void RealizarConsulta()
+
+    public void RealizarConsultaD()
+    {
+        RealizarConsulta();
+    }
+    public static void RealizarConsulta()
     {
         // TODO
+        string consulta = LectorConsulta.GetQuery();
+        Debug.Log(consulta);
         ResourceManager.ConsultasDisponibles--;
     }
 
-    public void ComprobarCaso()
+    public void ComprobarCasoD()
+    {
+        ComprobarCaso();
+    }
+    public static void ComprobarCaso()
     {
         //Sólo comprueba el caso si hay uno activo
         if (GameplayCycle.Instance.GetState() == 1)
@@ -47,7 +56,7 @@ public class OperacionesGameplay : MonoBehaviour
         }
     }
 
-    private void TerminarCaso()
+    private static void TerminarCaso()
     {
         if (GameplayCycle.Instance.GetState() == 1)
         {
@@ -56,7 +65,11 @@ public class OperacionesGameplay : MonoBehaviour
         }
     }
 
-    public void Rendirse()
+    public void RendirseD()
+    {
+        Rendirse();
+    }
+    public static void Rendirse()
     {
         if(GameplayCycle.Instance.GetState() == 1)
         {
@@ -70,7 +83,7 @@ public class OperacionesGameplay : MonoBehaviour
         }
     }
 
-    public void SinConsultas()
+    public static void SinConsultas()
     {
         if (GameplayCycle.Instance.GetState() == 1) GameplayCycle.Instance.SetState(2);
         else GameplayCycle.Instance.SetState(0);
@@ -80,7 +93,7 @@ public class OperacionesGameplay : MonoBehaviour
     /// Introduce los eventos recividos del servidor al banco de eventos del juego
     /// (No los ejecuta, solo los almacena)
     /// </summary>
-    public void CargarEventos()
+    public static void CargarEventos()
     {
         //1º Acceder a servidor y pedir eventos según el nivel de dificultad
         int nEventos = 0;
@@ -99,22 +112,23 @@ public class OperacionesGameplay : MonoBehaviour
     /// <summary>
     /// Crea un punto de guardado con los datos actuales
     /// </summary>
-    public void Snapshot()
+    public static void Snapshot()
     {
         ResourceManager.checkpoint.Fijar();
     }
 
-    public void EjecutarEventoAleatorio()
+    public static void EjecutarEventoAleatorio()
     {
+        return; //No habrán eventos en la Alpha
         // 1º Obtener el evento
-        int nEventos = BancoEventos.Instance().Count();
-        int e = UnityEngine.Random.Range(0,nEventos);
-        Evento evento = BancoEventos.Instance().Get(e);
+        //int nEventos = BancoEventos.Instance().Count();
+        //int e = UnityEngine.Random.Range(0,nEventos);
+        //Evento evento = BancoEventos.Instance().Get(e);
         // 2º Realizar cambios del evento
-        BancoEventos.Instance().Activate(evento);
+        //BancoEventos.Instance().Activate(evento);
     }
 
-    public void AplicarEfectosCaso(Caso caso, bool ganado, int consultasUsadas, float tiempoEmpleado)
+    public static void AplicarEfectosCaso(Caso caso, bool ganado, int consultasUsadas, float tiempoEmpleado)
     {
         foreach (var ev in caso.eventosCaso)
         {
@@ -162,22 +176,7 @@ public class OperacionesGameplay : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        if(Instancia == null) Instancia = this;
-        InicializarLUTEventos();
-    }
-
-    private void OnEnable()
-    {
-        ResourceManager.OnOutOfQueries.AddListener(SinConsultas);
-    }
-    private void OnDisable()
-    {
-        ResourceManager.OnOutOfQueries.RemoveListener(SinConsultas);
-    }
-
-    private void InicializarLUTEventos()
+    public static void InicializarLUTEventos()
     {
         LUTEfectos[0] = () => //Evento
         {
