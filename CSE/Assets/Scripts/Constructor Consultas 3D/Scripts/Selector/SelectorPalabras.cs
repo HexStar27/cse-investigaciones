@@ -144,7 +144,7 @@ namespace Hexstar.CSE
                 {
                     foreach (var p in contenedor)
                     {
-                        Destroy(p,2);
+                        Destroy(p.gameObject,2);
                     }
                 }
 

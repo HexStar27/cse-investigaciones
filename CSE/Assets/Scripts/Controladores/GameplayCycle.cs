@@ -120,6 +120,7 @@ public class GameplayCycle : MonoBehaviour
 		//Limpiar cajón de pistas y palabras en el selector
 		CajonPistas.instancia.VaciarCajon();
 		almacenPalabras.palabras[(int)TabType.Pistas] = new string[0];
+		SelectorPalabras.instancia.RellenarSelector();
 
 
 		PuzzleManager.Instance.casoActivo = null;

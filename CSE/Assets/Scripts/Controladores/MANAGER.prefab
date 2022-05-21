@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _dayCounter: {fileID: 0}
+  almacenPalabras: {fileID: 4133907181550038237}
 --- !u!114 &596190820490782978
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,6 +179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selector: {fileID: 0}
+  cajon: {fileID: 0}
 --- !u!114 &5747517705680798652
 MonoBehaviour:
   m_ObjectHideFlags: 0

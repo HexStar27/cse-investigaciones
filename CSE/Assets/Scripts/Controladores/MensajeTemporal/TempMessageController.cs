@@ -1,59 +1,48 @@
 ﻿/// Esta clase se encarga de mostrar mensajes informativos sobre lo que está pasando en el juego
 /// Ej: "Se ha aplicado el efecto PATATA"
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 
 public class TempMessageController : MonoBehaviour
 {
     public static TempMessageController Instancia { get; set; }
 
-    [SerializeField] private Animator _anim;
-    [SerializeField] private TextMeshProUGUI _texto;
-    [SerializeField] Queue<string> cola = new Queue<string>();
-    public int duracion = 1500;
-    private SemaphoreSlim semaforo = new SemaphoreSlim(0);
-    [SerializeField] string nombreAnimacion1 = "Mostrar";
-    [SerializeField] string nombreAnimacion2 = "Cerrar";
-
+    [SerializeField] private GameObject prefabMensaje;
+    [SerializeField] private RectTransform parent;
+    public float alturaMensajes = 100;
+    private float tiempoReinicio = 1 + ((float)TempMessage.duracion)/1000;
+    private float contador = 0;
     private bool terminado = true;
+    private int acumulaciones = 0;
 
-    public void InsetarMensajeEnCola(string mensaje)
+    public void GenerarMensaje(string mensaje)
     {
-        cola.Enqueue(mensaje);
-        semaforo.Release(1);
+        terminado = false;
+        contador = tiempoReinicio;
+        float offset = alturaMensajes * acumulaciones++;
+        TempMessage a = Instantiate(prefabMensaje, parent.position + new Vector3(0,-offset,0), Quaternion.identity, parent).GetComponent<TempMessage>();
+        parent.anchoredPosition = new Vector2(parent.anchoredPosition.x,offset);
+        a.EjecutarMensaje(mensaje);
     }
 
-    public void LimpiarCola()
-    {
-        cola.Clear();
-    }
 
     private void Awake()
     {
         Instancia = this;
-        ConsumirMensajes();
     }
 
-    public int SemaphoreState() { return semaforo.CurrentCount; }
-    public bool Terminado() { return terminado; }
-
-    private async void ConsumirMensajes()
+    private void FixedUpdate()
     {
-        while (true)
+        if(contador <= 0)
         {
             terminado = true;
-            await semaforo.WaitAsync();
-            terminado = false;
-            string mensaje = cola.Dequeue();
-            _texto.SetText(mensaje);
-            _anim.Play(nombreAnimacion1);
-            await Task.Delay(duracion);
-            _anim.Play(nombreAnimacion2);
-            await Task.Delay(500);
+            acumulaciones = 0;
+        }
+        else
+        {
+            contador -= Time.fixedDeltaTime;
         }
     }
+
+    public bool Terminado() { return terminado; }
 }

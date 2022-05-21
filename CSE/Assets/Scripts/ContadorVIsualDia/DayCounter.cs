@@ -18,7 +18,7 @@ public class DayCounter : MonoBehaviour
         bool viaLibre;
         do{
             await Task.Delay(100);
-            viaLibre = TempMessageController.Instancia.SemaphoreState() != 0 && !TempMessageController.Instancia.Terminado();
+            viaLibre = !TempMessageController.Instancia.Terminado();
         }
         while (viaLibre);
 

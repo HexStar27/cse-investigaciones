@@ -42,14 +42,14 @@ public class OperacionesGameplay : MonoBehaviour
             if (completado)
             {
                 //Informar de que es correcto
-                TempMessageController.Instancia.InsetarMensajeEnCola("EUREKA");
+                TempMessageController.Instancia.GenerarMensaje("EUREKA");
                 ResourceManager.CasosCompletados++;
                 TerminarCaso();
             }
             else
             {
                 //Informar de que no es correcto
-                TempMessageController.Instancia.InsetarMensajeEnCola("Sin discrepancias...");
+                TempMessageController.Instancia.GenerarMensaje("Sin discrepancias...");
             }
 
             ResourceManager.ConsultasDisponibles--;
@@ -75,11 +75,11 @@ public class OperacionesGameplay : MonoBehaviour
         {
             PuzzleManager.Instance.solucionCorrecta = false;
             TerminarCaso();
-            TempMessageController.Instancia.InsetarMensajeEnCola("Dejando caso... :(");
+            TempMessageController.Instancia.GenerarMensaje("Dejando caso... :(");
         }
         else
         {
-            TempMessageController.Instancia.InsetarMensajeEnCola("No se puede descartar caso, no hay casos activos.");
+            TempMessageController.Instancia.GenerarMensaje("No se puede descartar caso, no hay casos activos.");
         }
     }
 
@@ -181,7 +181,7 @@ public class OperacionesGameplay : MonoBehaviour
         LUTEfectos[0] = () => //Evento
         {
             // TODO
-            TempMessageController.Instancia.InsetarMensajeEnCola("El mensaje...");
+            TempMessageController.Instancia.GenerarMensaje("El mensaje...");
         };
         LUTEfectos[1] = () => //Reto
         {
@@ -196,18 +196,18 @@ public class OperacionesGameplay : MonoBehaviour
         LUTEfectos[3] = () => //Papeleo
         {
             // TODO
-            TempMessageController.Instancia.InsetarMensajeEnCola("El mensaje...");
+            TempMessageController.Instancia.GenerarMensaje("El mensaje...");
         };
         LUTEfectos[4] = () => //Incertidumbre
         {
             // TODO
-            TempMessageController.Instancia.InsetarMensajeEnCola("El mensaje...");
+            TempMessageController.Instancia.GenerarMensaje("El mensaje...");
         };
         LUTEfectos[5] = () => //MasDificultad
         {
             ResourceManager.DificultadActual++;
             //PuntoGuardado.Fijar();
-            TempMessageController.Instancia.InsetarMensajeEnCola("LA DIFICULTAD HA SIDO AUMENTADA");
+            TempMessageController.Instancia.GenerarMensaje("LA DIFICULTAD HA SIDO AUMENTADA");
         };
         LUTEfectos[6] = () => //FinDelJuego...
         {

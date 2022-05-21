@@ -43,7 +43,7 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		}
 		else
 		{
-			TempMessageController.Instancia.InsetarMensajeEnCola("Necesitas más agentes para desbloquear el caso");
+			TempMessageController.Instancia.GenerarMensaje("Necesitas más agentes para desbloquear el caso");
 			// Todo: Efecto de sonido
 		}
 	}
