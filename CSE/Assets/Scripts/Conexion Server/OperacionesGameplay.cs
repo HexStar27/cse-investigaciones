@@ -15,11 +15,22 @@ public class OperacionesGameplay : MonoBehaviour
     {
         RealizarConsulta();
     }
-    public static void RealizarConsulta()
+    public static async void RealizarConsulta()
     {
-        // TODO
-        string consulta = LectorConsulta.GetQuery();
-        Debug.Log(consulta);
+        WWWForm form = new WWWForm();
+        form.AddField("authorization",SesionHandler.sessionKEY);
+        form.AddField("consulta", LectorConsulta.GetQuery());
+
+        await ConexionHandler.APost(ConexionHandler.baseUrl + "case/check", form);
+        string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
+        if (resultado.Length < 3)
+        {
+            ResourceManager.ConsultasDisponibles--;
+            return;
+        }
+        resultado = resultado.Substring(1, resultado.Length - 2);
+        ImpresorResultado.Instancia.IntroducirResultado(resultado);
+
         ResourceManager.ConsultasDisponibles--;
     }
 
@@ -27,33 +38,36 @@ public class OperacionesGameplay : MonoBehaviour
     {
         ComprobarCaso();
     }
-    public static void ComprobarCaso()
+    public static async void ComprobarCaso()
     {
         //Sólo comprueba el caso si hay uno activo
         if (GameplayCycle.Instance.GetState() == 1)
         {
             //Se ha completado el caso?
-            //StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "case/solve",new Dictionary<string, string>()
-            //{ 
-            //Poner aquí los elementos a pasar por el header...
-            //}));
-            bool completado = false;
+            WWWForm form = new WWWForm();
+            form.AddField("authorization", SesionHandler.sessionKEY);
+            form.AddField("caseid", PuzzleManager.Instance.casoActivo.id);
+            form.AddField("caso", LectorConsulta.GetQuery());
+            await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
+            string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
+            bool completado = response[0] == 't'; // "true"
             PuzzleManager.Instance.solucionCorrecta = completado;
             if (completado)
             {
                 //Informar de que es correcto
-                TempMessageController.Instancia.GenerarMensaje("EUREKA");
+                TempMessageController.Instancia.GenerarMensaje("INFORMACIÓN CORRECTA, CRIMEN RESUELTO");
                 ResourceManager.CasosCompletados++;
                 TerminarCaso();
             }
             else
             {
                 //Informar de que no es correcto
-                TempMessageController.Instancia.GenerarMensaje("Sin discrepancias...");
+                TempMessageController.Instancia.GenerarMensaje("Crimen no resuelto...");
             }
 
             ResourceManager.ConsultasDisponibles--;
         }
+        else TempMessageController.Instancia.GenerarMensaje("Actualmente no se está resolviendo ningún caso");
     }
 
     private static void TerminarCaso()

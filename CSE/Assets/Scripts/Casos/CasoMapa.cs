@@ -22,35 +22,41 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 	public void Comprar()
 	{
-		if(SePuedeComprar())
-		{
-			int p = (int)TabType.Pistas;
-			if (caso.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
-			int n = caso.pistas.Length;
-			string[] palabras = new string[n];
-			for(int i = 0; i < n; i++)
-			{
-				palabras[i] = caso.pistas[i].palabra;
-			}
-			almacenPalabras.palabras[p] = palabras;
-
-			menuHover.Abrir(false);
-			PuzzleManager.Instance.casoActivo = caso;
-			ResourceManager.AgentesDisponibles -= caso.coste;
-			GameplayCycle.Instance.SetState(1); // Inicio Caso
-
-			Destroy(gameObject);
-		}
-		else
+		if(!SePuedeComprar())
 		{
 			TempMessageController.Instancia.GenerarMensaje("Necesitas más agentes para desbloquear el caso");
 			// Todo: Efecto de sonido
+			return;
 		}
+
+		if (GameplayCycle.Instance.GetState() == casoEmpezado) // Ya hay otro caso activo
+		{
+			TempMessageController.Instancia.GenerarMensaje("Sólo se puede resolver un caso a la vez");
+			// Todo: Efecto de sonido
+			return;
+		}
+
+		int p = (int)TabType.Pistas;
+		if (caso.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
+		int n = caso.pistas.Length;
+		string[] palabras = new string[n];
+		for (int i = 0; i < n; i++)
+		{
+			palabras[i] = caso.pistas[i].palabra;
+		}
+		almacenPalabras.palabras[p] = palabras;
+
+		menuHover.Abrir(false);
+		PuzzleManager.Instance.casoActivo = caso;
+		ResourceManager.AgentesDisponibles -= caso.coste;
+		GameplayCycle.Instance.SetState(1); // Inicio Caso
+
+		Destroy(gameObject);
 	}
 
 	private bool SePuedeComprar()
 	{
-		return caso.coste <= ResourceManager.AgentesDisponibles && GameplayCycle.Instance.GetState() != casoEmpezado;
+		return caso.coste <= ResourceManager.AgentesDisponibles;
 	}
 
 	public void EstablecerSprite(Sprite sprite)

@@ -23,6 +23,7 @@ public class BloqueMov3D : MonoBehaviour
 	[SerializeField] protected LayerMask suelo;
 	[SerializeField] protected LayerMask bloque;
 	[SerializeField] protected LayerMask raiz;
+	[SerializeField] protected LayerMask papelera;
 	[SerializeField] protected float altura = 0.1f;
 	[SerializeField] protected bool constrainX = false;
 	[SerializeField] protected bool constrainY = false;
@@ -55,7 +56,7 @@ public class BloqueMov3D : MonoBehaviour
 		click = click && initMPos == Input.mousePosition;
 		return click;
 	}
-	private void DesconectarAnterior()
+	public void DesconectarAnterior()
 	{
 		if (anterior != null)
 		{
@@ -80,9 +81,19 @@ public class BloqueMov3D : MonoBehaviour
 		Vector3 dir = p - cam.transform.position;
 		Ray r = new Ray(cam.transform.position,dir);
 
-		if (Physics.Raycast(r, out RaycastHit info, maxDist, bloque.value | raiz.value))
+		if (Physics.Raycast(r, out RaycastHit info, maxDist, bloque.value | raiz.value | papelera.value))
 		{
-			if((1 << info.collider.gameObject.layer) == raiz.value)
+			int layerHit = 1 << info.collider.gameObject.layer;
+			if (layerHit == papelera.value)
+			{
+				PropagateColl(true);
+				if (anterior != null) DesconectarAnterior();
+				if (siguiente != null) siguiente.DesconectarAnterior();
+				Destroy(gameObject);
+				return;
+			}
+
+			if(layerHit == raiz.value)
 			{
 				BloqueMov3D ultimo = info.collider.GetComponent<BloqueMov3D>();
 				while(ultimo.siguiente != null && ultimo.siguiente != this)

@@ -36,7 +36,7 @@ public class PuzzleManager : MonoBehaviour
 		//1º Acceder a servidor pidiendo n casos ( usando el ConexionHanlder )
 		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
 		WWWForm form = new WWWForm();
-		form.AddField("authorization", SesionHandler.KEY);
+		form.AddField("authorization", SesionHandler.sessionKEY);
 		form.AddField("dif", ResourceManager.DificultadActual);
 		form.AddField("casos", n);
 
@@ -73,7 +73,7 @@ public class PuzzleManager : MonoBehaviour
 		//1º Acceder a servidor pidiendo un caso examen ( usando el ConexionHanlder ) según la dificultad actual
 		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
 		WWWForm form = new WWWForm();
-		form.AddField("authorization", SesionHandler.KEY);
+		form.AddField("authorization", SesionHandler.sessionKEY);
 		form.AddField("dif", ResourceManager.DificultadActual);
 
 		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/exam",form);

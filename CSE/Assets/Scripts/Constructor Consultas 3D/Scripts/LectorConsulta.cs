@@ -23,6 +23,8 @@ public class LectorConsulta : MonoBehaviour
             c += " " + actual.info.ConsultaParcial();
             actual = actual.siguiente;
         }
+
+        c = c.Replace(" x ", " * ");
         return c;
     }
 }

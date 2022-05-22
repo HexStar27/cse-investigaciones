@@ -112,7 +112,7 @@ namespace Hexstar
                 }
                 else Debug.LogError("Ha habido un error leyendo \"res\" en la respuesta recibida");
             }
-            else Debug.LogError("El servidor no ha aceptado la petición :(\n"+download);
+            else Debug.LogWarning("El servidor no ha aceptado la petición :(\n"+download);
             
             return "{}";
         }

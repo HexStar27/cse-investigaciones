@@ -10,7 +10,7 @@ namespace Hexstar
 {
 	public class SesionHandler : MonoBehaviour
 	{
-		public static string KEY = "";
+		public static string sessionKEY = "";
 		public static string ciphKey;
 		public static string ciphIv;
 		public static SesionHandler Instance { get; set; }
@@ -35,13 +35,13 @@ namespace Hexstar
 			int s = dh.IndexOf("\"token\":\"");
 			if(s < 0)
 			{
-				KEY = "";
+				sessionKEY = "";
 				return;
 			}
 			s += 9;
 			int i;
 			for (i = s; i < dh.Length && (dh[i] != '\"' || dh[i] != '\''); i++){}
-			KEY = dh.Substring(s,i-s-2);
+			sessionKEY = dh.Substring(s,i-s-2);
 		}
 
 		/// <summary>

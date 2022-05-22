@@ -44,7 +44,7 @@ public class MainMenuOp : MonoBehaviour
 
         //Enviando formulario a servidor para comprobar si se encuentra el correo
         yield return StartCoroutine(SesionHandler.Instance.IniciarSesion(correo,contra));
-        bool exito = SesionHandler.KEY != "";
+        bool exito = SesionHandler.sessionKEY != "";
         if (exito) //Si hemos recibido una KEY, entonces el inicio de sesión es correcto
         {
             GameManager.user = correo;

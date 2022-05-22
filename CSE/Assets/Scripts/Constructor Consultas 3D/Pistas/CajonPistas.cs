@@ -28,9 +28,12 @@ namespace Hexstar.CSE
         public void ActualizarElementosRelacionados()
         {
             string[] palabrasPistas = new string[pistas.Count];
+            string p;
             for (int i = 0; i < palabrasPistas.Length; i++)
             {
-                palabrasPistas[i] = pistas[i].datos.palabra;
+                p = pistas[i].datos.palabra;
+                if (double.TryParse(p, out _)) palabrasPistas[i] = p;   //Es número
+                else palabrasPistas[i] = "\"" + p + "\"";               //Es palabra
             }
             almacenPalabras.palabras[AlmacenDePalabras.TipoAIndice(TabType.Pistas)] = palabrasPistas;
 

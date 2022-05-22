@@ -73,7 +73,7 @@ public class MenuPartidaController : MonoBehaviour
             cerrojo = true;
             PuntoGuardado pg;
             WWWForm form = new WWWForm();
-            form.AddField("authorization", SesionHandler.KEY);
+            form.AddField("authorization", SesionHandler.sessionKEY);
             form.AddField("user", GameManager.user);
             await ConexionHandler.APost(ConexionHandler.baseUrl + "load", form);
             string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
@@ -102,7 +102,7 @@ public class MenuPartidaController : MonoBehaviour
     {
         cerrojo = true;
         WWWForm form = new WWWForm();
-        form.AddField("authorization", SesionHandler.KEY);
+        form.AddField("authorization", SesionHandler.sessionKEY);
         form.AddField("user", GameManager.user);
         form.AddField("save", JsonConverter.ConvertirAJson(ResourceManager.checkpoint));
         await ConexionHandler.APost(ConexionHandler.baseUrl +"save", form);

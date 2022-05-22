@@ -14,15 +14,16 @@ namespace Hexstar.CSE
         public GameObject palabraPrefab;
         public GameObject separadorPrefab;
         public ContentScaler[] listasPalabras = new ContentScaler[0];
-         List<List<ContenedorPalabra>> contenedores = new List<List<ContenedorPalabra>>();
+        List<List<ContenedorPalabra>> contenedores = new List<List<ContenedorPalabra>>();
 
         public GameObject palabraSeleccionadaPrefab;
         public ContentScaler listaSeleccionados;
-         List<PalabraSeleccionada> seleccionadas = new List<PalabraSeleccionada>();
+        List<PalabraSeleccionada> seleccionadas = new List<PalabraSeleccionada>();
         private char[] trimParams = { ',', ' ' };
 
         private bool isOpen;
         private bool isSelect = false;
+        bool lastWasOperator = false;
 
 
         public static SelectorPalabras instancia;
@@ -52,7 +53,7 @@ namespace Hexstar.CSE
 
         public void Cerrar()
         {
-            if(bloqueActual) bloqueActual.SeleccionarContenido(contenidoActual.text);
+            if (bloqueActual) bloqueActual.SeleccionarContenido(contenidoActual.text);
             LimpiarPalabrasSeleccionadas();
             tabs.ResetBloqueos();
             padreCanvas.SetActive(false);
@@ -67,14 +68,31 @@ namespace Hexstar.CSE
         public void Actualizar(string conjunto)
         {
             contenidoActual.text = conjunto;
+            if(conjunto.Length > 0)
+            {
+                if(conjunto[0] == ' ')
+                {
+                    Parse(conjunto.Substring(1,conjunto.Length-1));
+                    return;
+                }
+            }
             Parse(conjunto);
         }
 
-        public void IncluirPalabra(string palabra)
+        public void IncluirPalabra(string palabra, bool incluirEnLista = true)
         {
-            if (contenidoActual.text.Length > 0) contenidoActual.text += ", " + palabra;
+            //Si la "palabra" es un operador, no poner comas.
+            bool isop = almacen.IsOperador(palabra);
+            if (contenidoActual.text.Length > 0)
+            {
+                if (!isop && !lastWasOperator) contenidoActual.text += ", " + palabra;
+                else contenidoActual.text += " " + palabra;
+            }
             else contenidoActual.text += palabra;
-            ColocarPalabraEnLista(palabra);
+            
+            if(incluirEnLista) ColocarPalabraEnLista(palabra);
+
+            lastWasOperator = isop;
         }
 
         public void RetirarPalabra(PalabraSeleccionada p)
@@ -86,7 +104,16 @@ namespace Hexstar.CSE
                 int final = inicio + palabra.Length;
 
                 if (final < contenidoActual.text.Length)
-                    contenidoActual.text = contenidoActual.text.Remove(inicio, palabra.Length + 2);
+                {
+                    int offsetI = 0,offsetF = 0;
+                    if (contenidoActual.text[final] + 1 == '\"')
+                    {
+                        offsetI = -1;
+                        offsetF = 1;
+                    }
+                    if (contenidoActual.text[final + offsetF] == ',') offsetF += 2;
+                    contenidoActual.text = contenidoActual.text.Remove(inicio + offsetI, palabra.Length + offsetF);
+                }
                 else if (final == contenidoActual.text.Length && inicio >= 2)
                     contenidoActual.text = contenidoActual.text.Remove(inicio - 2, palabra.Length + 2);
                 else
@@ -129,10 +156,10 @@ namespace Hexstar.CSE
         /// sus correspondientes pestañas
         /// </summary>
         public void RellenarSelector()
-        {            
+        {
             foreach (var lista in listasPalabras)
-                if (lista == null) 
-                    Debug.LogError("("+name+") No se puede actualizar una lista nula.");
+                if (lista == null)
+                    Debug.LogError("(" + name + ") No se puede actualizar una lista nula.");
 
             if (listasPalabras.Length != almacen.palabras.Length)
             {
@@ -144,7 +171,7 @@ namespace Hexstar.CSE
                 {
                     foreach (var p in contenedor)
                     {
-                        Destroy(p.gameObject,2);
+                        Destroy(p.gameObject, 2);
                     }
                 }
 
@@ -161,7 +188,7 @@ namespace Hexstar.CSE
                             o.texto.text = palabras[j];
                             contenedores[i].Add(o);
                         }
-                        else if(palabras[j] == palabras[j].ToUpper()) //La palabra es única del propio lenguaje de SQL
+                        else if (palabras[j] == palabras[j].ToUpper()) //La palabra es única del propio lenguaje de SQL
                         {
                             ContenedorPalabra o = Instantiate(palabraPrefab, listasPalabras[i].transform).GetComponent<ContenedorPalabra>();
                             o.Inicializar(false, false);
@@ -188,6 +215,7 @@ namespace Hexstar.CSE
 
         private void Parse(string conjunto)
         {
+            char[] trimmingtime = {',',' '};
             List<string> palabras = new List<string>();
 
             //Obtener las palabras escogidas
@@ -200,10 +228,16 @@ namespace Hexstar.CSE
                     if (conjunto[j] == ',') comaEncontrada = true;
                 }
 
-                if (j < conjunto.Length)
-                    palabras.Add(conjunto.Substring(i, j - i - 1));
-                else if (j == conjunto.Length)
-                    palabras.Add(conjunto.Substring(i, j - i));
+                string c = conjunto.Substring(i,j-i);
+                if(almacen.ContainsOperador(c))
+                {
+                    string[] otrasPalabras = c.Split(' ');
+                    foreach (var p in otrasPalabras)
+                    {
+                        palabras.Add(p.Trim(','));
+                    }
+                }
+                else palabras.Add(conjunto.Substring(i, j - i).Trim(trimmingtime));
 
                 i = j;
             }
@@ -244,8 +278,7 @@ namespace Hexstar.CSE
                 contenidoActual.text = "";
                 for(int i = 0; i < seleccionadas.Count; i++)
                 {
-                    if (contenidoActual.text.Length > 0) contenidoActual.text += ", " + seleccionadas[i].palabra.text;
-                    else contenidoActual.text += seleccionadas[i].palabra.text;
+                    IncluirPalabra(seleccionadas[i].palabra.text, false);
                 }
             }
         }
