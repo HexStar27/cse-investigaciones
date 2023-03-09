@@ -5,7 +5,7 @@ public class MenuPausa : MonoBehaviour
 {
 	public GameObject menu;
 	[SerializeField] private int escenaId = 1;
-	public bool Paused { get; private set; } = false;
+	public static bool Paused { get; private set; } = false;
 
 	private void Update()
 	{
@@ -13,6 +13,8 @@ public class MenuPausa : MonoBehaviour
 		{
 			Paused = !Paused;
 			menu.SetActive(Paused);
+			if (Paused) GameManager.OnPause.Invoke();
+			else GameManager.OnUnpause.Invoke();
 		}
 	}
 
@@ -20,6 +22,6 @@ public class MenuPausa : MonoBehaviour
 	{
 		OperacionesGameplay.Snapshot();
 		MenuPartidaController.GuardarPartidaEnCurso_S();
-		GameManager.CargarEscena_S(escenaId);
+		GameManager.CargarEscena(escenaId);
 	}
 }

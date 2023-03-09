@@ -9,19 +9,15 @@ public class TempMessageController : MonoBehaviour
 
     [SerializeField] private GameObject prefabMensaje;
     [SerializeField] private RectTransform parent;
-    public float alturaMensajes = 100;
     private float tiempoReinicio = 1 + ((float)TempMessage.duracion)/1000;
     private float contador = 0;
-    private bool terminado = true;
-    private int acumulaciones = 0;
+    [SerializeField] private bool terminado = true;
 
     public void GenerarMensaje(string mensaje)
     {
         terminado = false;
         contador = tiempoReinicio;
-        float offset = alturaMensajes * acumulaciones++;
-        TempMessage a = Instantiate(prefabMensaje, parent.position + new Vector3(0,-offset,0), Quaternion.identity, parent).GetComponent<TempMessage>();
-        parent.anchoredPosition = new Vector2(parent.anchoredPosition.x,offset);
+        TempMessage a = Instantiate(prefabMensaje, parent).GetComponent<TempMessage>();
         a.EjecutarMensaje(mensaje);
     }
 
@@ -34,14 +30,9 @@ public class TempMessageController : MonoBehaviour
     private void FixedUpdate()
     {
         if(contador <= 0)
-        {
             terminado = true;
-            acumulaciones = 0;
-        }
         else
-        {
             contador -= Time.fixedDeltaTime;
-        }
     }
 
     public bool Terminado() { return terminado; }

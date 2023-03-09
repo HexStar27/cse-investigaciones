@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b40f24b64a5fe442808bd7ccf0730ee, type: 3}
+  m_Name: nuevoAlmacen
+  m_EditorClassIdentifier: 
+  bloquesPrefab:
+  - prefab: {fileID: 2996546813201473964, guid: 7e06c5cfb10d0214aad9b865111cd593,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: SELECT
+  - prefab: {fileID: 4197847566453873662, guid: 448c922b73933844284f5dca2d9e37a3,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: FROM
+  - prefab: {fileID: 9101100125165716360, guid: d0e105399691cad46bdd06eeeaceee38,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: WHERE
+  - prefab: {fileID: 1711424462339358555, guid: 8d1d253e80e11a64eac5687bb41da7e3,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: GROUP BY
+  - prefab: {fileID: 5512188063596356509, guid: 98956eaf432fcd643a624670e2da555f,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: HAVING
+  - prefab: {fileID: 6285268189366427423, guid: 9688f222feaa0dd409de8fd55225e845,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: ORDER BY
+  - prefab: {fileID: 2578874824649413518, guid: ab26c09b7a641b14ebc04b3e07786a6d,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: Columna
+  - prefab: {fileID: 7161614912680464082, guid: 6d01dbf4d3767304f8b6ee92951542fd,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: Tabla
+  - prefab: {fileID: 8169189200474582010, guid: 09984a4b1e37ea840869a422c858238c,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: Valor
+  - prefab: {fileID: 2866258637498183560, guid: b08a820eb96d66d469fd59f29ef3a45f,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: AS
+  - prefab: {fileID: 1497208541678768579, guid: 842e95a02f18dfa4ea39c3f7984fdf30,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: "Op Aritm\xE9tico"
+  - prefab: {fileID: 3064252422129886177, guid: 46bb3ae3e4813a345abd255895b53ac7,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: "Op L\xF3gico"
+  - prefab: {fileID: 3064252422129886177, guid: a23e14096beec5f4fa3d422309c5dced,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: Op Relacional
+  - prefab: {fileID: 729866779978605911, guid: c43bfe2ef76498c45bb7ee500c4aaa9b, type: 3}
+    disponibleEnDificultad: 0
+    titulo: IN
+  - prefab: {fileID: 729866779978605911, guid: e57f463b3ab7e2642bfe1cb0ec95e66f, type: 3}
+    disponibleEnDificultad: 0
+    titulo: EXIST
+  - prefab: {fileID: 729866779978605911, guid: 260e8c02d3ebe8b4f8c2d44cedc189ab, type: 3}
+    disponibleEnDificultad: 0
+    titulo: ANY
+  - prefab: {fileID: 729866779978605911, guid: 7d9ad47d6d0370146ac3b087a0559dfa, type: 3}
+    disponibleEnDificultad: 0
+    titulo: ALL
+  - prefab: {fileID: 3931597870867859610, guid: d98a26f380959b3449a11c219fca09ab,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: COUNT
+  - prefab: {fileID: 3931597870867859610, guid: 32be009464a0e9349b4d1c3ba9f876b9,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: MAX
+  - prefab: {fileID: 3931597870867859610, guid: 8d0da08665f67504993631895d4bc79e,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: MIN
+  - prefab: {fileID: 3931597870867859610, guid: 97d2c24274118c041bfbb72316fd43b0,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: SUM
+  - prefab: {fileID: 3931597870867859610, guid: 4c5df0dd8217a914f8171517f9aad572,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: AVG
+  - prefab: {fileID: 3209334121000878702, guid: b041d284f07992444a0483510b4f64bf,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: JOIN
+  - prefab: {fileID: 3209334121000878702, guid: 5206bc975e5f11b418c209e73e8806b1,
+      type: 3}
+    disponibleEnDificultad: 0
+    titulo: BETWEEN

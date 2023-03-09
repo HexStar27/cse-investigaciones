@@ -4,6 +4,9 @@ public class DrawerHelper : MonoBehaviour
 {
 	[SerializeField] Animator _anim;
 	[SerializeField] CameraState _state;
+	[Header("Opcional")]
+	[SerializeField] AudioSource _audio;
+	[SerializeField] AudioClip[] clips;
 	bool opened = false;
 
 	public string[] triggerNames = {"TriggerA", "TriggerB"};
@@ -28,6 +31,13 @@ public class DrawerHelper : MonoBehaviour
 			opened = true;
 		}
 	}
+
+	public void Play(int clip)
+    {
+		if (_audio == null) return;
+		if (clip >= clips.Length || clip < 0) return;
+		_audio.PlayOneShot(clips[clip]);
+    }
 
 	private void OnEnable()
 	{

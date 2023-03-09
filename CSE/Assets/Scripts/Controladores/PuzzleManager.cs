@@ -2,30 +2,86 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using Hexstar.CSE;
 using Hexstar;
-using UnityEngine.Networking;
+using SimpleJSON;
 using System.Threading.Tasks;
 
 public class PuzzleManager : MonoBehaviour
 {
 	public static PuzzleManager Instance { get; private set; }
-	public AlmacenDePalabras almacen;
 
-	[SerializeField] List<Caso> casosCargados = new List<Caso>();
+	public List<Caso> casosCargados = new List<Caso>();
+	public List<int> puntuacionesPorCaso = new List<int>();
 	private GameObject[] casosGO = new GameObject[0];
-	public Caso casoExamen;
-
-	public Caso casoActivo;
+	[Header("Info:")]
+	public bool casoExamen; //¿Es el caso activo de tipo examen?
+	public int casoActivo; //Índice de la lista de casosCargados
 	public bool solucionCorrecta = false;
 
 	[SerializeField] RectTransform _map;
 	[SerializeField] CasoDescripcion _descriptor;
-
-	[SerializeField] Sprite spriteCaso;
-	[SerializeField] Sprite spriteCasoExamen;
+	[SerializeField] HighScoreTable _hst;
 
 	public GameObject casoMapaPrefab;
+	public GameObject casoMapaSPrefab;
+	public GameObject casoMapaBPrefab;
+
+	public static async Task PrepararCasosInicioDia(int casosACargar, int thresholdExamen)
+    {
+		Instance.QuitarTodos();
+		await Instance.LoadCasos(casosACargar);
+		//Cargar caso examen si necesario
+		if (ResourceManager.CasosCompletados >= thresholdExamen) await Instance.LoadCasoExamen();
+		Instance.MostrarCasosEnPantalla();
+		ObtenerPuntuacionesDeCasosCargados();
+	}
+
+	public static async Task RecargarCasosDePartidaGuardada(int[] listaIDs)
+    {
+		Instance.QuitarTodos();
+		for (int i = 0; i < listaIDs.Length; i++) 
+			await Instance.LoadCasoEspecifico(listaIDs[i]);
+		Instance.MostrarCasosEnPantalla();
+		ObtenerPuntuacionesDeCasosCargados();
+	}
+
+	public static async Task RellenarCasoFinCaso(int casosNuevos)
+    {
+		Instance.LimpiarPantalla();
+		await Instance.LoadCasos(casosNuevos);
+		Instance.MostrarCasosEnPantalla();
+		ObtenerPuntuacionesDeCasosCargados(true);
+	}
+
+	private static async void ObtenerPuntuacionesDeCasosCargados(bool dontClearJustAdd = false)
+    {
+		if(!dontClearJustAdd)
+        {
+			Instance._hst.DeleteElements();
+			Instance.puntuacionesPorCaso.Clear();
+		}
+		foreach(var c in Instance.casosCargados)
+        {
+			Instance._hst.SetCasoID(c.id);
+			await Instance._hst.SetupScore(false);
+			Instance.puntuacionesPorCaso.Add(Instance._hst.elements.Count);
+		}
+    }
+
+	public static void LimpiarFlags()
+    {
+		Instance.casoActivo = -1;
+		Instance.casoExamen = false;
+		Instance.solucionCorrecta = false;
+    }
+
+
+	public static Caso GetCasoCargado(int idx) { return Instance.casosCargados[idx]; }
+	public static Caso GetCasoActivo()
+    {
+		if (Instance.casoActivo < 0) return null;
+		return Instance.casosCargados[Instance.casoActivo];
+    }
 
 	/// <summary>
 	/// Añade casos a la lista
@@ -33,61 +89,68 @@ public class PuzzleManager : MonoBehaviour
 	/// <param name="n"></param>
 	public async Task LoadCasos(int n)
 	{
-		//1º Acceder a servidor pidiendo n casos ( usando el ConexionHanlder )
-		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
+		//1º Acceder a servidor pidiendo n casos
 		WWWForm form = new WWWForm();
 		form.AddField("authorization", SesionHandler.sessionKEY);
 		form.AddField("dif", ResourceManager.DificultadActual);
 		form.AddField("casos", n);
-
 		await ConexionHandler.APost(ConexionHandler.baseUrl+"case",form);
+		
+		//2º Parsear y guardarlos en casosCargados
+		ParsearJsonACasos(ConexionHandler.download);
 	}
 
-	private void ParsearJsonACasos(DownloadHandler download)
+	public async Task LoadCasoEspecifico(int id)
+    {
+		//1º Acceder a servidor pidiendo el caso 'id'
+		WWWForm form = new WWWForm();
+		form.AddField("authorization", SesionHandler.sessionKEY);
+		form.AddField("caso", id);
+		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/get", form);
+		
+		//2º Parsear y añadirlo a casosCargados
+		ParsearJsonACasos(ConexionHandler.download);
+	}
+
+	private void ParsearJsonACasos(string download)
 	{
 		//2º Parsear datos
-		string json = ConexionHandler.ExtraerJson(download.text);
-		json = json.Substring(1, json.Length - 2);
-		var cads = json.Split('#');
-		
-		List<Caso> casos = new List<Caso>();
-		foreach (var t in cads)
+		string json = ConexionHandler.ExtraerJson(download);
+		if (json == "{}")
 		{
-			Caso c = JsonConverter.PasarJsonAObjeto<Caso>(t);
-			casos.Add(c);
+			Debug.LogError("Ha habido un error en el servidor al pedir los casos :(");
+			return;
 		}
-		
-		//3º Crear casos
-		int n = casos.Count;
+		//3º Añadir casos
+		JSONNode jNodo = JSON.Parse(download);
+		int n = jNodo["res"].Count;
 		for (int i = 0; i < n; i++)
 		{
-			casosCargados.Add(casos[i]);
+			string cs = jNodo["res"][i].ToString();
+			Caso c = JsonConverter.PasarJsonAObjeto<Caso>(cs);
+			if (c != null) casosCargados.Add(c);
 		}
-		ConexionHandler.onFinishRequest.RemoveListener(ParsearJsonACasos);
-
-		//MostrarCasosEnPantalla();
 	}
 
 	public async Task LoadCasoExamen()
 	{
-		//1º Acceder a servidor pidiendo un caso examen ( usando el ConexionHanlder ) según la dificultad actual
-		ConexionHandler.onFinishRequest.AddListener(ParsearJsonACasos);
+		//1º Acceder a servidor pidiendo un caso examen según la dificultad actual
 		WWWForm form = new WWWForm();
 		form.AddField("authorization", SesionHandler.sessionKEY);
 		form.AddField("dif", ResourceManager.DificultadActual);
-
 		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/exam",form);
+
+		//2º Parsear y añadirlo a casosCargados
+		ParsearJsonACasos(ConexionHandler.download);
 	}
 
 	public void QuitarTodos()
 	{
-		int n = casosGO.Length;
-		for(int i = 0; i < n; i++)
-		{
-			Destroy(casosGO[i]);
-		}
+		//Destruye todos los casos en la pantalla
+		LimpiarPantalla();
+		// Limpia todas las listas y flags
 		casosCargados.Clear();
-		casoExamen = null;
+		LimpiarFlags();
 	}
 	public void QuitarCaso(Caso c)
 	{
@@ -99,6 +162,14 @@ public class PuzzleManager : MonoBehaviour
 			casosGO[i] = null;
 		}
 	}
+	public void LimpiarPantalla()
+    {
+		int n = casosGO.Length;
+		for (int i = 0; i < n; i++)
+		{
+			Destroy(casosGO[i]);
+		}
+	}
 
 	public void MostrarCasosEnPantalla()
 	{
@@ -107,48 +178,36 @@ public class PuzzleManager : MonoBehaviour
 		Vector2 size = 0.5f*_map.sizeDelta;
 		int n = casosCargados.Count;
 		Vector2[] posiciones = new Vector2[n];
+		casosGO = new GameObject[n];
 
-		int N = n + (casoExamen!=null?1:0);
-		casosGO = new GameObject[N];
-
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < n; i++) // Precalcular posiciones
 		{
 			posiciones[i].x = UnityEngine.Random.Range(offset - size.x, size.x - 2*offset);
 			posiciones[i].y = UnityEngine.Random.Range(2*offset - size.y, size.y - offset);
 		}
+
 		//2º Inicializar CasosMapa (1 por caso almacenado)
-		if(casoExamen != null)
-		{
-			GameObject o = Instantiate(casoMapaPrefab, _map);
-			CasoMapa cm = o.GetComponent<CasoMapa>();
-			cm.caso = casoExamen;
-			cm.almacenPalabras = almacen;
-			cm.menuHover = _descriptor;
-			cm.EstablecerSprite(spriteCasoExamen);
-			Vector2 p = new Vector2( UnityEngine.Random.Range(offset, size.x - offset), 
-									UnityEngine.Random.Range(offset, size.y - offset));
-			//3º Posicionar
-			o.transform.localPosition = p;
-			casosGO[n] = o;
-		}
 		GameObject objeto;
-		CasoMapa casoM;
-		for(int i = 0; i < n; i++)
-		{
-			objeto = Instantiate(casoMapaPrefab, _map);
-			casoM = objeto.GetComponent<CasoMapa>();
-			casoM.caso = casosCargados[i];
-			casoM.almacenPalabras = almacen;
-			casoM.menuHover = _descriptor;
-			casoM.EstablecerSprite(spriteCaso);
-			//3º Posicionar
-			objeto.transform.localPosition = posiciones[i];
-			casosGO[i] = objeto;
-		}
-	}
+        for (int i = 0; i < n; i++)
+        {
+			if(casosCargados[i].examen) objeto = Instantiate(casoMapaBPrefab, _map);
+			else objeto = Instantiate(casoMapaPrefab, _map);
+            
+			if (objeto.TryGetComponent(out CasoMapa casoM))
+            {
+                casoM.caso = i;
+                casoM.menuHover = _descriptor;
+				casoM.CargarDatosCaso();
+            }
+            //3º Posicionar
+            objeto.transform.localPosition = posiciones[i];
+            casosGO[i] = objeto;
+        }
+    }
 
 	private void Awake()
 	{
 		Instance = this;
+		_hst.InitializePrefab();
 	}
 }

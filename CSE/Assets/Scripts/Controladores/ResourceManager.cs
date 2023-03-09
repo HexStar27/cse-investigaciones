@@ -1,4 +1,6 @@
 ﻿/// Esta clase se encarga de controlar los recursos del jugador
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 
 public static class ResourceManager
@@ -8,10 +10,11 @@ public static class ResourceManager
     private static int agentesDisponibles;
     private static int consultasDisponibles;
     private static int consultasMaximas;
-    private static int casosCompletados;
+    private static int casosCompletados; //A.K.A. reputación
     private static int dificultadActual;
     private static int puntuacion;
     private static int dia;
+    private static List<string> tableCodes;
 
     public class OnEvent : UnityEvent { }
     public static OnEvent OnOutOfAgents = new OnEvent();
@@ -83,4 +86,9 @@ public static class ResourceManager
         }
     }
 
+    public static List<string> TableCodes
+    {
+        get => tableCodes;
+        set => tableCodes = value;
+    }
 }

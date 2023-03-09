@@ -38,12 +38,6 @@ namespace Hexstar
 			banco.Add(newEvent);
 		}
 
-		public void Activate(Evento e)
-		{
-
-			activos.Add(e);
-		}
-
 		/// <summary>
 		/// Delete all events in the bank
 		/// </summary>

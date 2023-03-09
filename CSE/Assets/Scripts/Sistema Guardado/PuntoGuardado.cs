@@ -1,4 +1,6 @@
-﻿///Esta clase se encarga de guardar los datos relevantes de la partida.
+﻿using System.Collections.Generic;
+using UnityEngine;
+///Esta clase se encarga de guardar los datos relevantes de la partida.
 [System.Serializable]
 public class PuntoGuardado
 {
@@ -7,10 +9,11 @@ public class PuntoGuardado
 	public int consultasMaximas;
 	public int casosCompletados;
 	public int dificultadActual;
-	public int puntuacion;
 	public int dia;
+	public int[] casosCargados; //?
 	public int casoEnCurso;
 	public int[] eventosActivos;
+	public string[] tableCodes;
 	//Y demás cosillas por aquí...
 
 	public PuntoGuardado()
@@ -20,11 +23,12 @@ public class PuntoGuardado
 		consultasMaximas = 4;
 		casosCompletados = 0;
 		dificultadActual = 1;
-		puntuacion = 0;
 		dia = 0;
+		casosCargados = new int[0];
 		casoEnCurso = -1;
 		eventosActivos = new int[0];
-	}
+		tableCodes = new string[0];
+}
 
 	public void Fijar()
 	{
@@ -33,11 +37,14 @@ public class PuntoGuardado
 		consultasMaximas = ResourceManager.ConsultasMaximas;
 		casosCompletados = ResourceManager.CasosCompletados;
 		dificultadActual = ResourceManager.DificultadActual;
-		puntuacion = ResourceManager.Puntuacion;
 		dia = ResourceManager.Dia;
-		if (PuzzleManager.Instance.casoActivo != null) casoEnCurso = PuzzleManager.Instance.casoActivo.id;
-		else casoEnCurso = -1;
+
+		List<int> idCasos = new List<int>();
+		foreach (var caso in PuzzleManager.Instance.casosCargados) idCasos.Add(caso.id);
+		casosCargados = idCasos.ToArray();
+		casoEnCurso = PuzzleManager.Instance.casoActivo;
 		eventosActivos = new int[0]; //Falta por ponerlo...
+		tableCodes = ResourceManager.TableCodes.ToArray();
 	}
 
 	public void Cargar()
@@ -47,10 +54,10 @@ public class PuntoGuardado
 		ResourceManager.ConsultasMaximas = consultasMaximas;
 		ResourceManager.CasosCompletados = casosCompletados;
 		ResourceManager.DificultadActual = dificultadActual;
-		ResourceManager.Puntuacion = puntuacion;
 		ResourceManager.Dia = dia;
-		//Cargar los casos indicados
-		//PuzzleManager.Instance.casoActivo = casoEnCurso;
-		//if (casoEnCurso >= 0) GameplayCycle.Instance.SetState(1);
+
+		List<string> codes = new List<string>();
+		codes.AddRange(tableCodes);
+		ResourceManager.TableCodes = codes;
 	}
 }

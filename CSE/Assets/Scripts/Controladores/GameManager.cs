@@ -3,65 +3,56 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public static class GameManager
 {
-    public UnityEvent OnPause;
-    public UnityEvent OnUnpause;
+    public static UnityEvent OnPause = new UnityEvent();
+    public static UnityEvent OnUnpause = new UnityEvent();
 
     public static string user;
+    private static bool isLoading;
 
-    private bool isLoading;
-
-    public static GameManager Instancia { get; private set; }
-
-    private void Awake()
-    {
-        if (Instancia == null) Instancia = this;
-        DontDestroyOnLoad(gameObject);
-    }
-
-    public void CerrarAplicacion()
+    public static void CerrarAplicacion()
     {
         Application.Quit();
     }
 
-    public void CargarEscena(int escenaId)
-    {
-        SceneManager.LoadScene(escenaId);
-    }
-    public static void CargarEscena_S(int escenaId)
+    public static void CargarEscena(int escenaId)
     {
         SceneManager.LoadScene(escenaId);
     }
 
+    public static IEnumerator CarganConPantallaDeCarga(int escenaId)
+    {
+        if (!isLoading)
+        {
+            isLoading = true;
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(escenaId);
+
+            // Wait until the asynchronous scene fully loads
+            while (!asyncLoad.isDone)
+            {
+                //Poner aquí todo lo que controla la pantalla de carga
+                yield return null;
+            }
+
+            isLoading = false;
+        }
+    }
+
+    /* Código zombi...
     public void CargarEscenaConPCarga(int escenaId)
     {
         if(!isLoading) StartCoroutine(CarganConPantallaDeCarga(escenaId));
     }
 
-    IEnumerator CarganConPantallaDeCarga(int escenaId)
-    {
-        isLoading = true;
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(escenaId);
-        
-        // Wait until the asynchronous scene fully loads
-        while (!asyncLoad.isDone)
-        {
-            //Poner aquí todo lo que controla la pantalla de carga
-            yield return null;
-        }
-        
-        isLoading = false;
-    }
-
-    public void Pausar()
+    public static void Pausar()
     {
         OnPause.Invoke();
     }
 
-    public void Despausar()
+    public static void Despausar()
     {
         OnUnpause.Invoke();
-    }
+    }*/
 
 }

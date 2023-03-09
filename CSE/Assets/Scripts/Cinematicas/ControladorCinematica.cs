@@ -12,6 +12,7 @@ namespace Hexstar
         [SerializeField] UnityEvent alTerminarCinematica = null;
         private bool pausado;
 
+        [ContextMenu("IniciarCinematica")]
         public void IniciarCinematica()
         {
             StartCoroutine(Loop());

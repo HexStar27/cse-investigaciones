@@ -1,15 +1,24 @@
-﻿/// Esta clase se va a encargar de mandar peticiones específicas del juego al servidor a través del Conexión Handler
+﻿// Esta clase se va a encargar de mandar peticiones específicas del juego al servidor a través del Conexión Handler
 
-using System.Collections.Generic;
 using UnityEngine;
 using Hexstar;
 using System;
+using System.Threading.Tasks;
 
 public class OperacionesGameplay : MonoBehaviour
 {
     private static Action[] LUTEfectos = new Action[16];
     public static int eventoId = 0;
 
+    [SerializeField] private GameObject dangerController;
+    private static GameObject dc;
+
+    private void Awake()
+    {
+        if (dangerController == null) 
+            Debug.LogError("Error, hace falta objeto Danger Controller en OperacionesGameplay.");
+        dc = dangerController;
+    }
 
     public void RealizarConsultaD()
     {
@@ -23,15 +32,20 @@ public class OperacionesGameplay : MonoBehaviour
 
         await ConexionHandler.APost(ConexionHandler.baseUrl + "case/check", form);
         string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
-        if (resultado.Length < 3)
-        {
-            ResourceManager.ConsultasDisponibles--;
-            return;
-        }
+
         resultado = resultado.Substring(1, resultado.Length - 2);
         ImpresorResultado.Instancia.IntroducirResultado(resultado);
 
-        ResourceManager.ConsultasDisponibles--;
+        if(GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        {
+            ResourceManager.ConsultasDisponibles--;
+            ActualizarDC();
+        }
+    }
+
+    public static void ActualizarDC()
+    {
+        dc.SetActive(ResourceManager.ConsultasDisponibles <= 1);
     }
 
     public void ComprobarCasoD()
@@ -41,12 +55,13 @@ public class OperacionesGameplay : MonoBehaviour
     public static async void ComprobarCaso()
     {
         //Sólo comprueba el caso si hay uno activo
-        if (GameplayCycle.Instance.GetState() == 1)
+        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
             //Se ha completado el caso?
+            int ind = PuzzleManager.Instance.casoActivo;
             WWWForm form = new WWWForm();
             form.AddField("authorization", SesionHandler.sessionKEY);
-            form.AddField("caseid", PuzzleManager.Instance.casoActivo.id);
+            form.AddField("caseid", PuzzleManager.Instance.casosCargados[ind].id);
             form.AddField("caso", LectorConsulta.GetQuery());
             await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
             string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
@@ -66,16 +81,17 @@ public class OperacionesGameplay : MonoBehaviour
             }
 
             ResourceManager.ConsultasDisponibles--;
+            ActualizarDC();
         }
         else TempMessageController.Instancia.GenerarMensaje("Actualmente no se está resolviendo ningún caso");
     }
 
     private static void TerminarCaso()
     {
-        if (GameplayCycle.Instance.GetState() == 1)
+        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            PuzzleManager.Instance.casoActivo = null;
-            GameplayCycle.Instance.SetState(2);
+            PuzzleManager.LimpiarFlags();
+            GameplayCycle.Instance.SetState(EstadosDelGameplay.FinCaso);
         }
     }
 
@@ -85,9 +101,8 @@ public class OperacionesGameplay : MonoBehaviour
     }
     public static void Rendirse()
     {
-        if(GameplayCycle.Instance.GetState() == 1)
+        if(GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            PuzzleManager.Instance.solucionCorrecta = false;
             TerminarCaso();
             TempMessageController.Instancia.GenerarMensaje("Dejando caso... :(");
         }
@@ -99,8 +114,11 @@ public class OperacionesGameplay : MonoBehaviour
 
     public static void SinConsultas()
     {
-        if (GameplayCycle.Instance.GetState() == 1) GameplayCycle.Instance.SetState(2);
-        else GameplayCycle.Instance.SetState(0);
+        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        {
+            GameplayCycle.Instance.SetState(EstadosDelGameplay.FinCaso);
+        }
+        else GameplayCycle.Instance.SetState(EstadosDelGameplay.FinDia);
     }
 
     /// <summary>
@@ -131,9 +149,9 @@ public class OperacionesGameplay : MonoBehaviour
         ResourceManager.checkpoint.Fijar();
     }
 
-    public static void EjecutarEventoAleatorio()
+    public static async Task EjecutarEventoAleatorio()
     {
-        return; //No habrán eventos en la Alpha
+        await Task.Yield(); //No habrán eventos en la Alpha
         // 1º Obtener el evento
         //int nEventos = BancoEventos.Instance().Count();
         //int e = UnityEngine.Random.Range(0,nEventos);

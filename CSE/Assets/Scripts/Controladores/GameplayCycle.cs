@@ -2,27 +2,36 @@
 /// Al cambiar el estado se está indicando que se está pasando a ese evento del juego.
 ////////////////////////////////////////////////////////////////////////////////////////
 
-using System;
 using UnityEngine;
 using Hexstar.CSE;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+[System.Serializable]
+public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
 public class GameplayCycle : MonoBehaviour
 {
 	public static GameplayCycle Instance { get; private set; }
 	public int EstadosPosibles { get; private set; }
+	private static readonly int multiplicadorExamenes = 3;
 
 	[SerializeField] DayCounter _dayCounter;
-	public AlmacenDePalabras almacenPalabras;
 
-	int estadoActual = 0;
-	bool gameover = false;
+	[Header("Status")]
+	[SerializeField] int estadoActual = 0;
+	[SerializeField] bool gameover = false;
+	bool habiaCasosEnArchivoGuardado = false;
 
 	Queue<int> pilaEstadosSiguientes = new Queue<int>();
 
+	public void SetState(EstadosDelGameplay estado)
+	{
+		if (gameover) return;
+		pilaEstadosSiguientes.Enqueue((int)estado);
+	}
 	public void SetState(int estado)
 	{
+		//El estado existe y no está activada la flag de fin de juego
 		if (estado >= 0 && estado < EstadosPosibles && !gameover) {
 			pilaEstadosSiguientes.Enqueue(estado);
 		}
@@ -36,6 +45,7 @@ public class GameplayCycle : MonoBehaviour
 			case 0: await InicioDia();	break;
 			case 1: await InicioCaso();	break;
 			case 2: await FinCaso();	break;
+			case 3: await FinDia();		break;
 		}
 	}
 
@@ -46,9 +56,7 @@ public class GameplayCycle : MonoBehaviour
 
 	private async Task InicioDia()
 	{
-		int dia = ++ResourceManager.Dia;
-
-		if (dia == 1)
+		if (ResourceManager.Dia == 0)
 		{
 			ResourceManager.ConsultasMaximas = 4;
 			//OperacionesGameplay.Instancia.CargarEventos();
@@ -62,27 +70,22 @@ public class GameplayCycle : MonoBehaviour
 				await GameOver(); //Fin del juego
 				return;
 			}
-
-			//OperacionesGameplay.Instancia.EjecutarEventoAleatorio();
+			await OperacionesGameplay.EjecutarEventoAleatorio();
 		}
 
-		//MostrarDía => al terminar... => Saludo de NPC
-		Task a = _dayCounter.InitAnimation(dia - 1, dia);
-
-		//Establecer consultas disponibles
-		ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
-
-		//Cargar los casos disponibles
-		PuzzleManager.Instance.QuitarTodos();
-		await PuzzleManager.Instance.LoadCasos(ResourceManager.ConsultasMaximas);
-		//Cargar caso examen si necesario
-		if (ResourceManager.CasosCompletados >= 4 * ResourceManager.DificultadActual)
-		{
-			await PuzzleManager.Instance.LoadCasoExamen();
+		//Establecer consultas disponibles y cargar los casos necesarios al iniciar el día
+		if (habiaCasosEnArchivoGuardado)
+        {
+			habiaCasosEnArchivoGuardado = false;
+			await PuzzleManager.RecargarCasosDePartidaGuardada(ResourceManager.checkpoint.casosCargados);
+        }
+        else
+        {
+			ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
+			await PuzzleManager.PrepararCasosInicioDia(ResourceManager.ConsultasMaximas,
+			multiplicadorExamenes * ResourceManager.DificultadActual);
 		}
-		PuzzleManager.Instance.MostrarCasosEnPantalla();
-
-		await Task.WhenAll(a);
+		OperacionesGameplay.ActualizarDC();
 	}
 
 	private async Task InicioCaso()
@@ -91,6 +94,10 @@ public class GameplayCycle : MonoBehaviour
 
 		//Mostrar pistas en cajón de pistas
 		CajonPistas.instancia.RellenarCajonConCasoActivo();
+		//Introducir pistas en almacén de bloques
+		AlmacenDePalabras.CargarPistasDeCasoActivo();
+		//Introducir las palabras del almacén al selector
+		SelectorPalabras.instancia.RellenarSelector();
 		await Task.Yield();
 	}
 
@@ -100,30 +107,34 @@ public class GameplayCycle : MonoBehaviour
 		bool completado = PuzzleManager.Instance.solucionCorrecta;
 
 		//Otorgar efectos correspondientes
+		//TODO...
 
-		//Rellenar mapa con el caso que falta
-		await PuzzleManager.Instance.LoadCasos(1);
-
-		//Iniciar siguiente día si no quedan consultas disponibles después de aplicar efectos
-		if(ResourceManager.ConsultasDisponibles == 0)
-		{
-			SetState(0);
-		}
-		else PuzzleManager.Instance.MostrarCasosEnPantalla();
+		//Iniciar siguiente día si no quedan consultas disponibles después de aplicar efectos,
+		if (ResourceManager.ConsultasDisponibles == 0) SetState(EstadosDelGameplay.FinDia);
+		else await PuzzleManager.RellenarCasoFinCaso(1);
 
 		//Aumentar dificultad si ha completado un caso examen
-		if (completado && PuzzleManager.Instance.casoActivo == PuzzleManager.Instance.casoExamen)
+		if (completado && PuzzleManager.Instance.casoExamen)
 		{
 			ResourceManager.DificultadActual++;
 		}
 
 		//Limpiar cajón de pistas y palabras en el selector
 		CajonPistas.instancia.VaciarCajon();
-		almacenPalabras.palabras[(int)TabType.Pistas] = new string[0];
+		AlmacenDePalabras.palabras[(int)TabType.Pistas] = new List<string>();
 		SelectorPalabras.instancia.RellenarSelector();
 
+		PuzzleManager.LimpiarFlags();
+	}
 
-		PuzzleManager.Instance.casoActivo = null;
+	private async Task FinDia()
+    {
+		int dia = ++ResourceManager.Dia;
+
+		//MostrarDía
+		await _dayCounter.InitAnimation(dia - 1, dia);
+
+		SetState(EstadosDelGameplay.InicioDia);
 	}
 
 	public async Task GameOver()
@@ -133,6 +144,8 @@ public class GameplayCycle : MonoBehaviour
 		//1º Oscurecer Pantalla con animación (como con el cambio de día)
 		//2º Mostrar boton de volver al menú y cargar último punto de guardado
 		//Ambos botones vuelven a cargar una escena, ya sea la misma u otra diferente.
+		if (TempMessageController.Instancia != null) 
+			TempMessageController.Instancia.GenerarMensaje("Game Over (Debug)");
 		await Task.Yield();
 	}
 
@@ -146,7 +159,10 @@ public class GameplayCycle : MonoBehaviour
 
 	private void Start()
 	{
-		if (ResourceManager.Dia == 0) SetState(0);
+		InicializacionDeSubSistemas();
+		if (ResourceManager.checkpoint.casoEnCurso < 0) SetState(EstadosDelGameplay.InicioDia);
+		else SetState(EstadosDelGameplay.InicioCaso);
+
 	}
 
 	private void OnEnable()
@@ -160,7 +176,7 @@ public class GameplayCycle : MonoBehaviour
 
 	private async void BucleExtractor()
 	{
-		while(true)
+		while(!gameover)
 		{
 			if(pilaEstadosSiguientes.Count > 0)
 			{
@@ -172,5 +188,13 @@ public class GameplayCycle : MonoBehaviour
 				await Task.Delay(100);
 			}
 		}
+	}
+
+
+	private void InicializacionDeSubSistemas()
+    {
+		AlmacenDePalabras.CargarPalabras();
+		habiaCasosEnArchivoGuardado = ResourceManager.checkpoint.casosCargados.Length > 0;
+		PuzzleManager.Instance.casoActivo = ResourceManager.checkpoint.casoEnCurso;
 	}
 }
