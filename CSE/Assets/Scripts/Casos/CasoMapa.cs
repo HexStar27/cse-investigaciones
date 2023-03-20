@@ -10,61 +10,78 @@ using Hexstar.CSE;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-	public Caso caso;
+	public int caso;
 	[HideInInspector] public CasoDescripcion menuHover;
-	[HideInInspector] public AlmacenDePalabras almacenPalabras;
 	public TextMeshProUGUI coste;
 
-	private static readonly int casoEmpezado = 1;
+	[Header("Audio clues")]
+	[SerializeField] AudioClip audioHover;
+	[SerializeField] AudioClip audioSelect, audioError;
+	AudioSource speaker; //El AudioSource del padre
 
-	public void Comprar()
+    private void Start()
+    {
+		speaker = transform.parent.GetComponent<AudioSource>();
+    }
+
+    public void Comprar()
 	{
-		if(SePuedeComprar())
+		if(!SePuedeComprar())
 		{
-			int p = (int)TabType.Pistas;
-			if (caso.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
-			int n = caso.pistas.Length;
-			int m = almacenPalabras.palabras[p].Length;
-			string[] palabras = new string[n+m];
-			for(int i = 0; i < n; i++)
-			{
-				palabras[i] = caso.pistas[i].palabra;
-			}
-			almacenPalabras.palabras[p].CopyTo(palabras, n);
-			almacenPalabras.palabras[p] = palabras;	
-
-			menuHover.Abrir(false);
-			PuzzleManager.Instance.casoActivo = caso;
-			ResourceManager.AgentesDisponibles -= caso.coste;
-			GameplayCycle.Instance.SetState(1); // Inicio Caso
-
-			Destroy(gameObject);
+			TempMessageController.Instancia.GenerarMensaje("Necesitas más agentes para desbloquear el caso");
+			if (speaker != null) speaker.PlayOneShot(audioError);
+			return;
 		}
-		else
+		// Ya hay otro caso activo
+		if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
 		{
-			Debug.Log("No se puede :(");
-			// Todo: Efecto de sonido o algo indicando que no puede hacer la acción.
+			TempMessageController.Instancia.GenerarMensaje("Sólo se puede resolver un caso a la vez");
+			if (speaker != null) speaker.PlayOneShot(audioError);
+			return;
 		}
+
+		Caso c = PuzzleManager.GetCasoCargado(caso);
+		if (c.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
+		
+		//Cargar pistas
+		int n = c.pistas.Length;
+		List<string> palabras = new List<string>();
+		for (int i = 0; i < n; i++)
+			palabras.Add(c.pistas[i].palabra);
+
+		AlmacenDePalabras.palabras[(int)TabType.Pistas] = palabras;
+
+		menuHover.Abrir(false);
+		//Actualizar estado después de compra
+		PuzzleManager.Instance.casoActivo = caso;
+		ResourceManager.AgentesDisponibles -= c.coste;
+		GameplayCycle.Instance.SetState(EstadosDelGameplay.InicioCaso);
+		if (speaker != null) speaker.PlayOneShot(audioSelect);
+		Destroy(gameObject); //F
 	}
 
 	private bool SePuedeComprar()
 	{
-		return caso.coste <= ResourceManager.AgentesDisponibles && GameplayCycle.Instance.GetState() != casoEmpezado;
+		Caso c = PuzzleManager.GetCasoCargado(caso);
+		return c.coste <= ResourceManager.AgentesDisponibles;
 	}
 
-	public void EstablecerSprite(Sprite sprite)
+	public void CargarDatosCaso()
 	{
-		GetComponent<Image>().sprite = sprite;
-		coste.SetText(caso.coste.ToString());
+		Caso c = PuzzleManager.GetCasoCargado(caso);
+		if(caso < 0) coste.SetText(99.ToString());
+		else coste.SetText(c.coste.ToString());
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		menuHover.LeerCaso(caso);
+		menuHover.LeerCaso(PuzzleManager.GetCasoCargado(caso),caso);
 		menuHover.Abrir(true);
+		if (speaker != null) speaker.PlayOneShot(audioHover);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)

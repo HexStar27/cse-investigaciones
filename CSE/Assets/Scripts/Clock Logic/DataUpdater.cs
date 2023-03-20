@@ -9,8 +9,6 @@ public class DataUpdater : MonoBehaviour
 	public TextMeshPro contenedor;
 	private string contenido;
 
-	//public int a,c,p;
-
 	public void FixedUpdate()
 	{
 		ObtenerDatos();

@@ -8,9 +8,10 @@ namespace Hexstar
 	{
 
 		protected List<Evento> banco = new List<Evento>();
+		protected List<Evento> activos = new List<Evento>();
 
 		private static BancoEventos instance_;
-		public static BancoEventos instance() { return instance_; }
+		public static BancoEventos Instance() { return instance_; }
 
 		public void Awake()
 		{
@@ -32,13 +33,13 @@ namespace Hexstar
 		/// </summary>
 		/// <param name="eventName">name of event</param>
 		/// <param name="value">value of event</param>
-		public void Set( Evento newEvent)
+		public void Add( Evento newEvent)
 		{
 			banco.Add(newEvent);
 		}
 
 		/// <summary>
-		/// Delete all event in the bank
+		/// Delete all events in the bank
 		/// </summary>
 		public void Clear()
 		{

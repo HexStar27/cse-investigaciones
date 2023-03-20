@@ -4,6 +4,7 @@ public class InscryptionLikeCameraState : MonoBehaviour
 {
     [SerializeField] private CameraState camS;
     public bool loopable = false;
+    public static bool bypass = false;
     private bool ready = true;
     private int estadoActual = 0;
     public int initialState = 1;
@@ -31,6 +32,7 @@ public class InscryptionLikeCameraState : MonoBehaviour
 
     void Update()
     {
+        if (bypass) return;
         if (ready)
         {
             float scrollDelta = Input.mouseScrollDelta.y;

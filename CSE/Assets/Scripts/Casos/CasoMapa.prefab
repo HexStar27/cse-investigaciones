@@ -192,14 +192,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6650944, g: 0.83224374, b: 1, a: 1}
+  m_Color: {r: 0.6650944, g: 0.83224374, b: 1, a: 0.49019608}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300050, guid: fd419bef7a36af8459a810bc72573105, type: 3}
+  m_Sprite: {fileID: 42200905200766207, guid: b60ac0513b092a644bc7232060f6bdc4, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -297,10 +297,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81fbe3d1a7301c14396bb1ffcc101e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  caso: {fileID: 0}
+  caso: 0
   menuHover: {fileID: 0}
-  almacenPalabras: {fileID: 0}
   coste: {fileID: 3357576506559923353}
+  audioHover: {fileID: 8300000, guid: db4de31355c0b9e49a33ca8022f11a87, type: 3}
+  audioSelect: {fileID: 8300000, guid: ee943ef9a8397a741affed0dcecc77ab, type: 3}
+  audioError: {fileID: 8300000, guid: c8b7867965a142740afa6b5f2642623d, type: 3}
 --- !u!114 &972208044946187976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -329,8 +331,10 @@ MonoBehaviour:
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 21300022, guid: fd419bef7a36af8459a810bc72573105, type: 3}
+    m_HighlightedSprite: {fileID: -4635955510145091147, guid: b60ac0513b092a644bc7232060f6bdc4,
+      type: 3}
+    m_PressedSprite: {fileID: 42200905200766207, guid: b60ac0513b092a644bc7232060f6bdc4,
+      type: 3}
     m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 0}
   m_AnimationTriggers:
