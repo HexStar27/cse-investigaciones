@@ -12,9 +12,7 @@ PrefabInstance:
       propertyPath: m_text
       value: 'Sub Query Placeholder siduh isudhciusdhcs d
 
-        c sdsdvsvsdvnsdvnwjfjwi
-
-'
+        c sdsdvsvsdvnsdvnwjfjwi'
       objectReference: {fileID: 0}
     - target: {fileID: 20370231790266222, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
@@ -101,6 +99,56 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 256554256932989577, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 256554256932989578, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181556145309, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181589612404, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181936601670, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181937193547, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866182744878040, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 797593946531044063, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1104519522843160202, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4704250498228358578, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0.99
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6cce604aeae31d14aabd118ed41b0f54, type: 3}

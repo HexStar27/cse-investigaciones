@@ -1,5 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &4293939035678354178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7161614912680464082}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e79572f0aca20149b673b6928727048, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentTable: 
 --- !u!114 &4917226543689473434
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,12 +210,12 @@ PrefabInstance:
     - target: {fileID: 20370231790266222, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
       propertyPath: m_text
-      value: Tabla Placeholder
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 20370231790266222, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
       propertyPath: m_fontSize
-      value: 0.5
+      value: 1.6
       objectReference: {fileID: 0}
     - target: {fileID: 20370231790266222, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
@@ -217,7 +230,7 @@ PrefabInstance:
     - target: {fileID: 256554255912676452, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
       propertyPath: m_Size.x
-      value: 0.42
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 256554255912676453, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
@@ -225,6 +238,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: bd82840b67e9e91408ecea40cdec6c5b,
         type: 2}
+    - target: {fileID: 256554255912676453, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: blockSize.x
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 256554255912676455, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
       propertyPath: m_RootOrder
@@ -285,10 +303,60 @@ PrefabInstance:
       propertyPath: m_CastShadows
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 256554256554357534, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 256554256932989578, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 256554256932989583, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}
       propertyPath: m_CastShadows
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181556145309, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181589612404, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181936601670, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866181937193547, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 289866182744878040, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 797593946531044063, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1102853512716119502, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1104519522843160202, guid: 6cce604aeae31d14aabd118ed41b0f54,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1463356642838083570, guid: 6cce604aeae31d14aabd118ed41b0f54,
         type: 3}

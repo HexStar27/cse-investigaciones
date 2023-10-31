@@ -4,6 +4,7 @@
 public class Caso
 {
 	public int id,dif,coste;
+	public bool secundario;
 	public bool examen;
 	public string titulo;
 	public string resumen;

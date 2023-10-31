@@ -72,4 +72,19 @@ public class CameraState : MonoBehaviour
         finished = true;
         onFinished.Invoke();
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (estados.Count <= 0) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(estados[0].posicion, 0.1f);
+        float intervalo = 1f / (float)estados.Count;
+        for (int i = 1; i < estados.Count; i++)
+        {
+            float b = i*intervalo;
+            Gizmos.color = new Color(1-b,b,0);
+            Gizmos.DrawLine(estados[i - 1].posicion, estados[i].posicion);
+            Gizmos.DrawSphere(estados[i].posicion, 0.1f);
+        }
+    }
 }

@@ -15,6 +15,8 @@ public class MainMenuOp : MonoBehaviour
     private TMP_InputField textoCorreo;
     [SerializeField]
     private InputField textoContra;
+    [SerializeField]
+    private TMP_InputField textNick;
 #pragma warning restore 0649
 
     [Header("Conexión a servidor")]
@@ -61,6 +63,29 @@ public class MainMenuOp : MonoBehaviour
     {
         //El SesionHandler se encargará de cifrar la contraseña así que se la pasamos sin cifrar aquí.
         IniciarSesion(textoCorreo.text, textoContra.text);
+    }
+
+    public async void CrearCuenta()
+    {
+        if (isRequesting) return;
+        isRequesting = true; //Cierro cerrojo
+
+        string correo = textoCorreo.text;
+        await SesionHandler.ACrearCuenta(textNick.text, correo, textoContra.text);
+        bool exito = SesionHandler.sessionKEY != "";
+        if (exito)
+        {
+            GameManager.user = correo;
+            isRequesting = false; //Abro cerrojo
+            onSuccess.Invoke();
+            await Task.Delay(750); //Tiempo para ejecutar animación de credenciales aceptadas.
+            GameManager.CargarEscena(1);
+        }
+        else
+        {
+            isRequesting = false; //Abro cerrojo
+            onError.Invoke();
+        }
     }
 
     public void Salir()

@@ -7,6 +7,7 @@ namespace Hexstar.Graphics
     {
         public Material material;
         public bool update;
+        public bool useMinAsLow = false;
         [Range(0, 4)] public int suavizado;
         [Range(0.1f, 1)] public float factorSuave = 0.5f;
         public float[] datos;
@@ -72,6 +73,18 @@ namespace Hexstar.Graphics
 
         public void DatosAGrafica(float[] datos)
         {   
+            if(useMinAsLow)
+            {
+                float min = float.MaxValue;
+                for (int i = 0; i < datos.Length; i++)
+                {
+                    float d = datos[i];
+                    if (d < min) min = d;
+                }
+                for(int i = 0; i < datos.Length; i++) datos[i] -= min;
+            }
+
+
             if (suavizado > 0)
             {
                 int potencia = 1 << suavizado;
@@ -101,7 +114,7 @@ namespace Hexstar.Graphics
                     for (int j = 0; j < gaussConv.Length; j++)
                     {
                         int indiceAjustado = i + j - (gaussConv.Length >> 1);
-                        if (indiceAjustado < 0 || indiceAjustado >= datos.Length) continue;
+                        if (indiceAjustado < 0 || indiceAjustado >= datos.Length) indiceAjustado = i;
 
                         convi += nuevosDatos[indiceAjustado] * gaussConv[j];
                     }
@@ -111,33 +124,40 @@ namespace Hexstar.Graphics
 
             float x = -rect.rect.width * 0.5f, y = -rect.rect.height * 0.5f, z = 0;
             int n = datos.Length;
-            float incrementoX = rect.rect.width / (n - 1);
-            float max = 0;
+            int nn = n - 1;
+            if (nn < 1) nn = 1;
+            float incrementoX = rect.rect.width / nn;
+            float max = float.MinValue;
             for(int i = 0; i < n; i++)
             {
-                if (datos[i] > max) max = datos[i];
+                float d = datos[i];
+                if (d > max) max = d;   
             }
 
             newVertices = new Vector3[n<<1];
             newUV = new Vector2[n<<1];
             for(var i = 0; i < n; i++) // Asignación de vértices y UV
             {
-                newVertices[i] = new Vector3(x+(incrementoX*i),Mathf.Lerp(y, y+rect.rect.height,datos[i]/max),z);
+                float tY = datos[i] / max;
+                newVertices[i] = new Vector3(x+(incrementoX*i),Mathf.Lerp(y, y+rect.rect.height,tY),z);
                 newVertices[i + n] = new Vector3(x + (incrementoX * i), y, z);
-                newUV[i] = new Vector2(Mathf.Lerp(0,1,i/(n-1)),Mathf.Lerp(0,1,datos[i]/max));
-                newUV[i + n] = new Vector2(Mathf.Lerp(0, 1, i / (n - 1)), 0);
+
+                float uvX = Mathf.Lerp(0, 1, (float)i / nn);
+                newUV[i] = new Vector2(uvX, Mathf.Lerp(0, 1, tY));
+                newUV[i + n] = new Vector2(uvX, 0);
             }
 
-            newTriangles = new int[6 * (n - 1)];
+            newTriangles = new int[6 * nn];
             for(var i = 0; i < n-1; i++) // Asiganción de triángulos
             {
-                newTriangles[(6 * i)] = i;
-                newTriangles[(6 * i)+1] = i+n+1;
-                newTriangles[(6 * i)+2] = i+n;
+                int j = 6 * i;
+                newTriangles[j    ] = i;
+                newTriangles[j + 1] = i + n + 1;
+                newTriangles[j + 2] = i + n;
 
-                newTriangles[(6 * i) + 3] = i;
-                newTriangles[(6 * i) + 4] = i + 1;
-                newTriangles[(6 * i) + 5] = i + n + 1;
+                newTriangles[j + 3] = i;
+                newTriangles[j + 4] = i + 1;
+                newTriangles[j + 5] = i + n + 1;
             }
         }
 

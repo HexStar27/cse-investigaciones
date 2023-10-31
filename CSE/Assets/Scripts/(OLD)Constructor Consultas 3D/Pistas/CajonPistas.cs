@@ -36,7 +36,7 @@ namespace Hexstar.CSE
             }
             AlmacenDePalabras.palabras[AlmacenDePalabras.TipoAIndice(TabType.Pistas)] = palabrasPistas;
 
-            SelectorPalabras.instancia.RellenarSelector();
+            //SelectorPalabras.instancia.RellenarSelector();
         }
 
         public void MostrarDescripcion(string descripcion)

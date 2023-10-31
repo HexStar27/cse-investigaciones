@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 //Código para el botón de configuración que llevará el bloque operador
 public class BotonConfigOperadores : MonoBehaviour
@@ -12,6 +13,8 @@ public class BotonConfigOperadores : MonoBehaviour
     List<GameObject> elementos = new List<GameObject>();
 
     private Hexstar.CSE.BlockMovAndConexion bloque;
+    public class SelectionEvent : UnityEvent<string> { }
+    [HideInInspector] public SelectionEvent onSelectOP = new SelectionEvent();
 
     public void Abrir()
     {
@@ -30,6 +33,7 @@ public class BotonConfigOperadores : MonoBehaviour
     private void SeleccionarOpcion(string val)
     {
         textoDelBloque.text = val;
+        onSelectOP?.Invoke(val);
     }
 
     public void Cerrar()

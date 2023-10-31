@@ -20,11 +20,10 @@ MonoBehaviour:
   tipoPropio: {fileID: 11400000, guid: e296ee8352ee7e14f99b9fc84a618f80, type: 2}
   salidaDerecha:
     tiposAceptados:
-    - {fileID: 11400000, guid: 2d786f2feb601574ebbeb82c27443a6f, type: 2}
+    - {fileID: 11400000, guid: 38f9db28f159e5944891c7df6d66bdd3, type: 2}
   salidaAbajo:
     tiposAceptados: []
   seccionesAceptadas:
     tiposAceptados:
     - {fileID: 11400000, guid: fcdcb73a1d096c84197ba5fa9e897cdf, type: 2}
     - {fileID: 11400000, guid: 9f05b3d25c61f1a4fb88605ebd067fba, type: 2}
-  hasPepito: 0

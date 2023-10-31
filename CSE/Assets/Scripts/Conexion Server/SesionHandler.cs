@@ -32,6 +32,25 @@ namespace Hexstar
 			SesionHandler.email = email;
 		}
 
+		public static void ResetSesionValues()
+        {
+			email = null;
+			sessionKEY = null;
+			nickname = null;
+        }
+
+		public static async Task ACrearCuenta(string nick, string email, string password)
+        {
+			string url = ConexionHandler.baseUrl + "signin";
+			WWWForm formulario = new WWWForm();
+			formulario.AddField("nickname",nick);
+			formulario.AddField("email", email);
+			formulario.AddField("password", Cifrar(password));
+			await ConexionHandler.APost(url, formulario);
+			SetKey(ConexionHandler.download);
+			SesionHandler.email = email;
+		}
+
 		public static async Task GetNickname() //NOT TESTED
 		{
 			string url = ConexionHandler.baseUrl + "nickname";

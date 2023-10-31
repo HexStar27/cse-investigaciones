@@ -22,17 +22,20 @@ public class AperturaTableta : MonoBehaviour
 
 	public void OverTable(bool value)
 	{
+		if (MenuPausa.Paused) return;
 		anim.SetBool(over, value);
 	}
 
 	public void OpenTablet(bool value)
 	{
+		if (MenuPausa.Paused) return;
 		if (value) Rellenar();
 		anim.SetBool(open, value);
 		opened = value;
 	}
 	public void SwitchStateTablet()
 	{
+		if (MenuPausa.Paused) return;
 		opened = !opened;
 		if (opened) Rellenar();
 		anim.SetBool(open, opened);

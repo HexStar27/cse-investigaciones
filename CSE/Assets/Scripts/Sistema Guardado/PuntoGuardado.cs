@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-///Esta clase se encarga de guardar los datos relevantes de la partida.
+///Esta clase se encarga de guardar y cargar los datos relevantes de la partida del ResourceManager.
 [System.Serializable]
 public class PuntoGuardado
 {
@@ -10,8 +10,10 @@ public class PuntoGuardado
 	public int casosCompletados;
 	public int dificultadActual;
 	public int dia;
-	public int[] casosCargados; //?
-	public int casoEnCurso;
+	public int[] casosCargados;
+	public int casoEnCurso;			//Indice del caso en curso del array de casos cargados
+	public int ultimoCasoPrincipalEmpezado;
+	public bool ultimoCasoPrincipalGanado;
 	public int[] eventosActivos;
 	public string[] tableCodes;
 	//Y demás cosillas por aquí...
@@ -26,6 +28,7 @@ public class PuntoGuardado
 		dia = 0;
 		casosCargados = new int[0];
 		casoEnCurso = -1;
+		ultimoCasoPrincipalEmpezado = -1;
 		eventosActivos = new int[0];
 		tableCodes = new string[0];
 }
@@ -43,6 +46,8 @@ public class PuntoGuardado
 		foreach (var caso in PuzzleManager.Instance.casosCargados) idCasos.Add(caso.id);
 		casosCargados = idCasos.ToArray();
 		casoEnCurso = PuzzleManager.Instance.casoActivo;
+		ultimoCasoPrincipalEmpezado = ResourceManager.UltimoCasoPrincipalEmpezado;
+		ultimoCasoPrincipalGanado = ResourceManager.UltimoCasoPrincipalGanado;
 		eventosActivos = new int[0]; //Falta por ponerlo...
 		tableCodes = ResourceManager.TableCodes.ToArray();
 	}
@@ -53,6 +58,8 @@ public class PuntoGuardado
 		ResourceManager.ConsultasDisponibles = consultasDisponibles;
 		ResourceManager.ConsultasMaximas = consultasMaximas;
 		ResourceManager.CasosCompletados = casosCompletados;
+		ResourceManager.UltimoCasoPrincipalEmpezado = ultimoCasoPrincipalEmpezado;
+		ResourceManager.UltimoCasoPrincipalGanado = ultimoCasoPrincipalGanado;
 		ResourceManager.DificultadActual = dificultadActual;
 		ResourceManager.Dia = dia;
 

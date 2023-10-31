@@ -5,11 +5,12 @@ public class DangerController : MonoBehaviour
 {
 	public Camera mainCam;
 	[SerializeField] private Color AAAA;
-	[SerializeField] AudioSource mainMusic;
+	AudioSource mainMusic;
 	[SerializeField, Range(-1,1)] float pitchVariation = 0.8f;
 
 	private void OnEnable()
 	{
+		if (mainMusic == null) mainMusic = GameplayCycle.Instance.Get_BGM_Source();
 		mainCam.backgroundColor = AAAA;
 		mainMusic.pitch = pitchVariation;
 	}

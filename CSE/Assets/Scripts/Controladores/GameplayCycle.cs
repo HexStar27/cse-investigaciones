@@ -13,9 +13,10 @@ public class GameplayCycle : MonoBehaviour
 {
 	public static GameplayCycle Instance { get; private set; }
 	public int EstadosPosibles { get; private set; }
-	private static readonly int multiplicadorExamenes = 3;
 
 	[SerializeField] DayCounter _dayCounter;
+	[SerializeField] Transform gameOverMenu;
+	[SerializeField] AudioSource bgmSource;
 
 	[Header("Status")]
 	[SerializeField] int estadoActual = 0;
@@ -56,11 +57,10 @@ public class GameplayCycle : MonoBehaviour
 
 	private async Task InicioDia()
 	{
-		if (ResourceManager.Dia == 0)
+		if (ResourceManager.Dia == 0) //Inicio del juego
 		{
 			ResourceManager.ConsultasMaximas = 4;
 			//OperacionesGameplay.Instancia.CargarEventos();
-			//Establecer número de agentes al inicial el primer día
 			ResourceManager.AgentesDisponibles = ResourceManager.agentesInciales;
 		}
 		else //El resto de días
@@ -70,10 +70,11 @@ public class GameplayCycle : MonoBehaviour
 				await GameOver(); //Fin del juego
 				return;
 			}
-			await OperacionesGameplay.EjecutarEventoAleatorio();
+			//Comprobar si hay eventos de efecto aplicables en la pila
+			await OperacionesGameplay.EjecutarEventoAleatorio(); //Cambiar por lo nuevo
 		}
 
-		//Establecer consultas disponibles y cargar los casos necesarios al iniciar el día
+		//Cargar los casos necesarios al iniciar el día
 		if (habiaCasosEnArchivoGuardado)
         {
 			habiaCasosEnArchivoGuardado = false;
@@ -82,49 +83,46 @@ public class GameplayCycle : MonoBehaviour
         else
         {
 			ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
-			await PuzzleManager.PrepararCasosInicioDia(ResourceManager.ConsultasMaximas,
-			multiplicadorExamenes * ResourceManager.DificultadActual);
+			await PuzzleManager.PrepararCasosInicioDia();
 		}
 		OperacionesGameplay.ActualizarDC();
 	}
 
 	private async Task InicioCaso()
 	{
-		//Cambiar la música (probablemente)
+		//TODO: Cambiar la música. Ahora mismo no tengo otra)
 
-		//Mostrar pistas en cajón de pistas
 		CajonPistas.instancia.RellenarCajonConCasoActivo();
-		//Introducir pistas en almacén de bloques
 		AlmacenDePalabras.CargarPistasDeCasoActivo();
-		//Introducir las palabras del almacén al selector
-		SelectorPalabras.instancia.RellenarSelector();
+		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
+
 		await Task.Yield();
 	}
 
 	private async Task FinCaso()
 	{
-		//Ver si lo ha completado o no
 		bool completado = PuzzleManager.Instance.solucionCorrecta;
 
-		//Otorgar efectos correspondientes
+		//Quitar resumen del caso de la pantalla superior
+		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
+
+		//Comprobar si hay eventos de efecto aplicables en la pila
 		//TODO...
 
-		//Iniciar siguiente día si no quedan consultas disponibles después de aplicar efectos,
-		if (ResourceManager.ConsultasDisponibles == 0) SetState(EstadosDelGameplay.FinDia);
-		else await PuzzleManager.RellenarCasoFinCaso(1);
-
-		//Aumentar dificultad si ha completado un caso examen
-		if (completado && PuzzleManager.Instance.casoExamen)
+		if (ResourceManager.AgentesDisponibles <= 0) await GameOver();
+		else
 		{
-			ResourceManager.DificultadActual++;
+			//Iniciar siguiente día si no quedan consultas disponibles después de aplicar efectos
+			if (ResourceManager.ConsultasDisponibles == 0) SetState(EstadosDelGameplay.FinDia);
+
+			if (completado && PuzzleManager.Instance.casoExamen)
+				ResourceManager.DificultadActual++;
 		}
 
-		//Limpiar cajón de pistas y palabras en el selector
 		CajonPistas.instancia.VaciarCajon();
 		AlmacenDePalabras.palabras[(int)TabType.Pistas] = new List<string>();
-		SelectorPalabras.instancia.RellenarSelector();
 
-		PuzzleManager.LimpiarFlags();
+		if (!completado) PuzzleManager.LimpiarFlags();
 	}
 
 	private async Task FinDia()
@@ -137,17 +135,23 @@ public class GameplayCycle : MonoBehaviour
 		SetState(EstadosDelGameplay.InicioDia);
 	}
 
+	public AudioSource Get_BGM_Source() { return bgmSource; }
+
 	public async Task GameOver()
 	{
 		gameover = true;
-		// TODO!
-		//1º Oscurecer Pantalla con animación (como con el cambio de día)
-		//2º Mostrar boton de volver al menú y cargar último punto de guardado
-		//Ambos botones vuelven a cargar una escena, ya sea la misma u otra diferente.
-		if (TempMessageController.Instancia != null) 
-			TempMessageController.Instancia.GenerarMensaje("Game Over (Debug)");
+		InscryptionLikeCameraState.bypass = true;
+		if (bgmSource != null) bgmSource.Stop(); //Cambiar por música de gameover
+		if (gameOverMenu != null) gameOverMenu.gameObject.SetActive(true);
 		await Task.Yield();
 	}
+
+	public void ReintentarDesdePuntoDeGuardado()
+    {
+		ResourceManager.checkpoint.Cargar();
+		GameManager.CargarEscena(2);
+	}
+	public void VolverAlMenuPrincipal() { GameManager.CargarEscena(1); }
 
 	private void Awake()
 	{

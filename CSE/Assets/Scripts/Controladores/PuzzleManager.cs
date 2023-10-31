@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 
 public class PuzzleManager : MonoBehaviour
 {
+	private static readonly int primerCasoPrincipalDelJuego = 1;
+	public static int consultasRealizadasActuales = 0;
+	private static float tiempoEmpleado = .0f;
+
 	public static PuzzleManager Instance { get; private set; }
 
 	public List<Caso> casosCargados = new List<Caso>();
 	public List<int> puntuacionesPorCaso = new List<int>();
 	private GameObject[] casosGO = new GameObject[0];
 	[Header("Info:")]
-	public bool casoExamen; //¿Es el caso activo de tipo examen?
+	public bool casoExamen; //"Es caso activo de tipo examen?"
 	public int casoActivo; //Índice de la lista de casosCargados
 	public bool solucionCorrecta = false;
 
 	[SerializeField] RectTransform _map;
+	[SerializeField] TMPro.TextMeshProUGUI textoObjetivoMision;
 	[SerializeField] CasoDescripcion _descriptor;
 	[SerializeField] HighScoreTable _hst;
 
@@ -26,12 +31,27 @@ public class PuzzleManager : MonoBehaviour
 	public GameObject casoMapaSPrefab;
 	public GameObject casoMapaBPrefab;
 
-	public static async Task PrepararCasosInicioDia(int casosACargar, int thresholdExamen)
+	public static void IniciarStatsCaso(int indiceCaso)
+    {
+		Instance.casoActivo = indiceCaso;
+		consultasRealizadasActuales = 0;
+		tiempoEmpleado = Time.realtimeSinceStartup;
+    }
+	public static float GetTiempoEmpleado() { return Time.realtimeSinceStartup - tiempoEmpleado; }
+	public static void TerminarStatsCaso() { tiempoEmpleado -= Time.realtimeSinceStartup; }
+
+	public static async Task PrepararCasosInicioDia( bool primerDia = false)
     {
 		Instance.QuitarTodos();
-		await Instance.LoadCasos(casosACargar);
-		//Cargar caso examen si necesario
-		if (ResourceManager.CasosCompletados >= thresholdExamen) await Instance.LoadCasoExamen();
+
+		int ultimoCaso = ResourceManager.UltimoCasoPrincipalEmpezado;
+		if (primerDia || ultimoCaso < 0) await Instance.LoadCasoEspecifico(primerCasoPrincipalDelJuego);
+		else await Instance.LoadSiguientesPrincipales();
+
+		int huecosLibres = ResourceManager.ConsultasMaximas - Instance.casosCargados.Count;
+		if (huecosLibres < 0) huecosLibres = 0;
+		await Instance.LoadCasosSecundarios(huecosLibres);
+		
 		Instance.MostrarCasosEnPantalla();
 		ObtenerPuntuacionesDeCasosCargados();
 	}
@@ -47,8 +67,8 @@ public class PuzzleManager : MonoBehaviour
 
 	public static async Task RellenarCasoFinCaso(int casosNuevos)
     {
-		Instance.LimpiarPantalla();
-		await Instance.LoadCasos(casosNuevos);
+		Instance.LimpiarMapaDeCasos();
+		await Instance.LoadCasosSecundarios(casosNuevos);
 		Instance.MostrarCasosEnPantalla();
 		ObtenerPuntuacionesDeCasosCargados(true);
 	}
@@ -84,44 +104,71 @@ public class PuzzleManager : MonoBehaviour
     }
 
 	/// <summary>
-	/// Añade casos a la lista
+	/// Añade N casos secundarios a la lista
 	/// </summary>
 	/// <param name="n"></param>
-	public async Task LoadCasos(int n)
+	public async Task LoadCasosSecundarios(int n)
 	{
-		//1º Acceder a servidor pidiendo n casos
 		WWWForm form = new WWWForm();
 		form.AddField("authorization", SesionHandler.sessionKEY);
 		form.AddField("dif", ResourceManager.DificultadActual);
 		form.AddField("casos", n);
 		await ConexionHandler.APost(ConexionHandler.baseUrl+"case",form);
 		
-		//2º Parsear y guardarlos en casosCargados
 		ParsearJsonACasos(ConexionHandler.download);
 	}
 
+	/// <summary>
+	/// Añade el caso con la id especificada a la lista
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
 	public async Task LoadCasoEspecifico(int id)
     {
-		//1º Acceder a servidor pidiendo el caso 'id'
 		WWWForm form = new WWWForm();
 		form.AddField("authorization", SesionHandler.sessionKEY);
 		form.AddField("caso", id);
 		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/get", form);
 		
-		//2º Parsear y añadirlo a casosCargados
+		ParsearJsonACasos(ConexionHandler.download);
+	}
+
+	/// <summary>
+	/// Añade el (o los) siguientes casos principales a la lista
+	/// </summary>
+	/// <returns></returns>
+	public async Task LoadSiguientesPrincipales()
+	{
+		WWWForm form = new WWWForm();
+		form.AddField("authorization", SesionHandler.sessionKEY);
+		form.AddField("id", ResourceManager.UltimoCasoPrincipalEmpezado);
+		form.AddField("win", ResourceManager.UltimoCasoPrincipalGanado ? 1 : 0);
+		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/get", form);
+
+		ParsearJsonACasos(ConexionHandler.download);
+	}
+
+	///(Obsoleto) La función "LoadSiguientesPrincipales" es mejor
+	public async Task LoadCasoExamen()
+	{
+		WWWForm form = new WWWForm();
+		form.AddField("authorization", SesionHandler.sessionKEY);
+		form.AddField("dif", ResourceManager.DificultadActual);
+		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/exam", form);
+
 		ParsearJsonACasos(ConexionHandler.download);
 	}
 
 	private void ParsearJsonACasos(string download)
 	{
-		//2º Parsear datos
+		//1º Parsear datos
 		string json = ConexionHandler.ExtraerJson(download);
 		if (json == "{}")
 		{
 			Debug.LogError("Ha habido un error en el servidor al pedir los casos :(");
 			return;
 		}
-		//3º Añadir casos
+		//2º Añadir casos
 		JSONNode jNodo = JSON.Parse(download);
 		int n = jNodo["res"].Count;
 		for (int i = 0; i < n; i++)
@@ -132,43 +179,30 @@ public class PuzzleManager : MonoBehaviour
 		}
 	}
 
-	public async Task LoadCasoExamen()
-	{
-		//1º Acceder a servidor pidiendo un caso examen según la dificultad actual
-		WWWForm form = new WWWForm();
-		form.AddField("authorization", SesionHandler.sessionKEY);
-		form.AddField("dif", ResourceManager.DificultadActual);
-		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/exam",form);
-
-		//2º Parsear y añadirlo a casosCargados
-		ParsearJsonACasos(ConexionHandler.download);
-	}
-
 	public void QuitarTodos()
 	{
-		//Destruye todos los casos en la pantalla
-		LimpiarPantalla();
-		// Limpia todas las listas y flags
+		LimpiarMapaDeCasos();
 		casosCargados.Clear();
 		LimpiarFlags();
 	}
-	public void QuitarCaso(Caso c)
-	{
-		int i = casosCargados.IndexOf(c);
-		casosCargados.Remove(c);
-		if(casosGO[i] != null)
-		{
-			Destroy(casosGO[i]);
-			casosGO[i] = null;
-		}
-	}
-	public void LimpiarPantalla()
+
+	public void LimpiarMapaDeCasos()
     {
 		int n = casosGO.Length;
 		for (int i = 0; i < n; i++)
 		{
 			Destroy(casosGO[i]);
 		}
+	}
+
+	public bool HayAlMenos1CasoPrincipal()
+	{
+		int n = casosCargados.Count;
+		for (int i = 0; i < n; i++)
+		{
+			if (!casosCargados[i].secundario) return true;
+		}
+		return false;
 	}
 
 	public void MostrarCasosEnPantalla()
@@ -190,12 +224,13 @@ public class PuzzleManager : MonoBehaviour
 		GameObject objeto;
         for (int i = 0; i < n; i++)
         {
-			if(casosCargados[i].examen) objeto = Instantiate(casoMapaBPrefab, _map);
+			if (casosCargados[i].examen) objeto = Instantiate(casoMapaBPrefab, _map);
+			else if (casosCargados[i].secundario) objeto = Instantiate(casoMapaSPrefab, _map);
 			else objeto = Instantiate(casoMapaPrefab, _map);
             
 			if (objeto.TryGetComponent(out CasoMapa casoM))
             {
-                casoM.caso = i;
+                casoM.indiceCaso = i;
                 casoM.menuHover = _descriptor;
 				casoM.CargarDatosCaso();
             }
@@ -203,6 +238,15 @@ public class PuzzleManager : MonoBehaviour
             objeto.transform.localPosition = posiciones[i];
             casosGO[i] = objeto;
         }
+    }
+
+	public static void MostrarObjetivoDeCasoEnPantalla(bool value)
+    {
+		if (value && Instance.casoActivo >= 0)
+		{
+			Instance.textoObjetivoMision.text = Instance.casosCargados[Instance.casoActivo].resumen;
+		}
+		else Instance.textoObjetivoMision.text = "";
     }
 
 	private void Awake()

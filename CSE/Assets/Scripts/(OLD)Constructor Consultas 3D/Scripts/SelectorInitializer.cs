@@ -8,11 +8,17 @@ public class SelectorInitializer : MonoBehaviour
     [SerializeField] Hexstar.CSE.CajonPistas cajon;
     private void Awake()
     {
-        selector.transform.parent.gameObject.SetActive(true);
-        selector.Instanciar();
-        selector.transform.parent.gameObject.SetActive(false);
+        if(selector != null)
+        {
+            selector.transform.parent.gameObject.SetActive(true);
+            selector.Instanciar();
+            selector.transform.parent.gameObject.SetActive(false);
+        }
 
-        cajon.transform.parent.gameObject.SetActive(true);
-        cajon.transform.parent.gameObject.SetActive(false);
+        if(cajon != null)
+        {
+            cajon.transform.parent.gameObject.SetActive(true);
+            cajon.transform.parent.gameObject.SetActive(false);
+        }
     }
 }

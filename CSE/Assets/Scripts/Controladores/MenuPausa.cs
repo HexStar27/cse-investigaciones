@@ -9,13 +9,15 @@ public class MenuPausa : MonoBehaviour
 
 	private void Update()
 	{
-		if(Input.GetKeyDown(KeyCode.Escape))
-		{
-			Paused = !Paused;
-			menu.SetActive(Paused);
-			if (Paused) GameManager.OnPause.Invoke();
-			else GameManager.OnUnpause.Invoke();
-		}
+		if(Input.GetKeyDown(KeyCode.Escape)) Pausar();
+	}
+
+	public void Pausar()
+    {
+		Paused = !Paused;
+		menu.SetActive(Paused);
+		if (Paused) GameManager.OnPause.Invoke();
+		else GameManager.OnUnpause.Invoke();
 	}
 
 	public void IrAMenuPrincipal()

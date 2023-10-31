@@ -86,7 +86,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bd: {fileID: 11400000, guid: c41609852eb787d4497e80390da73bcf, type: 2}
   config: {fileID: 11400000, guid: c94bbda14ba76ac4691c385cde29bb4f, type: 2}
-  blockSize: {x: -0.225, y: 0, z: -0.075}
+  bloqueCuerpo: {fileID: 6943120809458775976}
+  ghostBlockScale: 0.5
   cancelGrab: 1
   onBlockConectionChanged:
     m_PersistentCalls:

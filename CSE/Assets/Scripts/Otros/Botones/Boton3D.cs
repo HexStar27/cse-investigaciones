@@ -21,18 +21,21 @@ public class Boton3D : MonoBehaviour
 
     private void OnMouseEnter()
     {
+        if (MenuPausa.Paused) return;
         onEnter.Invoke();
         if (animator != null && enterAnim != "") animator.Play(enterAnim);
     }
 
     private void OnMouseExit()
     {
+        if (MenuPausa.Paused) return;
         onExit.Invoke();
         if (animator != null && exitAnim != "") animator.Play(exitAnim);
     }
 
     private void OnMouseUp()
     {
+        if (MenuPausa.Paused) return;
         SendClick();
     }
 
@@ -43,9 +46,9 @@ public class Boton3D : MonoBehaviour
         clickable = true;
     }
 
-    private void SendClick()
+    public void SendClick()
     {
-        if (clickable)
+        if (clickable && !MenuPausa.Paused)
         {
             if(clickDelay > 0) StartCoroutine(Delay());
             onClick.Invoke();

@@ -91,9 +91,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bloquePrefab: {fileID: 2398806446649474279, guid: 103de00969fb0e244be7ec2d59957ed2,
     type: 3}
-  offsetInicial: {x: -48, y: 4, z: 0}
   zonaSpawnBloques: {fileID: 0}
-  tmesh: {fileID: 1424206910195777337}
+  tmesh: {fileID: 3899177729348954154}
 --- !u!1 &5936455676492113106
 GameObject:
   m_ObjectHideFlags: 0
@@ -237,7 +236,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7361906195552112939}
   - component: {fileID: 8365538397605841350}
-  - component: {fileID: 1424206910195777337}
+  - component: {fileID: 3899177729348954154}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -261,8 +260,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -6.499999}
+  m_SizeDelta: {x: 0, y: 20.999998}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8365538397605841350
 CanvasRenderer:
@@ -272,7 +271,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7183820856708323556}
   m_CullTransparentMesh: 0
---- !u!114 &1424206910195777337
+--- !u!114 &3899177729348954154
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -285,23 +284,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 14
+    m_Font: {fileID: 12800000, guid: 59d2e2db105f2d6418307ab030df489a, type: 3}
+    m_FontSize: 90
     m_FontStyle: 1
-    m_BestFit: 1
-    m_MinSize: 1
-    m_MaxSize: 274
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 300
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\tKEYword"
+  m_Text: "OP Aritm\xE9tico"

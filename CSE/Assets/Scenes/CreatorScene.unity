@@ -215,28 +215,33 @@ MonoBehaviour:
   bonito: 1
   json: 
   caso:
-    id: 1
+    id: 2
     dif: 1
     coste: 1
+    secundario: 1
     examen: 0
-    titulo: "Robo de Mercanc\xEDa Peligrosa"
-    resumen: "Se ha detectado una p\xE9rdida de mercanc\xEDa peligrosa durante su
-      transporte y necesitan saber el nombre y apellido del responsable para poder
-      arrestarlo."
+    titulo: "Prevenci\xF3n del Terrorismo"
+    resumen: "Hay sospechas de que una serie de individuos est\xE1n planeando un
+      acto terrorista y se quiere buscar esas personas a trav\xE9s de los logs de
+      los asistentes de voz"
     pistas:
-    - titulo: Color de pelo
-      descripcion: Un testigo declara haber visto a un transportista pelirrojo parar
-        la nave en un punto no autorizado durante el transporte.
-      palabra: pelirrojo
-    - titulo: Altura
-      descripcion: "Adem\xE1s se ha fijado en que med\xEDa m\xE1s de 1,90 metros
-        de altura."
-      palabra: 1.9
+    - titulo: "\xBFExplosivos?"
+      descripcion: "Fuentes externas han confirmado la alta probabilidad del uso
+        de alg\xFAn explosivo."
+      palabra: bomba
+    - titulo: "\xBFExplosivos?"
+      descripcion: "Fuentes externas han confirmado la alta probabilidad del uso
+        de alg\xFAn explosivo."
+      palabra: explosivo
+    - titulo: "\xBFExplosivos?"
+      descripcion: "Fuentes externas han confirmado la alta probabilidad del uso
+        de alg\xFAn explosivo."
+      palabra: carga
+    eventoId: 0
     eventosCaso:
     - condicion: 0
       efecto: 7
       cantidad: 2
-    eventoId: 0
 --- !u!1 &2088748734
 GameObject:
   m_ObjectHideFlags: 0

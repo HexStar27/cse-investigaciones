@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Hexstar;
-using System.Threading.Tasks;
 
 public class MenuPartidaController : MonoBehaviour
 {
@@ -47,6 +46,12 @@ public class MenuPartidaController : MonoBehaviour
     public void Salir()
     {
         GameManager.CerrarAplicacion();
+    }
+
+    public void CerrarSesion()
+    {
+        SesionHandler.ResetSesionValues();
+        GameManager.CargarEscena(0);
     }
 
     private static async void TryGetSavedFile(bool loadScene)

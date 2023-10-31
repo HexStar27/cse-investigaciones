@@ -19,18 +19,33 @@ public class DataUpdater : MonoBehaviour
 	{
 		StringBuilder builder = new StringBuilder();
 		int consultas = ResourceManager.ConsultasDisponibles;
-		int punt = ResourceManager.Puntuacion;
+		int crono = 0;
 		int agentes = ResourceManager.AgentesDisponibles;
+
+		if(GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+			crono = Mathf.RoundToInt(PuzzleManager.GetTiempoEmpleado());		
 
 		builder.Append(consultas);
 		builder.Append("    ");
-		builder.Append(AntiOverflowInt(punt));
+		builder.Append(AntiOverflowTime(crono));
 		builder.Append("    ");
 		builder.Append(agentes);
 
 		contenido = builder.ToString();
 	}
 
+	//Limitación: Cada pantallita del reloj puede tener hasta 4 carácteres
+	public string AntiOverflowTime(int num)
+    {
+		int segs = num % 60;
+		int min = num / 60;
+		if (min >= 10) return "+10m";
+		else
+		{
+			string extra = segs < 10 ? "0" : "";
+			return min + ":" + extra + segs;
+		}
+    }
 	public string AntiOverflowInt(int num)
 	{
 		if(num >= 100000)

@@ -186,6 +186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pista: {fileID: 6552081272786914884}
   toggle: {fileID: 5523458597504886405}
+  useCuotes: 1
 --- !u!1 &6552081272786914886
 GameObject:
   m_ObjectHideFlags: 0

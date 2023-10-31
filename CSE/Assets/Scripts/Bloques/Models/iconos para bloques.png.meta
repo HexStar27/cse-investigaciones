@@ -17,6 +17,15 @@ TextureImporter:
   - first:
       213: -7995157942444557209
     second: iconos para bloques_4
+  - first:
+      213: 5965678177466589318
+    second: iconos para bloques_5
+  - first:
+      213: 1895160250464196694
+    second: iconos_6
+  - first:
+      213: 7657448488394631740
+    second: iconos_7
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -105,7 +114,7 @@ TextureImporter:
       name: iconos para bloques_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 16
         y: 32
         width: 16
         height: 16
@@ -126,7 +135,7 @@ TextureImporter:
       name: iconos para bloques_1
       rect:
         serializedVersion: 2
-        x: 16
+        x: 32
         y: 32
         width: 16
         height: 16
@@ -147,12 +156,12 @@ TextureImporter:
       name: iconos para bloques_2
       rect:
         serializedVersion: 2
-        x: 0
+        x: 16
         y: 16
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -168,12 +177,12 @@ TextureImporter:
       name: iconos para bloques_3
       rect:
         serializedVersion: 2
-        x: 16
+        x: 32
         y: 16
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -189,12 +198,12 @@ TextureImporter:
       name: iconos para bloques_4
       rect:
         serializedVersion: 2
-        x: 0
+        x: 16
         y: 0
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -202,6 +211,69 @@ TextureImporter:
       bones: []
       spriteID: 76cf275263e7b0190800000000000000
       internalID: -7995157942444557209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: iconos para bloques_5
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6802234e1b85ac250800000000000000
+      internalID: 5965678177466589318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: iconos_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 658db51f436fc4a10800000000000000
+      internalID: 1895160250464196694
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: iconos_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 16
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c3a2d9c44d8b44a60800000000000000
+      internalID: 7657448488394631740
       vertices: []
       indices: 
       edges: []

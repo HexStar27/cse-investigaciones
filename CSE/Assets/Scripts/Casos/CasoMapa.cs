@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-	public int caso;
+	public int indiceCaso;
 	[HideInInspector] public CasoDescripcion menuHover;
 	public TextMeshProUGUI coste;
 
@@ -44,21 +44,22 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 			return;
 		}
 
-		Caso c = PuzzleManager.GetCasoCargado(caso);
-		if (c.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
+		Caso datosCaso = PuzzleManager.GetCasoCargado(indiceCaso);
+		if (datosCaso.pistas == null) Debug.LogError("El caso asignado a la instancia de CasoMapa no tiene pistas.");
 		
 		//Cargar pistas
-		int n = c.pistas.Length;
+		int n = datosCaso.pistas.Length;
 		List<string> palabras = new List<string>();
 		for (int i = 0; i < n; i++)
-			palabras.Add(c.pistas[i].palabra);
+			palabras.Add(datosCaso.pistas[i].palabra);
 
 		AlmacenDePalabras.palabras[(int)TabType.Pistas] = palabras;
 
 		menuHover.Abrir(false);
 		//Actualizar estado después de compra
-		PuzzleManager.Instance.casoActivo = caso;
-		ResourceManager.AgentesDisponibles -= c.coste;
+		PuzzleManager.IniciarStatsCaso(indiceCaso);
+		ResourceManager.AgentesDisponibles -= datosCaso.coste;
+		if (datosCaso.secundario == false) ResourceManager.UltimoCasoPrincipalEmpezado = datosCaso.id;
 		GameplayCycle.Instance.SetState(EstadosDelGameplay.InicioCaso);
 		if (speaker != null) speaker.PlayOneShot(audioSelect);
 		Destroy(gameObject); //F
@@ -66,20 +67,20 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 	private bool SePuedeComprar()
 	{
-		Caso c = PuzzleManager.GetCasoCargado(caso);
+		Caso c = PuzzleManager.GetCasoCargado(indiceCaso);
 		return c.coste <= ResourceManager.AgentesDisponibles;
 	}
 
 	public void CargarDatosCaso()
 	{
-		Caso c = PuzzleManager.GetCasoCargado(caso);
-		if(caso < 0) coste.SetText(99.ToString());
+		Caso c = PuzzleManager.GetCasoCargado(indiceCaso);
+		if(indiceCaso < 0) coste.SetText(99.ToString());
 		else coste.SetText(c.coste.ToString());
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		menuHover.LeerCaso(PuzzleManager.GetCasoCargado(caso),caso);
+		menuHover.LeerCaso(PuzzleManager.GetCasoCargado(indiceCaso),indiceCaso);
 		menuHover.Abrir(true);
 		if (speaker != null) speaker.PlayOneShot(audioHover);
 	}

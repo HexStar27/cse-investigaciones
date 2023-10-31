@@ -16,6 +16,8 @@ public class HighScoreTable : MonoBehaviour
     [HideInInspector] public List<GameObject> elements = new List<GameObject>();
     [SerializeField] bool loadOnStart = false;
 
+    [SerializeField] TextMeshProUGUI myHS;
+
     private void Awake()
     {
         InitializePrefab();
@@ -35,9 +37,20 @@ public class HighScoreTable : MonoBehaviour
     {
         WWWForm form = new WWWForm();
         form.AddField("caso", caso);
+        form.AddField("tipo", -1);
         await ConexionHandler.APost(ConexionHandler.baseUrl + "score", form);
         if(deletePrevious) DeleteElements();
         GetData(ConexionHandler.download);
+
+        if(myHS != null)
+        {
+            form = new WWWForm();
+            form.AddField("authorization", SesionHandler.sessionKEY);
+            form.AddField("user", SesionHandler.email);
+            await ConexionHandler.APost(ConexionHandler.baseUrl + "score/total", form);
+            string datos = ConexionHandler.ExtraerJson(ConexionHandler.download);
+            myHS.text = datos.Substring(1, datos.Length - 2).Trim();
+        }
     }
 
     public void SetCasoID(int id) { caso = id; }

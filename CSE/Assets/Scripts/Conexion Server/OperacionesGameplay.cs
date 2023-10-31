@@ -4,6 +4,7 @@ using UnityEngine;
 using Hexstar;
 using System;
 using System.Threading.Tasks;
+using SimpleJSON;
 
 public class OperacionesGameplay : MonoBehaviour
 {
@@ -26,19 +27,28 @@ public class OperacionesGameplay : MonoBehaviour
     }
     public static async void RealizarConsulta()
     {
+        string consulta = LectorConsulta.GetQuery();
+        if (consulta.Length <= 0)
+        {
+            TempMessageController.Instancia.GenerarMensaje("Inserta un bloque agrupado en el conector central para enviar consultas");
+            return;
+        }
+
         WWWForm form = new WWWForm();
         form.AddField("authorization",SesionHandler.sessionKEY);
-        form.AddField("consulta", LectorConsulta.GetQuery());
+        form.AddField("consulta", consulta);
 
         await ConexionHandler.APost(ConexionHandler.baseUrl + "case/check", form);
         string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
 
         resultado = resultado.Substring(1, resultado.Length - 2);
         ImpresorResultado.Instancia.IntroducirResultado(resultado);
+        TempMessageController.Instancia.GenerarMensaje("Consulta realizada!");
 
-        if(GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
             ResourceManager.ConsultasDisponibles--;
+            PuzzleManager.consultasRealizadasActuales++;
             ActualizarDC();
         }
     }
@@ -64,22 +74,26 @@ public class OperacionesGameplay : MonoBehaviour
             form.AddField("caseid", PuzzleManager.Instance.casosCargados[ind].id);
             form.AddField("caso", LectorConsulta.GetQuery());
             await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
+            TempMessageController.Instancia.GenerarMensaje("Enviando solución...");
             string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
             bool completado = response[0] == 't'; // "true"
+            
             PuzzleManager.Instance.solucionCorrecta = completado;
+            if (!PuzzleManager.GetCasoActivo().secundario) ResourceManager.UltimoCasoPrincipalGanado = completado;
+
+            //Informar del resultado al jugador
             if (completado)
             {
-                //Informar de que es correcto
-                TempMessageController.Instancia.GenerarMensaje("INFORMACIÓN CORRECTA, CRIMEN RESUELTO");
                 ResourceManager.CasosCompletados++;
+                await CalcularYGuardarPuntuacion();
                 TerminarCaso();
             }
             else
             {
-                //Informar de que no es correcto
                 TempMessageController.Instancia.GenerarMensaje("Crimen no resuelto...");
             }
 
+            PuzzleManager.consultasRealizadasActuales++;
             ResourceManager.ConsultasDisponibles--;
             ActualizarDC();
         }
@@ -90,7 +104,8 @@ public class OperacionesGameplay : MonoBehaviour
     {
         if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            PuzzleManager.LimpiarFlags();
+            //PuzzleManager.TerminarStatsCaso();
+            PuzzleManager.LimpiarFlags(); //???
             GameplayCycle.Instance.SetState(EstadosDelGameplay.FinCaso);
         }
     }
@@ -119,6 +134,49 @@ public class OperacionesGameplay : MonoBehaviour
             GameplayCycle.Instance.SetState(EstadosDelGameplay.FinCaso);
         }
         else GameplayCycle.Instance.SetState(EstadosDelGameplay.FinDia);
+    }
+
+    public static async Task CalcularYGuardarPuntuacion()
+    {
+        int id = PuzzleManager.GetCasoActivo().id;
+        int time = Mathf.FloorToInt(PuzzleManager.GetTiempoEmpleado());
+        WWWForm form = new WWWForm();
+        form.AddField("authorization", SesionHandler.sessionKEY);
+        form.AddField("caso", id);
+        form.AddField("consultas", PuzzleManager.consultasRealizadasActuales);
+        form.AddField("tiempo", time);
+        form.AddField("examen", PuzzleManager.Instance.casoExamen ? 1 : 0);
+        form.AddField("reto", 0); //TODO: Comprobar si retos opcionales completados (cuando los eventos estén bien)
+        form.AddField("dificultad", ResourceManager.DificultadActual);
+        form.AddField("consulta", LectorConsulta.GetQuery());
+        await ConexionHandler.APost(ConexionHandler.baseUrl + "score/calculate", form);
+
+        string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
+        if (json == "{}") Debug.LogError("Ha habido un error en el servidor al calcular la puntuación :(");
+        else
+        {
+            JSONNode jNodo = JSON.Parse(ConexionHandler.download);
+            int puntuacion = jNodo["res"].AsInt;
+            
+
+            form = new WWWForm();
+            form.AddField("authorization", SesionHandler.sessionKEY);
+            form.AddField("user", SesionHandler.email);
+            form.AddField("caso", id);
+            form.AddField("punt", puntuacion);
+            form.AddField("dif", ResourceManager.DificultadActual);
+            form.AddField("used", PuzzleManager.consultasRealizadasActuales);
+            form.AddField("time", time);
+            await ConexionHandler.APost(ConexionHandler.baseUrl + "score/save", form);
+
+            json = ConexionHandler.ExtraerJson(ConexionHandler.download);
+            if (json == "{}") Debug.LogError("Ha habido un error al intentar guardar la puntuación :(");
+            else
+            {
+                //TODO: Mostrar asíncronamente la puntuación que ha obtenido el jugador
+                await PuntuacionController.PresentarPuntuaciones(puntuacion);
+            }
+        }
     }
 
     /// <summary>
@@ -151,13 +209,15 @@ public class OperacionesGameplay : MonoBehaviour
 
     public static async Task EjecutarEventoAleatorio()
     {
-        await Task.Yield(); //No habrán eventos en la Alpha
+        //TODO
+
         // 1º Obtener el evento
         //int nEventos = BancoEventos.Instance().Count();
         //int e = UnityEngine.Random.Range(0,nEventos);
         //Evento evento = BancoEventos.Instance().Get(e);
         // 2º Realizar cambios del evento
         //BancoEventos.Instance().Activate(evento);
+        await Task.Yield();
     }
 
     public static void AplicarEfectosCaso(Caso caso, bool ganado, int consultasUsadas, float tiempoEmpleado)

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using System.Threading.Tasks;
 
@@ -9,15 +8,9 @@ public class DayCounter : MonoBehaviour
     [SerializeField] Animator anim;
     public string start = "Play";
 
-    [Header("Status:")]
-    [SerializeField] private bool locked = false;
-
     public async Task InitAnimation(int fromDay, int toDay)
     {
-        if (locked) return;
-
-        do { await Task.Delay(100); }
-        while (!TempMessageController.Instancia.Terminado());
+        while (!TempMessageController.Instancia.Terminado()) await Task.Delay(100);
 
         actual.text = fromDay.ToString() + " " + GetWeekDay(fromDay);
         siguiente.text = toDay.ToString() + " " + GetWeekDay(toDay);
@@ -28,8 +21,10 @@ public class DayCounter : MonoBehaviour
             anim.enabled = true;
             anim.SetTrigger(start);
 
-            do { await Task.Delay(100); }
-            while (anim.GetCurrentAnimatorStateInfo(0).IsName(start));
+            //do { await Task.Delay(100); } while (anim.GetCurrentAnimatorStateInfo(0).IsName(start));
+            await Task.Delay(2500); 
+            //La animación siempre tarda 3 segundos y medio. Termina antes para que otros sistemas puedan
+            //actualizarse sin que el jugador se dé cuenta.
         }
     }
 
@@ -42,7 +37,6 @@ public class DayCounter : MonoBehaviour
 
     public void DisableAnimator()
     {
-        locked = false;
         actual.text = siguiente.text;
         if(anim != null) anim.enabled = false;
     }

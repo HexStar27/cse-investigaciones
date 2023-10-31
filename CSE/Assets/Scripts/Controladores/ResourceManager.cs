@@ -11,6 +11,8 @@ public static class ResourceManager
     private static int consultasDisponibles;
     private static int consultasMaximas;
     private static int casosCompletados; //A.K.A. reputación
+    private static int ultimoCasoPrincipalEmpezado;
+    private static bool ultimoCasoPrincipalGanado;
     private static int dificultadActual;
     private static int puntuacion;
     private static int dia;
@@ -90,5 +92,16 @@ public static class ResourceManager
     {
         get => tableCodes;
         set => tableCodes = value;
+    }
+
+    public static int UltimoCasoPrincipalEmpezado
+    {
+        get => ultimoCasoPrincipalEmpezado;
+        set => ultimoCasoPrincipalEmpezado = value;
+    }
+    public static bool UltimoCasoPrincipalGanado
+    {
+        get => ultimoCasoPrincipalGanado;
+        set => ultimoCasoPrincipalGanado = value;
     }
 }

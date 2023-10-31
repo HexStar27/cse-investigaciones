@@ -100,6 +100,7 @@ namespace Hexstar.CSE
             int iBest = 0;
             for (int i = 0; i < conectoresTocando.Count; i++)
             {
+                if (!conectoresTocando[i].gameObject.activeSelf) continue;
                 float distance = Vector3.Distance(transform.position, conectoresTocando[i].transform.position);
                 if (distance < closestDistance)
                 {
