@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Hexstar;
+using CSE;
 
 public class MenuPartidaController : MonoBehaviour
 {
@@ -32,9 +33,10 @@ public class MenuPartidaController : MonoBehaviour
     {
         PuntoGuardado pg = new PuntoGuardado();
         ResourceManager.checkpoint = pg;
-        pg.Cargar();
+        pg.CargarDatosAlSistema();
         existePartida = true;
-        GameManager.CargarEscena(2);
+        XAPI_Builder.CreateStatement_GameSession(true, true); // Starting session + new game
+        GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
     }
 
 
@@ -51,9 +53,13 @@ public class MenuPartidaController : MonoBehaviour
     public void CerrarSesion()
     {
         SesionHandler.ResetSesionValues();
-        GameManager.CargarEscena(0);
+        GameManager.CargarEscena(GameManager.GameScene.INICIO_SESION);
     }
 
+    /// <summary>
+    /// Try to load a saved file from the server. Will create a new file if none was found.
+    /// </summary>
+    /// <param name="loadScene"></param>
     private static async void TryGetSavedFile(bool loadScene)
     {
         if(!existePartida)
@@ -77,12 +83,16 @@ public class MenuPartidaController : MonoBehaviour
             }
 
             ResourceManager.checkpoint = pg;
-            pg.Cargar();
+            pg.CargarDatosAlSistema();
 
             cerrojo = false;
         }
 
-        if(loadScene) GameManager.CargarEscena(2);
+        if (loadScene)
+        {
+            GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
+            XAPI_Builder.CreateStatement_GameSession(true,!existePartida); // starting session
+        }
     }
 
     private static async void GuardarPartidaEnServer()

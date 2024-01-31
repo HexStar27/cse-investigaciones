@@ -2,40 +2,46 @@
 /// Al cambiar el estado se está indicando que se está pasando a ese evento del juego.
 ////////////////////////////////////////////////////////////////////////////////////////
 
-using UnityEngine;
-using Hexstar.CSE;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Text;
+using UnityEngine;
+using UnityEngine.Events;
+using CSE;
+using Hexstar.CSE;
+using Hexstar.Dialogue;
+using Hexstar.CSE.SistemaEventos;
+using CSE.Feedback;
 
-[System.Serializable]
-public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
-public class GameplayCycle : MonoBehaviour
+[System.Serializable] public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
+public class GameplayCycle : MonoBehaviour, ISingleton
 {
 	public static GameplayCycle Instance { get; private set; }
+
 	public int EstadosPosibles { get; private set; }
 
 	[SerializeField] DayCounter _dayCounter;
 	[SerializeField] Transform gameOverMenu;
 	[SerializeField] AudioSource bgmSource;
+	[SerializeField] Hexstar.ControladorCinematica controladorCinematica;
+	[SerializeField] AwaiterUntilPressed popupFinDia;
 
-	[Header("Status")]
-	[SerializeField] int estadoActual = 0;
-	[SerializeField] bool gameover = false;
-	bool habiaCasosEnArchivoGuardado = false;
+	static int estadoActual = 0;
+	static bool gameover = false;
+	static bool terminarBucleExtractor = false;
+	static bool recargarCasosDePartidaAnterior = false;
 
-	Queue<int> pilaEstadosSiguientes = new Queue<int>();
+	public static UnityEvent OnCycleTaskFinished { get; set; } = new();
+	private static Queue<int> pilaEstadosSiguientes = new Queue<int>();
 
-	public void SetState(EstadosDelGameplay estado)
+	private static Dictionary<string, bool> pauseMessageDict = new();
+
+	private int startedCasesInDay = 0, completedCasesInDay = 0;
+
+	public static void EnqueueState(EstadosDelGameplay estado)
 	{
 		if (gameover) return;
 		pilaEstadosSiguientes.Enqueue((int)estado);
-	}
-	public void SetState(int estado)
-	{
-		//El estado existe y no está activada la flag de fin de juego
-		if (estado >= 0 && estado < EstadosPosibles && !gameover) {
-			pilaEstadosSiguientes.Enqueue(estado);
-		}
 	}
 
 	private async Task ApplyState(int e)
@@ -50,49 +56,60 @@ public class GameplayCycle : MonoBehaviour
 		}
 	}
 
-	public int GetState()
+	public static int GetState()
 	{
 		return estadoActual;
 	}
 
 	private async Task InicioDia()
 	{
-		if (ResourceManager.Dia == 0) //Inicio del juego
+        startedCasesInDay = 0;
+        completedCasesInDay = 0;
+        PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
+
+        if (ResourceManager.Dia == 0) //Inicio del juego
 		{
 			ResourceManager.ConsultasMaximas = 4;
-			//OperacionesGameplay.Instancia.CargarEventos();
+
+			if (!TutorialIsEnabled())
+			{
+				SetTutorialEvent(true);
+				controladorCinematica.CargarJSON();
+                controladorCinematica.IniciarCinematica();
+			}
 			ResourceManager.AgentesDisponibles = ResourceManager.agentesInciales;
-		}
+            DataUpdater.Instance.ResetSingleton();
+        }
 		else //El resto de días
 		{
-			if (ResourceManager.AgentesDisponibles <= 0)
+			await AlmacenEventos.EncargarseDeEventosAptos();
+
+            if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent())
 			{
-				await GameOver(); //Fin del juego
+				await GameOver();
 				return;
 			}
-			//Comprobar si hay eventos de efecto aplicables en la pila
-			await OperacionesGameplay.EjecutarEventoAleatorio(); //Cambiar por lo nuevo
 		}
 
-		//Cargar los casos necesarios al iniciar el día
-		if (habiaCasosEnArchivoGuardado)
-        {
-			habiaCasosEnArchivoGuardado = false;
-			await PuzzleManager.RecargarCasosDePartidaGuardada(ResourceManager.checkpoint.casosCargados);
-        }
-        else
-        {
+        // Carga los casos necesarios al iniciar el día
+        await PuzzleManager.PrepararCasosParaInicioDia(recargarCasosDePartidaAnterior);
+
+        if (recargarCasosDePartidaAnterior) recargarCasosDePartidaAnterior = false;
+		else
+		{
 			ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
-			await PuzzleManager.PrepararCasosInicioDia();
-		}
-		OperacionesGameplay.ActualizarDC();
+			if (ResourceManager.Dia > 0) await DataUpdater.Instance.ShowAgentesDisponibles();
+        }
+
+        OperacionesGameplay.ActualizarDangerController();
 	}
 
 	private async Task InicioCaso()
 	{
-		//TODO: Cambiar la música. Ahora mismo no tengo otra)
+		startedCasesInDay++;
+        //TODO: Cambiar la música. Ahora mismo no tengo otra
 
-		CajonPistas.instancia.RellenarCajonConCasoActivo();
+        CajonPistas.instancia.RellenarCajonConCasoActivo();
 		AlmacenDePalabras.CargarPistasDeCasoActivo();
 		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
 
@@ -101,104 +118,206 @@ public class GameplayCycle : MonoBehaviour
 
 	private async Task FinCaso()
 	{
-		bool completado = PuzzleManager.Instance.solucionCorrecta;
+		int nConsultas = PuzzleManager.ConsultasRealizadasActuales;
+		float tiempo = PuzzleManager.UltimoTiempoEmpleado;
+        bool ganado = PuzzleManager.SolucionCorrecta;
+		if (ganado) completedCasesInDay++;
 
-		//Quitar resumen del caso de la pantalla superior
 		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
+		await PuzzleManager.GetCasoActivo().ComprobarYAplicarBounties(ganado,nConsultas,tiempo);
 
-		//Comprobar si hay eventos de efecto aplicables en la pila
-		//TODO...
+		await AlmacenEventos.EncargarseDeEventosAptos();
 
-		if (ResourceManager.AgentesDisponibles <= 0) await GameOver();
+		if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent()) await GameOver();
 		else
 		{
-			//Iniciar siguiente día si no quedan consultas disponibles después de aplicar efectos
-			if (ResourceManager.ConsultasDisponibles == 0) SetState(EstadosDelGameplay.FinDia);
+			if (ResourceManager.ConsultasDisponibles == 0)
+			{
+				EnqueueState(EstadosDelGameplay.FinDia);
 
-			if (completado && PuzzleManager.Instance.casoExamen)
+				//Esperar confirmación del jugador para continuar
+				if (popupFinDia != null) popupFinDia.ActivarPopUp();
+
+				XAPI_Builder.CreateStatement_DayFinished(!ganado, completedCasesInDay, startedCasesInDay);
+			}
+
+			if (ganado && PuzzleManager.CasoActivoEsExamen())
+			{
 				ResourceManager.DificultadActual++;
+				TempMessageController.Instancia.GenerarMensaje("LA DIFICULTAD HA SIDO AUMENTADA");
+				XAPI_Builder.CreateStatement_DifficultyIncrease(ResourceManager.DificultadActual);
+			}
 		}
 
-		CajonPistas.instancia.VaciarCajon();
-		AlmacenDePalabras.palabras[(int)TabType.Pistas] = new List<string>();
+        //Elimina las pistas del caso
+        CajonPistas.instancia.VaciarCajon();
+		AlmacenDePalabras.palabras[(int)TabType.Pistas].Clear();
 
-		if (!completado) PuzzleManager.LimpiarFlags();
+        PuzzleManager.LimpiarFlagsDeCasoActual();
 	}
 
 	private async Task FinDia()
     {
-		int dia = ++ResourceManager.Dia;
-
 		//MostrarDía
+        int dia = ++ResourceManager.Dia;
 		await _dayCounter.InitAnimation(dia - 1, dia);
 
-		SetState(EstadosDelGameplay.InicioDia);
+		//Limpieza
+		RestartCameraState();
+		Intelisense.instance.pantalla.text ="";
+		BloqueTabletaElemento.DestruirBloquesEnMesa();
+
+        EnqueueState(EstadosDelGameplay.InicioDia);
+	}
+
+	private void RestartCameraState()
+	{
+		var mainCam = Camera.main;
+        var ilcs = mainCam.GetComponent<InscryptionLikeCameraState>();
+		var cs = mainCam.GetComponent<CameraState>();
+		ilcs.SetCameraState(cs);
+		ilcs.SetEstadoActual(0);
+		cs.Transition(0);
 	}
 
 	public AudioSource Get_BGM_Source() { return bgmSource; }
 
 	public async Task GameOver()
 	{
+		//Debería ser el fin del juego cuando 
 		gameover = true;
-		InscryptionLikeCameraState.bypass = true;
-		if (bgmSource != null) bgmSource.Stop(); //Cambiar por música de gameover
+        InscryptionLikeCameraState.SetBypass(true);
+        if (bgmSource != null) bgmSource.Stop(); //Cambiar por música de gameover
 		if (gameOverMenu != null) gameOverMenu.gameObject.SetActive(true);
 		await Task.Yield();
 	}
 
+	private static bool CheckGameOverEvent()
+	{
+		string  v = ControladorDialogos.GetDialogueEventValue("game_over");
+		if(int.TryParse(v,System.Globalization.NumberStyles.Integer, 
+			new System.Globalization.CultureInfo("es-ES"),out int res))
+		{
+			return res > 0; // Evento activado => Ejecutar Game Over cuando sea posible.
+		}
+		return false;
+	}
+
 	public void ReintentarDesdePuntoDeGuardado()
     {
-		ResourceManager.checkpoint.Cargar();
-		GameManager.CargarEscena(2);
+		ResourceManager.checkpoint.CargarDatosAlSistema();
+		GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
 	}
-	public void VolverAlMenuPrincipal() { GameManager.CargarEscena(1); }
+	public void VolverAlMenuPrincipal() { 
+		GameManager.CargarEscena(GameManager.GameScene.MENU_PARTIDA); 
+	}
 
-	private void Awake()
+	private void SetTutorialEvent(bool enabled)
+	{
+		ControladorDialogos.SetDialogueEvent("tutorial", enabled ? "true" : "false");
+	}
+    private bool TutorialIsEnabled()
+    {
+        string v = ControladorDialogos.GetDialogueEventValue("tutorial");
+        return v.Equals("true");
+    }
+
+    private void Awake()
 	{
 		if(Instance == null) Instance = this;
-		EstadosPosibles = 3;
+		EstadosPosibles = 4;
 
 		BucleExtractor();
 	}
 
 	private void Start()
 	{
-		InicializacionDeSubSistemas();
-		if (ResourceManager.checkpoint.casoEnCurso < 0) SetState(EstadosDelGameplay.InicioDia);
-		else SetState(EstadosDelGameplay.InicioCaso);
-
+		TryLoadGame();
+		if (ResourceManager.checkpoint.casoEnCurso < 0) EnqueueState(EstadosDelGameplay.InicioDia);
+		else EnqueueState(EstadosDelGameplay.InicioCaso);
 	}
 
-	private void OnEnable()
+    public void ResetSingleton()
+    {
+		estadoActual = 0;
+		gameover = false;
+
+        pilaEstadosSiguientes.Clear();
+		pauseMessageDict.Clear();
+    }
+    private void OnEnable()
 	{
+		//PauseGameplayCycle(false, "self");
 		ResourceManager.OnOutOfQueries.AddListener(OperacionesGameplay.SinConsultas);
+		MenuPausa.onExitLevel.AddListener(ResetSingleton);
 	}
 	private void OnDisable()
 	{
-		ResourceManager.OnOutOfQueries.RemoveListener(OperacionesGameplay.SinConsultas);
-	}
+        MenuPausa.onExitLevel.RemoveListener(ResetSingleton);
+        ResourceManager.OnOutOfQueries.RemoveListener(OperacionesGameplay.SinConsultas);
+		//PauseGameplayCycle(true, "self");
+		terminarBucleExtractor = true;
 
-	private async void BucleExtractor()
+    }
+    private void OnApplicationQuit()
+    {
+        OperacionesGameplay.Snapshot();
+        MenuPartidaController.GuardarPartidaEnCurso_S();
+        XAPI_Builder.CreateStatement_GameSession(false); // finishing session
+		XAPI_Builder.SendAllStatements();
+    }
+
+    private async void BucleExtractor()
 	{
-		while(!gameover)
+		while(!gameover && !terminarBucleExtractor)
 		{
 			if(pilaEstadosSiguientes.Count > 0)
 			{
 				int e = pilaEstadosSiguientes.Dequeue();
+				while (IsPaused()) await Task.Delay(100);
 				await ApplyState(e);
-			}
+				OnCycleTaskFinished?.Invoke();
+            }
 			else
 			{
-				await Task.Delay(100);
+				await Task.Delay(50);
 			}
 		}
+        terminarBucleExtractor = false;
+    }
+	public static void PauseGameplayCycle(bool pause, string objName)
+	{
+		//print(objName+" pause set to: "+pause);
+		if (!pauseMessageDict.TryAdd(objName, pause)) 
+			pauseMessageDict[objName] = pause;
+	}
+    public static bool IsPaused()
+	{
+		//El sistema está pausado si hay al menos un mensaje de pausa activado.
+		bool pausado = false;
+		foreach(bool val in pauseMessageDict.Values) pausado |= val;
+		return pausado;
 	}
 
 
-	private void InicializacionDeSubSistemas()
+	private void TryLoadGame()
     {
 		AlmacenDePalabras.CargarPalabras();
-		habiaCasosEnArchivoGuardado = ResourceManager.checkpoint.casosCargados.Length > 0;
-		PuzzleManager.Instance.casoActivo = ResourceManager.checkpoint.casoEnCurso;
+		recargarCasosDePartidaAnterior = ResourceManager.checkpoint.casosCargados.Length > 0;
+		PuzzleManager.CasoActivoIndice = ResourceManager.checkpoint.casoEnCurso;
+		Task.Run(() => AlmacenEventos.DescargarEventosServidor());
 	}
+
+    [ContextMenu("Loggear Estado de Pausas")]
+    private void LogPauseStates()
+    {
+		if (pauseMessageDict == null) return;
+
+		StringBuilder sb = new();
+        foreach(var elem in pauseMessageDict)
+		{
+			sb.Append(elem.Key + " -> " + elem.Value+"\n");
+		}
+		print(sb.ToString());
+    }
 }

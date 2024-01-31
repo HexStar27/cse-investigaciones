@@ -15,10 +15,10 @@ public class DrawerHelper : MonoBehaviour
 
 	public void TWO()
 	{
-		int state = _state.GetState();
-		if ((state == drawerState + 1 || state == drawerState - 1) && opened) 
+        int state = _state.GetState();
+		if ((state != drawerState) && opened) 
 		{
-			_anim.SetTrigger(triggerNames[1]);
+            _anim.SetTrigger(triggerNames[1]);
 			opened = false;
 		}
 	}
@@ -27,7 +27,7 @@ public class DrawerHelper : MonoBehaviour
 	{
 		if(nextState == drawerState && !opened)
 		{
-			_anim.SetTrigger(triggerNames[0]);
+            _anim.SetTrigger(triggerNames[0]);
 			opened = true;
 		}
 	}

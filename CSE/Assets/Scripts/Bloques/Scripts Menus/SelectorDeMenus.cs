@@ -22,7 +22,7 @@ public class SelectorDeMenus : MonoBehaviour
 
     public void SeleccionarMenu(int idx)
     {
-        InscryptionLikeCameraState.bypass = true;
+        InscryptionLikeCameraState.SetBypass(true);
         if(ilcs != null && ilcs.GetEstadoActual() != targetCameraState) {
             CerrarMenus();
             return;
@@ -42,7 +42,7 @@ public class SelectorDeMenus : MonoBehaviour
         foreach (var m in acomodadores) m.gameObject.SetActive(false);
         onCloseMenu?.Invoke();
 
-        InscryptionLikeCameraState.bypass = false;
+        InscryptionLikeCameraState.SetBypass(false);
     }
 
     public Transform GetMenuSelected()

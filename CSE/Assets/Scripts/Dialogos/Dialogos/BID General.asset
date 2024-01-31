@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f50c12888f5af0429f4e22519cb3e0f, type: 3}
+  m_Name: BID General
+  m_EditorClassIdentifier: 
+  imagenes:
+  - tag: CasoPrincipal
+    sprite: {fileID: 42200905200766207, guid: b60ac0513b092a644bc7232060f6bdc4, type: 3}
+  - tag: CasoSecundario
+    sprite: {fileID: 5989931899594976518, guid: b60ac0513b092a644bc7232060f6bdc4,
+      type: 3}
+  - tag: CasoExamen
+    sprite: {fileID: -4025753675219642673, guid: b60ac0513b092a644bc7232060f6bdc4,
+      type: 3}

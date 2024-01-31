@@ -71,5 +71,10 @@ namespace Hexstar.CSE {
             else AlmacenDePalabras.AddAliasToColumn(elementRenamed, val);
             valueInserted = val;
         }
+
+        private void OnDestroy()
+        {
+            QuitarAntiguos();
+        }
     }
 }

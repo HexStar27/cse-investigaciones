@@ -17,6 +17,7 @@ public class HighScoreTable : MonoBehaviour
     [SerializeField] bool loadOnStart = false;
 
     [SerializeField] TextMeshProUGUI myHS;
+    public int maxElementsInTable = 10;
 
     private void Awake()
     {
@@ -49,7 +50,7 @@ public class HighScoreTable : MonoBehaviour
             form.AddField("user", SesionHandler.email);
             await ConexionHandler.APost(ConexionHandler.baseUrl + "score/total", form);
             string datos = ConexionHandler.ExtraerJson(ConexionHandler.download);
-            myHS.text = datos.Substring(1, datos.Length - 2).Trim();
+            myHS.text = datos[1..^1].Trim();
         }
     }
 
@@ -72,7 +73,7 @@ public class HighScoreTable : MonoBehaviour
             }
             else
             {
-                int n = json["res"].Count;
+                int n = System.Math.Min(json["res"].Count,maxElementsInTable);
                 for (int i = 0; i < n; i++)
                 {
                     GameObject row = Instantiate(scoreRowPrefab, transform);

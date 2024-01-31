@@ -13,10 +13,12 @@ public class AlmacenDeBloquesSimple : ScriptableObject
 
     public List<Bloque> bloquesPrefab = new List<Bloque>();
 
-    public List<Bloque> BloquesDisponiblesEnDificultad(int dificultad)
+    public List<Bloque> BloquesDisponiblesEnDificultad(int dificultadActual)
     {
         List<Bloque> lista = new List<Bloque>();
-        foreach(var bloque in bloquesPrefab) lista.Add(bloque);
+        foreach (var bloque in bloquesPrefab)
+            if (bloque.disponibleEnDificultad <= dificultadActual)
+                lista.Add(bloque);
         return lista;
     }
 }

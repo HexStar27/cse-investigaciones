@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CSE;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Hexstar.CSE
@@ -27,6 +28,7 @@ namespace Hexstar.CSE
 		[SerializeField] float ghostBlockScale = 0.5f;
 
 		[SerializeField] bool cancelGrab = false;
+		[SerializeField] bool sendXAPIStatement = true;
 		[HideInInspector] public UnityEvent onBlockConectionChanged = new UnityEvent();
 
 		[Header("Conectores")]
@@ -51,6 +53,8 @@ namespace Hexstar.CSE
 
 		//Para type checking
 		private BlockType seccionPresente = null;
+
+		public string GetBlockTitle() => bd.title;
 
 		#region Drag
 		private void BeginDrag()
@@ -408,6 +412,8 @@ namespace Hexstar.CSE
 			audioS = GetComponent<AudioSource>();
 			CQU = GetComponent<ContentQueryUnit>();
 			UpdateVisuals();
+
+			if(sendXAPIStatement) XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.GENERATED, bd.title);
 		}
 
 		private void OnMouseDown()
@@ -492,13 +498,16 @@ namespace Hexstar.CSE
 					//Invocar evento por todo el grupo
 					FlotarOnConnectionChange();     //if (cEntrada.ElBloque() == this) cSalida.ElBloque().onBlockConectionChanged?.Invoke();
 					HundirOnConnectionChange(false);//else cEntrada.ElBloque().onBlockConectionChanged?.Invoke();
+					
 					audioS.PlayOneShot(config.blockConect);
-				}
+                    XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.CONNECTED, bd.title,cEntrada.ElBloque().bd.title);
+                }
 			}
 			else if (wantToDeleteBlock)
             {
 				Conector.distanciaEntradasTocando.Clear();
-				Destroy(this.gameObject);
+                XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.REMOVED, bd.title);
+                Destroy(this.gameObject);
             }
 
 			Conector.distanciaEntradasTocando.Clear();

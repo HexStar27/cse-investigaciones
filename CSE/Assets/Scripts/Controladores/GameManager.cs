@@ -8,6 +8,8 @@ public static class GameManager
     public static UnityEvent OnPause = new UnityEvent();
     public static UnityEvent OnUnpause = new UnityEvent();
 
+    public enum GameScene { INICIO_SESION=0, MENU_PARTIDA=1, ESCENA_PRINCIPAL=2 };
+
     public static string user;
     private static bool isLoading;
 
@@ -16,12 +18,12 @@ public static class GameManager
         Application.Quit();
     }
 
-    public static void CargarEscena(int escenaId)
+    public static void CargarEscena(GameScene escena)
     {
-        SceneManager.LoadScene(escenaId);
+        SceneManager.LoadScene((int)escena);
     }
 
-    public static IEnumerator CarganConPantallaDeCarga(int escenaId)
+    public static IEnumerator CarganConPantallaDeCarga(int escenaId) // No se usa ???
     {
         if (!isLoading)
         {
@@ -38,21 +40,4 @@ public static class GameManager
             isLoading = false;
         }
     }
-
-    /* Código zombi...
-    public void CargarEscenaConPCarga(int escenaId)
-    {
-        if(!isLoading) StartCoroutine(CarganConPantallaDeCarga(escenaId));
-    }
-
-    public static void Pausar()
-    {
-        OnPause.Invoke();
-    }
-
-    public static void Despausar()
-    {
-        OnUnpause.Invoke();
-    }*/
-
 }

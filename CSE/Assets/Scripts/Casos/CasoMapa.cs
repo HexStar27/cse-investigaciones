@@ -7,15 +7,14 @@
 
 using UnityEngine;
 using Hexstar.CSE;
-using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using CSE;
 
 public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 	public int indiceCaso;
-	[HideInInspector] public CasoDescripcion menuHover;
 	public TextMeshProUGUI coste;
 
 	[Header("Audio clues")]
@@ -28,20 +27,36 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		speaker = transform.parent.GetComponent<AudioSource>();
     }
 
+	public void Seleccionar()
+	{
+        CasoDescripcion.Instance.LeerCaso(this, PuzzleManager.GetCasoCargado(indiceCaso), indiceCaso);
+        CasoDescripcion.Instance.Abrir(true);
+        if (speaker != null) speaker.PlayOneShot(audioSelect);
+    }
+
     public void Comprar()
 	{
 		if(!SePuedeComprar())
 		{
-			TempMessageController.Instancia.GenerarMensaje("Necesitas más agentes para desbloquear el caso");
+			TempMessageController.Instancia.GenerarMensaje("NECESITAS MÁS AGENTES");
 			if (speaker != null) speaker.PlayOneShot(audioError);
+			XAPI_Builder.CreateStatement_CaseRequest(false);
 			return;
 		}
-		// Ya hay otro caso activo
-		if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+		if(ResourceManager.ConsultasDisponibles <= 0)
 		{
-			TempMessageController.Instancia.GenerarMensaje("Sólo se puede resolver un caso a la vez");
+            TempMessageController.Instancia.GenerarMensaje("NO TE QUEDAN CONSULTAS");
+            if (speaker != null) speaker.PlayOneShot(audioError);
+            XAPI_Builder.CreateStatement_CaseRequest(false);
+            return;
+        }
+		// Ya hay otro caso activo
+		if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
+		{
+			TempMessageController.Instancia.GenerarMensaje("SÓLO UN CASO A LA VEZ");
 			if (speaker != null) speaker.PlayOneShot(audioError);
-			return;
+            XAPI_Builder.CreateStatement_CaseRequest(false);
+            return;
 		}
 
 		Caso datosCaso = PuzzleManager.GetCasoCargado(indiceCaso);
@@ -55,15 +70,23 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 		AlmacenDePalabras.palabras[(int)TabType.Pistas] = palabras;
 
-		menuHover.Abrir(false);
-		//Actualizar estado después de compra
-		PuzzleManager.IniciarStatsCaso(indiceCaso);
-		ResourceManager.AgentesDisponibles -= datosCaso.coste;
-		if (datosCaso.secundario == false) ResourceManager.UltimoCasoPrincipalEmpezado = datosCaso.id;
-		GameplayCycle.Instance.SetState(EstadosDelGameplay.InicioCaso);
-		if (speaker != null) speaker.PlayOneShot(audioSelect);
-		Destroy(gameObject); //F
-	}
+		HandleResourcesAndGameplay(datosCaso);
+    }
+
+	private async void HandleResourcesAndGameplay(Caso datosCaso)
+	{
+        //Actualizar estado después de compra
+        ResourceManager.AgentesDisponibles -= datosCaso.coste;
+        await DataUpdater.Instance.ShowAgentesDisponibles();
+        CasoDescripcion.Instance.Abrir(false);
+        PuzzleManager.IniciarStatsCaso(indiceCaso);
+
+        if (datosCaso.secundario == false) ResourceManager.UltimoCasoPrincipalEmpezado = datosCaso.id;
+        GameplayCycle.EnqueueState(EstadosDelGameplay.InicioCaso);
+        if (speaker != null) speaker.PlayOneShot(audioSelect);
+        XAPI_Builder.CreateStatement_CaseRequest(true);
+        Destroy(gameObject); //F
+    }
 
 	private bool SePuedeComprar()
 	{
@@ -71,22 +94,18 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		return c.coste <= ResourceManager.AgentesDisponibles;
 	}
 
-	public void CargarDatosCaso()
+	public void CargarDatosCaso(int indice)
 	{
+		indiceCaso = indice;
 		Caso c = PuzzleManager.GetCasoCargado(indiceCaso);
-		if(indiceCaso < 0) coste.SetText(99.ToString());
+		if(indiceCaso < 0) coste.SetText("?");
 		else coste.SetText(c.coste.ToString());
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		menuHover.LeerCaso(PuzzleManager.GetCasoCargado(indiceCaso),indiceCaso);
-		menuHover.Abrir(true);
 		if (speaker != null) speaker.PlayOneShot(audioHover);
 	}
 
-	public void OnPointerExit(PointerEventData eventData)
-	{
-		menuHover.Abrir(false);
-	}
+	public void OnPointerExit(PointerEventData eventData) {}
 }

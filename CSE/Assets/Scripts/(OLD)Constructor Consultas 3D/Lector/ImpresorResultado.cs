@@ -7,16 +7,24 @@ public class ImpresorResultado : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI textoResultado;
     [SerializeField] Boton3D IO_Button;
-    [SerializeField] int maxLineLength = 40;
+    [SerializeField] int maxLineLength = 0;
+    [SerializeField] int maxColumnWidth = 20;
     [SerializeField] RectTransform contentFather;
+
+    bool badQuery = false;
 
     public static ImpresorResultado Instancia { get; set; }
 
     public void IntroducirResultado(string r)
     {
         textoResultado.text = QueryResultBeautifierV2(r);
-        if (IO_Button != null && textoResultado.transform.localScale.x == 0) IO_Button.SendClick();
+        if (IO_Button != null && textoResultado.transform.localScale.x == 0)
+        {
+            IO_Button.SendClick();
+        }
     }
+
+    public bool LastQueryWasNotCorrect() => badQuery;
 
     private string QueryResultBeautifier(string json)
     {
@@ -24,12 +32,12 @@ public class ImpresorResultado : MonoBehaviour
         var nodo = SimpleJSON.JSON.Parse(json);
         var filas = nodo["query"].AsArray;
 
-        List<string> columnas = new List<string>();
+        List<string> columnas = new();
         foreach (var key in filas[0].Keys) columnas.Add(key);
 
         int[] anchura = CalcularAnchura(columnas.Count, ref filas);
 
-        StringBuilder filasBienColocadas = new StringBuilder();
+        StringBuilder filasBienColocadas = new();
         for(int i = 0; i < filas.Count; i++)
         {
             SimpleJSON.JSONNode fila = filas[i];
@@ -42,30 +50,37 @@ public class ImpresorResultado : MonoBehaviour
     private string QueryResultBeautifierV2(string json)
     {
         json = "{query:[" + json + "]}";
+        print(json);
         var nodo = SimpleJSON.JSON.Parse(json);
+
+        badQuery = nodo["query"].HasKey("message");
+        if (badQuery) return nodo["query"]["message"];
+
         var filas = nodo["query"].AsArray;
 
-        List<string> columnas = new List<string>();
-        TableCreator tc = new TableCreator();
+        List<string> columnas = new();
+        TableCreator tc = new();
         tc.maxWidth = maxLineLength;
+        tc.maxDesiredColumnWidth = maxColumnWidth;
         //Calculamos numero de columnas
         foreach (var key in filas[0].Keys)
         {
-            print(key);
-            columnas.Add(key);
-            tc.AddColumn(key, 2);
+            string t = key;
+            //if ((int)key[^1] == 8203) t = key[0..^1];
+            columnas.Add(t);
+            tc.AddColumn(t, 2);
         }
         //Calculamos anchura de columnas y altura de cada fila.
         for (int i = 0; i < filas.Count; i++)
         {
             var vals = filas[i].Values;
-            List<string> datosFila = new List<string>();
+            List<string> datosFila = new();
             while (vals.MoveNext()) datosFila.Add(vals.Current);
             tc.AddRow(datosFila, 2);
         }
 
         //Metemos texto de cada fila
-        StringBuilder filasBienColocadas = new StringBuilder();
+        StringBuilder filasBienColocadas = new();
         for (int i = 0; i < filas.Count; i++)
         {
             SimpleJSON.JSONNode fila = filas[i];
@@ -73,7 +88,7 @@ public class ImpresorResultado : MonoBehaviour
             AddRowV2(ref filasBienColocadas, ref tc, ref fila, i);
         }
 
-        return EncabezadoTablaV2(tc, columnas) + filasBienColocadas.ToString() + FinTablaV2(tc.currentWidth+columnas.Count);
+        return EncabezadoTablaV2(tc, columnas) + filasBienColocadas.ToString() + FinTablaV2(tc);
     }
 
     private void AddRow(ref StringBuilder sb, ref int[] anchura, ref SimpleJSON.JSONNode fila)
@@ -108,8 +123,8 @@ public class ImpresorResultado : MonoBehaviour
             {
                 sb.Append(' ');
                 string value = vals.Current;
+                value = value.Replace('\n', '\t');
                 int cw = tc.widthPerColumn[idxCol];
-                print(value+" + "+cw);
                 int fw = cw - 2;
 
                 if(value.Length > fw) //Hay que hacer división
@@ -149,7 +164,7 @@ public class ImpresorResultado : MonoBehaviour
     
     private string FinTabla(ref int[] anchura)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append('\\');
         for (int i = 0; i < anchura.Length; i++)
         {
@@ -161,14 +176,24 @@ public class ImpresorResultado : MonoBehaviour
         return sb.ToString();
     }
 
-    private string FinTablaV2(int l)
+    private string FinTablaV2(TableCreator tc)
     {
-        return "\\" + new string('-', l - 2) + "/\n";
+        StringBuilder sb = new();
+        sb.Append('\\');
+        int n = tc.widthPerColumn.Count;
+        for (int i = 0; i < n; i++)
+        {
+            int length = tc.widthPerColumn[i];
+            for (int j = 0; j < length; j++) sb.Append('-');
+            if (i < tc.widthPerColumn.Count - 1) sb.Append('-');
+        }
+        sb.Append("/\n");
+        return sb.ToString();
     }
 
     private string EncabezadoTabla(ref List<string> columnas, ref int[] anchura)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append('/');
         for (int i = 0; i < anchura.Length; i++)
         {
@@ -200,7 +225,7 @@ public class ImpresorResultado : MonoBehaviour
 
     private string EncabezadoTablaV2(TableCreator tc, List<string> columnas)
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         sb.Append('/');
         int n = tc.widthPerColumn.Count;
         for (int i = 0; i < n; i++)
@@ -269,28 +294,5 @@ public class ImpresorResultado : MonoBehaviour
     private void Awake()
     {
         Instancia = this;
-    }
-
-    private void Test()
-    {
-        TableCreator tc = new TableCreator();
-        tc.AddColumn("123", 2);
-        tc.AddColumn("123", 2);
-        tc.AddColumn("123", 2);
-        ImprimirTC(tc);
-        tc.AddRow(new List<string> { "Pepito", "1", "1" }, 2);
-        ImprimirTC(tc);
-        tc.AddRow(new List<string> { "MECAGONTOLOCAGABLEMADREMIAWILLYPEROQUEESTASHACIENDOCOMPAÑERO", "1", "12" }, 2);
-        ImprimirTC(tc);
-    }
-    private void ImprimirTC(TableCreator tc)
-    {
-        Debug.Log("WpC: " + tc.widthPerColumn.Count);
-        for (int i = 0; i < tc.widthPerColumn.Count; i++) Debug.Log(i);
-        Debug.Log("CW");
-        Debug.Log(tc.currentWidth);
-        Debug.Log("HpR: " + tc.heightsPerRow.Count);
-        for (int i = 0; i < tc.heightsPerRow.Count; i++) Debug.Log(i);
-        Debug.Log("----------------------------");
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Hexstar.CSE;
 
 [CreateAssetMenu(menuName = "Hexstar/KeyWord Database")]
 public class KeywordDB : ScriptableObject
@@ -41,13 +42,26 @@ public class KeywordDB : ScriptableObject
                 comprobado[i] = true;
             }
         }
-        //Si la longitud del patrón es 1, entonces la última comprobación es la misma que la anterior
-        //y se puede omitir.
-        if (l == 1) return ocurrencies;
+        //Si la longitud del patrón es 1, entonces la última comprobación
+        //es la misma que la que busca secciones y se puede omitir.
+        if (l > 1)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                if (comprobado[i]) continue;
+                if (kw[i].ContainsChars(pattern))
+                {
+                    ocurrencies.Add(i);
+                    comprobado[i] = true;
+                }
+            }
+        }
+        //Buscar en la descripción (Última prioridad)
         for (int i = 0; i < n; i++)
         {
             if (comprobado[i]) continue;
-            if (kw[i].ContainsChars(pattern)) {
+            if (kw[i].InDescription(pattern))
+            {
                 ocurrencies.Add(i);
                 comprobado[i] = true;
             }
@@ -56,14 +70,45 @@ public class KeywordDB : ScriptableObject
         return ocurrencies;
     }
 
+    public List<int> GetIndexOfColumnsFromTable(string table, string pattern)
+    {
+        List<int> ocurrencies = new List<int>();
+        List<string> columnasABuscar = AlmacenDePalabras.GetColumnasDeTabla(table);
+        
+        for(int i = 0; i < kw.Count; i++)
+        {
+            if (!kw[i].description.Equals("(Columna)")) continue;
+            if (!columnasABuscar.Contains(kw[i].name)) continue;
+
+            if (pattern.Length == 0) ocurrencies.Add(i);
+            else if (kw[i].ContainsSection(pattern)) ocurrencies.Add(i);
+            
+        }
+        return ocurrencies;
+    }
+
     public void Load()
     {
         kw.Clear();
-        for(int i = 0; i <= 3; i++)
-        {
-            foreach (string palabra in Hexstar.CSE.AlmacenDePalabras.palabras[i]) kw.Add(new Keyword(palabra));
-        }
+
+        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[0],"(Tabla)"));
+        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[1],"(Columna)",true));
+        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[2],"(Pista)"));
+        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[3],"(Función)"));
+        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.GetOperadoresEspeciales(), "(Operador)"));
+
         for (int i = 0; i < kWords.Length; i++) kw.Add(kWords[i]);
+    }
+
+    private List<Keyword> ConvertStringToKeywords(List<string> lista, string tipo = "", bool filtrar = false)
+    {
+        List<Keyword> keywords = new();
+        foreach(var elem in lista)
+        {
+            if (filtrar && elem.Contains(':')) continue;
+            keywords.Add(new Keyword(elem, tipo));
+        }
+        return keywords;
     }
 }
 
@@ -104,5 +149,11 @@ public struct Keyword
             if (!name.Contains(c+"")) return false;
         }
         return true;
+    }
+
+    public bool InDescription(string desc)
+    {
+        if (desc.Length < 2) return false;
+        return description.ToLower().Contains(desc.ToLower());
     }
 };

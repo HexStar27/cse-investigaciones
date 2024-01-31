@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CSE;
+using UnityEngine;
 
 namespace Hexstar.CSE {
     public class AgrupadorDeBloques : MonoBehaviour
@@ -16,7 +17,8 @@ namespace Hexstar.CSE {
             if (bloque == null) return;
 
             Transform grupo = bloque.CQU.GetGroupBlockAssignedTo();
-            if (grupo != null) // Desagrupar
+            bool desagrupando = grupo != null;
+            if (desagrupando) // Desagrupar
             {
                 grupo.gameObject.SetActive(true);
                 grupo.SetParent(null,true);
@@ -32,6 +34,7 @@ namespace Hexstar.CSE {
                 bloque.transform.SetParent(gb.transform, true);
                 bloque.gameObject.SetActive(false);
             }
+            XAPI_Builder.CreateStatement_BlockGroup(!desagrupando);
         }
 
         private void UpdateRays()

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class ElementoMenuAS : MonoBehaviour
 {
-    [SerializeField] TMPro.TextMeshProUGUI pista;
+    [SerializeField] TMPro.TMP_InputField pista;
     public class Evento : UnityEvent<string> { };
     public static Evento onToggle = new Evento();
     public Toggle toggle;

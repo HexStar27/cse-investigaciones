@@ -43,7 +43,10 @@ public class ControladorMenuBloqueValue : MonoBehaviour
         for (int i = elementosActivos.Count - 1; i >= 0; i--) Destroy(elementosActivos[i]);
         elementosActivos.Clear();
 
-        if(bloqueConfigurandoActual != null) bloqueConfigurandoActual.CambiarTexto(pistaActual);
+        if (bloqueConfigurandoActual != null)
+        {
+            bloqueConfigurandoActual.CambiarTexto(pistaActual);
+        }
     }
 
     private void Transmitir(string value) { pistaActual = value; }

@@ -18,6 +18,11 @@ namespace Hexstar.CSE
             instancia = this;
         }
 
+        private void OnDisable()
+        {
+            EsconderDescripcion();
+        }
+
         public void Abrir(bool value)
         {
             gameObject.SetActive(value);
@@ -96,8 +101,6 @@ namespace Hexstar.CSE
             pistas.Clear();
             if (content != null) content.Actualizar();
             ActualizarElementosRelacionados();
-
-            //TODO: No eliminar los casos que sean de historia
         }
 
         //Tanto introducir como eliminar pista se van a encargar de modificar 

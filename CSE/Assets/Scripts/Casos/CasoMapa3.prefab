@@ -22,17 +22,17 @@ PrefabInstance:
     - target: {fileID: 3357576507491219680, guid: fbdb36eb7430d3848b80820f4edf025d,
         type: 3}
       propertyPath: m_Name
-      value: CasoMapa
+      value: CasoMapa3
       objectReference: {fileID: 0}
     - target: {fileID: 3357576507491219681, guid: fbdb36eb7430d3848b80820f4edf025d,
         type: 3}
       propertyPath: m_Pivot.x
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3357576507491219681, guid: fbdb36eb7430d3848b80820f4edf025d,
         type: 3}
       propertyPath: m_Pivot.y
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 3357576507491219681, guid: fbdb36eb7430d3848b80820f4edf025d,
         type: 3}

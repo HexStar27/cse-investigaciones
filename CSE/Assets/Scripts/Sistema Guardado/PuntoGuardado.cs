@@ -1,70 +1,100 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-///Esta clase se encarga de guardar y cargar los datos relevantes de la partida del ResourceManager.
+/// Esta clase se encarga de guardar y cargar los datos relevantes 
+/// de la partida del ResourceManager y demás sistemas únicos.
 [System.Serializable]
 public class PuntoGuardado
 {
 	public int agentesDisponibles;
     public int consultasDisponibles;
 	public int consultasMaximas;
-	public int casosCompletados;
+
 	public int dificultadActual;
 	public int dia;
-	public int[] casosCargados;
 	public int casoEnCurso;			//Indice del caso en curso del array de casos cargados
-	public int ultimoCasoPrincipalEmpezado;
-	public bool ultimoCasoPrincipalGanado;
-	public int[] eventosActivos;
+	public int[] casosCargados;
 	public string[] tableCodes;
-	//Y demás cosillas por aquí...
+
+	public int[] casosCompletados;
+	public int ultimoCasoPrincipalEmpezado;
+	public int[] casosCompletados_listaDeEstados;
+
+	public string dialogueEventList;
+	public int[] eventosEjecutados;
+	public bool hasCompletedTutorial;
 
 	public PuntoGuardado()
 	{
 		agentesDisponibles = 3;
 		consultasDisponibles = 4;
 		consultasMaximas = 4;
-		casosCompletados = 0;
+		casosCompletados = new int[0];
 		dificultadActual = 1;
 		dia = 0;
 		casosCargados = new int[0];
 		casoEnCurso = -1;
 		ultimoCasoPrincipalEmpezado = -1;
-		eventosActivos = new int[0];
+		casosCompletados_listaDeEstados = new int[0];
+        eventosEjecutados = new int[0];
 		tableCodes = new string[0];
-}
+		hasCompletedTutorial = false;
+		dialogueEventList = "";
+    }
 
-	public void Fijar()
+	public void CopiarDatosDelSistema()
 	{
 		agentesDisponibles = ResourceManager.AgentesDisponibles;
 		consultasDisponibles = ResourceManager.ConsultasDisponibles;
 		consultasMaximas = ResourceManager.ConsultasMaximas;
-		casosCompletados = ResourceManager.CasosCompletados;
+		casosCompletados = ResourceManager.CasosCompletados.ToArray();
 		dificultadActual = ResourceManager.DificultadActual;
 		dia = ResourceManager.Dia;
 
 		List<int> idCasos = new List<int>();
-		foreach (var caso in PuzzleManager.Instance.casosCargados) idCasos.Add(caso.id);
+		int n = PuzzleManager.GetTotalCasosCargados();
+        for (int i = 0; i < n; i++)
+		{
+			int id = PuzzleManager.GetCasoCargado(i).id;
+            if (!ResourceManager.CasosCompletados.Contains(id))
+				idCasos.Add(id);
+        }
 		casosCargados = idCasos.ToArray();
-		casoEnCurso = PuzzleManager.Instance.casoActivo;
+		
+		casoEnCurso = PuzzleManager.CasoActivoIndice;
 		ultimoCasoPrincipalEmpezado = ResourceManager.UltimoCasoPrincipalEmpezado;
-		ultimoCasoPrincipalGanado = ResourceManager.UltimoCasoPrincipalGanado;
-		eventosActivos = new int[0]; //Falta por ponerlo...
-		tableCodes = ResourceManager.TableCodes.ToArray();
-	}
+		casosCompletados_listaDeEstados = ResourceManager.CasosCompletados_ListaDeEstados.ToArray();
 
-	public void Cargar()
+		eventosEjecutados = ResourceManager.EventosEjecutados.ToArray();
+		tableCodes = ResourceManager.TableCodes.ToArray();
+
+		dialogueEventList = Hexstar.Dialogue.ControladorDialogos.GetAllEventsFromDict();
+    }
+
+	public void CargarDatosAlSistema()
 	{
 		ResourceManager.AgentesDisponibles = agentesDisponibles;
 		ResourceManager.ConsultasDisponibles = consultasDisponibles;
 		ResourceManager.ConsultasMaximas = consultasMaximas;
-		ResourceManager.CasosCompletados = casosCompletados;
-		ResourceManager.UltimoCasoPrincipalEmpezado = ultimoCasoPrincipalEmpezado;
-		ResourceManager.UltimoCasoPrincipalGanado = ultimoCasoPrincipalGanado;
+
+        List<int> completados = new();
+		completados.AddRange(casosCompletados);
+		ResourceManager.CasosCompletados = completados;
+
+		List<int> estados_cc = new();
+		estados_cc.AddRange(casosCompletados_listaDeEstados);
+		ResourceManager.CasosCompletados_ListaDeEstados = estados_cc;
+
+        List<int> ee = new();
+        ee.AddRange(eventosEjecutados);
+        ResourceManager.EventosEjecutados = ee;
+
+        ResourceManager.UltimoCasoPrincipalEmpezado = ultimoCasoPrincipalEmpezado;
 		ResourceManager.DificultadActual = dificultadActual;
 		ResourceManager.Dia = dia;
 
 		List<string> codes = new List<string>();
 		codes.AddRange(tableCodes);
 		ResourceManager.TableCodes = codes;
-	}
+		
+		Hexstar.Dialogue.ControladorDialogos.SetAllEventsToList(dialogueEventList, true);
+    }
 }

@@ -7,7 +7,8 @@ namespace Hexstar
     /// Clase base para los separadores, 
     /// no hace nada por lo que bloqueará la cinemática
     /// </summary>
-    [CreateAssetMenu(fileName = "Separador", menuName = "Hexstar/Cinematicas/Separador")] public class ElementoSeparador : ScriptableObject
+    [CreateAssetMenu(fileName = "Separador", menuName = "Hexstar/Cinematicas/Separador")] 
+    public class ElementoSeparador : ScriptableObject
     {
         public enum Tipo { EsperarSegundos, EsperarEvento, EsperarContador, OperarAND, OperarOR};
         [HideInInspector] public bool haTerminado;
@@ -35,7 +36,7 @@ namespace Hexstar
         /// Función que sirve para ponerla en eventos de otros objetos
         /// Si recive una señal indica que el separador ha terminado
         /// </summary>
-        public void Escuchar()
+        public void Terminar()
         {
             if (tipo == Tipo.EsperarEvento) haTerminado = true;
             else Debug.LogWarning("Has suscrito el separador a un evento pero este separador no está configurado para eso.");
@@ -45,7 +46,7 @@ namespace Hexstar
         /// Funcionamiento del separador para el resto de opciones que no sean "EsperarEvento"
         /// </summary>
         /// <returns></returns>
-        public IEnumerator Cuerpo()
+        public virtual IEnumerator Cuerpo()
         {
             if(separadorA) separadorA.Reiniciar();
             if(separadorB) separadorB.Reiniciar();
@@ -67,6 +68,9 @@ namespace Hexstar
                 case Tipo.OperarOR:
                     if (!separadorA || !separadorB) Debug.LogError("Ha usado un operador binario para este separador pero no se han asignado suficientes separadores al operador.");
                     yield return new WaitUntil(() => { return separadorA.haTerminado || separadorB.haTerminado; });
+                    break;
+                case Tipo.EsperarEvento:
+                    yield return new WaitUntil(()=> { return haTerminado; });
                     break;
                 default:
                     break;

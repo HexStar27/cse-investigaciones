@@ -76,7 +76,8 @@ namespace DIG.GBLXAPI.Internal
 			var requestOperation = request.SendWebRequest();
 			requestOperation.completed += (operation) =>
 			{
-				success = !(request.isNetworkError || request.isHttpError);
+				success = !(request.result == UnityWebRequest.Result.ConnectionError ||
+							request.result == UnityWebRequest.Result.ProtocolError);
 
 				if (success)
 				{

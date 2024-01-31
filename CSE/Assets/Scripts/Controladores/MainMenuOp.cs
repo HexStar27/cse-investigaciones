@@ -4,19 +4,17 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Hexstar;
 using System.Threading.Tasks;
+using ResultType = UnityEngine.Networking.UnityWebRequest.Result;
 
 public class MainMenuOp : MonoBehaviour
 {
     [Header("Botones de interfaz")]
 #pragma warning disable 0649
-    [SerializeField]
-    private Toggle terminosCondiciones;
-    [SerializeField]
-    private TMP_InputField textoCorreo;
-    [SerializeField]
-    private InputField textoContra;
-    [SerializeField]
-    private TMP_InputField textNick;
+    [SerializeField] private Toggle terminosCondiciones;
+    [SerializeField] private TMP_InputField textoCorreo;
+    [SerializeField] private InputField textoContra;
+    [SerializeField] private TMP_InputField textNick;
+    [SerializeField] private Transform conexionFallidaMSG;
 #pragma warning restore 0649
 
     [Header("Conexión a servidor")]
@@ -43,6 +41,7 @@ public class MainMenuOp : MonoBehaviour
 
         //Enviando formulario a servidor para comprobar si se encuentra el correo
         await SesionHandler.AIniciarSesion(correo,contra);
+        CheckConnection();
         bool exito = SesionHandler.sessionKEY != "";
         if (exito) //Si hemos recibido una KEY, entonces el inicio de sesión es correcto
         {
@@ -50,7 +49,7 @@ public class MainMenuOp : MonoBehaviour
             isRequesting = false; //Abro cerrojo
             onSuccess.Invoke();
             await Task.Delay(750); //Tiempo para ejecutar animación de credenciales aceptadas.
-            GameManager.CargarEscena(1);
+            GameManager.CargarEscena(GameManager.GameScene.MENU_PARTIDA);
         }
         else
         {
@@ -72,6 +71,7 @@ public class MainMenuOp : MonoBehaviour
 
         string correo = textoCorreo.text;
         await SesionHandler.ACrearCuenta(textNick.text, correo, textoContra.text);
+        CheckConnection();
         bool exito = SesionHandler.sessionKEY != "";
         if (exito)
         {
@@ -79,13 +79,18 @@ public class MainMenuOp : MonoBehaviour
             isRequesting = false; //Abro cerrojo
             onSuccess.Invoke();
             await Task.Delay(750); //Tiempo para ejecutar animación de credenciales aceptadas.
-            GameManager.CargarEscena(1);
+            GameManager.CargarEscena(GameManager.GameScene.MENU_PARTIDA);
         }
         else
         {
             isRequesting = false; //Abro cerrojo
             onError.Invoke();
         }
+    }
+
+    public void CheckConnection()
+    {
+        conexionFallidaMSG.gameObject.SetActive(ConexionHandler.result == ResultType.ConnectionError);
     }
 
     public void Salir()

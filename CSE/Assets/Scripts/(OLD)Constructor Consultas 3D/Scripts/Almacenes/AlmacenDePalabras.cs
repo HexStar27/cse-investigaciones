@@ -50,9 +50,11 @@ namespace Hexstar.CSE
         {
             for (int i = 0; i < 5; i++) palabras[i] = new List<string>();
             //1º Cargar tablas y columnas
-            
-            //Cambiar esto por los codigos que se guardaran en los archivos de guardado más adelante...
             string codigos = "\"ejemplo0\", \"ejemplo1\"";
+            
+            for(int i = 0; i < ResourceManager.TableCodes.Count; i++)
+                codigos += ", \""+ ResourceManager.TableCodes[i]+"\"";
+            
 
             WWWForm form1 = new WWWForm();
             form1.AddField("authorization",SesionHandler.sessionKEY);
@@ -120,6 +122,31 @@ namespace Hexstar.CSE
             return palabras[indice];
         }
 
+        public static List<string> GetColumnasDeTabla(string nombreTabla)
+        {
+            List<string> columnasEncontradas = new();
+            bool buscando = true, fin = false;
+            if(palabras[0].Contains(nombreTabla))
+            {
+                var columnas = palabras[1];
+                int n = columnas.Count;
+                for(int i = 0; i < n && !fin; i++)
+                {
+                    string col = columnas[i];
+                    if (buscando && col.Contains(':') && col.Contains(nombreTabla))
+                    {
+                        buscando = false;
+                    }
+                    else if(!buscando && !fin)
+                    {
+                        if(col.Contains(':')) fin = true;
+                        else columnasEncontradas.Add(col);
+                    }
+                }
+            }
+            return columnasEncontradas;
+        }
+
         public static int TipoAIndice(TabType tipo)
         {
             return (int)tipo;
@@ -159,22 +186,10 @@ namespace Hexstar.CSE
             aliasParaColumnas[columna].Add(newName);
         }
 
-        //No recomando su uso (costoso)
-        public static List<string> GetColumnasFromTable(string table)
+        public static List<string> GetOperadoresEspeciales()
         {
-            List<string> columnas = new List<string>();
-            int i = palabras[1].FindIndex(TablaAComparar) + 1;
-            while(i < palabras[1].Count && !palabras[1][i].Contains(":"))
-            {
-                columnas.Add(palabras[1][i++]);
-            }
-            return columnas;
-
-            bool TablaAComparar(string elem)
-            {
-                int idx = elem.IndexOf(':');
-                return elem.Substring(idx + 1) == table;
-            }
+            List<string> ops = new(operadores[12..]);
+            return ops;
         }
 
         public static Dictionary<string,int> GenerarMapaSeparacionColumnasEnTablas()

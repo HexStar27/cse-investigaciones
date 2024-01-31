@@ -14,6 +14,8 @@ public class ConfiguradorBloqueValor : MonoBehaviour
     {
         textoBloque.text = value;
         onTextChanged?.Invoke(value);
+
+        CSE.XAPI_Builder.CreateStatement_BlockAction(CSE.XAPI_Builder.BlockAction.MODIFIED, bloque.GetBlockTitle());
     }
 
     public bool FreeOfAS()
@@ -50,6 +52,8 @@ public class ConfiguradorBloqueValor : MonoBehaviour
             }
         }
     }
+    public Hexstar.CSE.BlockMovAndConexion GetBloque() => bloque;
+
     private void Awake()
     {
         bloque = GetComponent<Hexstar.CSE.BlockMovAndConexion>();

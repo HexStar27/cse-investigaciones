@@ -37,7 +37,7 @@ public class ControladorMenuBloqueTabla : MonoBehaviour
         {
             columnas = IncluirElementosRenombrados(columnas);
         }
-        GenerarElementosMenu(Filtrar(columnas),zonaMenuColumna);
+        GenerarElementosMenu(Filtrar(columnas),zonaMenuColumna,true);
     }
 
     private List<string> Filtrar(List<string> lista)
@@ -103,7 +103,7 @@ public class ControladorMenuBloqueTabla : MonoBehaviour
         return columnas;
     }
 
-    private void GenerarElementosMenu(List<string> nombres, Transform zonaMenus)
+    private void GenerarElementosMenu(List<string> nombres, Transform zonaMenus, bool columnas = false)
     {
         foreach (var t in nombres)
         {
@@ -111,7 +111,8 @@ public class ControladorMenuBloqueTabla : MonoBehaviour
             elementosActivosMenus.Add(o);
             var elem = o.GetComponent<ElementoMenuValor>();
             elem.SetText(t);
-            elem.toggle.group = tGroupTablas;
+            if (columnas) elem.toggle.group = tGroupColumnas;
+            else elem.toggle.group = tGroupTablas;
             elem.useCuotes = false;
             if (t.Contains(":")) //Es un separador por tablas
             {

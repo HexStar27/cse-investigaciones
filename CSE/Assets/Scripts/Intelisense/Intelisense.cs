@@ -9,7 +9,7 @@ public class Intelisense : MonoBehaviour
     public static Intelisense instance;
 
     [SerializeField] KeywordDB keywords;
-    [SerializeField] TMP_InputField pantalla;
+    public TMP_InputField pantalla;
     [SerializeField] RectTransform sugerencias;
     [SerializeField] RectTransform contenidoSugerencias;
     private List<GameObject> poolSugerencias = new List<GameObject>();
@@ -19,7 +19,7 @@ public class Intelisense : MonoBehaviour
     [SerializeField] GameObject sugerenciaPrefab;
 
     bool ms;
-    bool moveS {
+    bool moverSugerencias {
         get { return ms; }
         set { 
             ms = value;
@@ -34,16 +34,20 @@ public class Intelisense : MonoBehaviour
         instance = this;
         pantalla.onValueChanged.AddListener(Edicion);
         SetupAutocomplete();
+        pantalla.onSelect.AddListener(FocusScreen);
+        pantalla.onDeselect.AddListener(UnFocusScreen);
     }
 
     private void OnDisable()
     {
         pantalla.onValueChanged.RemoveListener(Edicion);
+        pantalla.onSelect.RemoveListener(FocusScreen);
+        pantalla.onDeselect.RemoveListener(UnFocusScreen);
     }
 
     private void FixedUpdate()
     {
-        if (moveS) SugerenciasACaret();
+        if (moverSugerencias) SugerenciasACaret();
         //if (moveS) SeleccionSugerencias();
         if (shouldApplySuggestion) Autocomplete();
         else if (shouldAddCouple) AddCouple();
@@ -51,9 +55,25 @@ public class Intelisense : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) moveS = false;
+        if (Input.GetKeyDown(KeyCode.Escape)) moverSugerencias = false;
         if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.Backspace)) EraseCurrentCaretWord();
     }
+
+    /// <summary>
+    /// Cuando se ejecuta, la cámara no se moverá por la escena
+    /// </summary>
+    private void FocusScreen(string _)
+    {
+        InscryptionLikeCameraState.SetBypass(true);
+    }
+    /// <summary>
+    /// Cuando se ejecuta, la cámara se vovlerá a poder mover por la escena
+    /// </summary>
+    private void UnFocusScreen(string _)
+    {
+        InscryptionLikeCameraState.SetBypass(false);
+    }
+
 
     private void EraseCurrentCaretWord()
     {
@@ -61,12 +81,12 @@ public class Intelisense : MonoBehaviour
         if (caretP == 0) return;
         int len = pantalla.text.Length;
         int i = caretP - 1;
-        for (; i > 0 && isNotSpace(pantalla.text[i]); i--) { }
+        for (; i > 0 && isNotSpace(pantalla.text[i]) && isNotDot(pantalla.text[i]); i--) { }
         int inicio = 0;
         if (i != 0) inicio = i + 1;
         StringBuilder sb = new StringBuilder();
-        sb.Append(pantalla.text.Substring(0,inicio));
-        sb.Append(pantalla.text.Substring(caretP, len - caretP));
+        sb.Append(pantalla.text[..inicio]);
+        sb.Append(pantalla.text[caretP..len]);
         pantalla.text = sb.ToString();
     }
 
@@ -81,22 +101,31 @@ public class Intelisense : MonoBehaviour
         if (poolSugerencias.Count > 0)
         { //Pillar cadena y meterla en la palabra.
             string palabra = keywords.kw[indices[0]].name;
-            int i = pantalla.caretPosition - 1;
-            for (; i > 0 && isNotSpace(pantalla.text[i]); i--) { }
+
+            int i = pantalla.caretPosition;
+            bool searchingStartOfWord = true;
+            while (i > 0 && searchingStartOfWord) 
+            {
+                char c = pantalla.text[--i];
+                // Keep looking if it's not any of the word separator characters
+                searchingStartOfWord = isNotSpace(c) && isNotDot(c) && isNotComma(c);
+            }
             int inicio = 0;
             if (i != 0) inicio = i + 1;
+
             int j = pantalla.caretPosition;
             int len = pantalla.text.Length;
             for (; j < len && isNotSpace(pantalla.text[j]); j++) { }
+            
             StringBuilder sb = new StringBuilder();
-            sb.Append(pantalla.text.Substring(0, inicio));
+            sb.Append(pantalla.text[..inicio]);
             sb.Append(palabra);
             sb.Append(' ');
-            sb.Append(pantalla.text.Substring(j, len - j));
+            sb.Append(pantalla.text[j..len]);
             pantalla.text = sb.ToString();
             pantalla.caretPosition = inicio + palabra.Length + 1;
         }
-        moveS = false;
+        moverSugerencias = false;
     }
 
     public void Autocomplete(int idx)
@@ -120,7 +149,7 @@ public class Intelisense : MonoBehaviour
             pantalla.text = sb.ToString();
             pantalla.caretPosition = inicio + palabra.Length + 1;
         }
-        moveS = false;
+        moverSugerencias = false;
     }
 
     private void SetupAutocomplete()
@@ -129,13 +158,12 @@ public class Intelisense : MonoBehaviour
     }
     private char Validate(string input, int index, char charToValidate)
     {
-        if (charToValidate == '\t' && moveS == true)
+        if (charToValidate == '\t' && moverSugerencias == true)
         {
             charToValidate = '\0';
 
-            //SeleccionSugerencias();
             shouldApplySuggestion = true;
-            moveS = false;
+            moverSugerencias = false;
         }
         else if (charToValidate == '\"' || charToValidate == '(')
         {
@@ -154,45 +182,26 @@ public class Intelisense : MonoBehaviour
         shouldAddCouple = false;
     }
 
-    private void SeleccionSugerencias()
-    {
-        if(Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            if(!AnyElementSelected())
-                contenidoSugerencias.GetComponentInChildren<UnityEngine.UI.Button>().Select();
-        }
-    }
-
-    private bool AnyElementSelected()
-    {
-        var selectedObj = EventSystem.current.currentSelectedGameObject;
-        for (int i = 0; i < contenidoSugerencias.childCount; i++)
-        {
-            if (selectedObj == contenidoSugerencias.GetChild(i).gameObject) return true;
-        }
-        return false;
-    }
-
     private void Edicion(string nuevoValor)
     {
         if (pantalla.caretPosition == 0)
         {
-            moveS = false;
+            moverSugerencias = false;
             return;
         }
         char c = nuevoValor[pantalla.caretPosition - 1];
         if (isNotSpace(c))
         {
-            moveS = true;
+            moverSugerencias = true;
             LoadWords();
         }
-        else moveS = false;
+        else moverSugerencias = false;
     }
 
-    private void AddToPool(string keyword, int idx = 0)
+    private void AddToPool(Keyword keyword, int idx = 0)
     {
         GameObject go = Instantiate(sugerenciaPrefab, contenidoSugerencias);
-        go.transform.GetComponentInChildren<TextMeshProUGUI>().text = keyword;
+        go.transform.GetComponentInChildren<TextMeshProUGUI>().text = keyword.name +" "+ keyword.description;
         poolSugerencias.Add(go);
         go.GetComponent<KWListButton>().idx = idx;
     }
@@ -205,15 +214,25 @@ public class Intelisense : MonoBehaviour
         for (; i > 0 && isNotSpace(pantalla.text[i]); i--) {}
         int inicio = 0;
         if (i != 0) inicio = i+1;
-        string patron = pantalla.text.Substring(inicio,caretP-inicio);
-
+        string patron = pantalla.text[inicio..caretP];
         //Usar un pool para las palabras...
         keywords.Load();
-        indices = keywords.GetIndexOcurrenciesOf(patron);
+
+        int opAcceso = patron.IndexOf('.');
+        if (opAcceso > 1) // Modo acceso a tabla
+        {
+            var data = patron.Split('.');
+            indices = keywords.GetIndexOfColumnsFromTable(data[0], data[1]);
+        }
+        else // Modo genérico
+        {
+            indices = keywords.GetIndexOcurrenciesOf(patron);
+        }
+
         for (int j = 0; j < poolSugerencias.Count; j++) Destroy(poolSugerencias[j]);
         poolSugerencias.Clear();
-        if (indices.Count == 0) moveS = false;
-        else for (int j = 0; j < indices.Count; j++) AddToPool(keywords.kw[indices[j]].name, j);
+        if (indices.Count == 0) moverSugerencias = false;
+        else for (int j = 0; j < indices.Count; j++) AddToPool(keywords.kw[indices[j]], j);
     }
 
     private void SugerenciasACaret()
@@ -221,17 +240,16 @@ public class Intelisense : MonoBehaviour
         if (!sugerencias.gameObject.activeInHierarchy) return;
         int cp = pantalla.caretPosition - 1;
         if (cp < 0) cp = 0;
-        if (!isNotSpace(pantalla.text[cp])) moveS = false; 
+        if (!isNotSpace(pantalla.text[cp])) moverSugerencias = false; 
         Vector2 pos = CaretPos();
         pos.x *= letterSize.x;
         pos.y = pos.y * letterSize.y + letterSize.y;
         sugerencias.anchoredPosition = pos;
     }
 
-    private bool isNotSpace(char c)
-    {
-        return c != ' ' && c != '\t' && c != '\n';
-    }
+    private bool isNotSpace(char c) => (c != ' ' && c != '\t' && c != '\n');
+    private bool isNotDot(char c) => (c != '.');
+    private bool isNotComma(char c) => (c != ',');
 
     private Vector2 CaretPos()
     {
@@ -251,7 +269,3 @@ public class Intelisense : MonoBehaviour
         return y;
     }
 }
-
-
-//Lo único que quedaría así por hacer sería:
-// -La conexion entre el intelisense y todas las palabras del almacen de palabras...

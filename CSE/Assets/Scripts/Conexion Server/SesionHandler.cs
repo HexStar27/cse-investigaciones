@@ -51,7 +51,7 @@ namespace Hexstar
 			SesionHandler.email = email;
 		}
 
-		public static async Task GetNickname() //NOT TESTED
+		public static async Task GetNickname()
 		{
 			string url = ConexionHandler.baseUrl + "nickname";
 			WWWForm formulario = new WWWForm();
@@ -59,6 +59,7 @@ namespace Hexstar
 			formulario.AddField("email", email);
 			await ConexionHandler.APost(url, formulario);
 			nickname = ConexionHandler.ExtraerJson(ConexionHandler.download);
+			nickname = nickname.Trim('"');
 		}
 
 		private static void SetKey(string dh)
@@ -76,7 +77,7 @@ namespace Hexstar
 		}
 
 		/// <summary>
-		/// TODO: Cifra un mensaje :v
+		/// Cifra un mensaje :v
 		/// </summary>
 		/// <param name="texto"></param>
 		/// <returns></returns>

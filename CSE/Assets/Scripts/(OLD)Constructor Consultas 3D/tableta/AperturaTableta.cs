@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Hexstar.CSE;
+using static UnityEngine.Rendering.DebugUI;
 
 public class AperturaTableta : MonoBehaviour
 {
@@ -22,24 +23,22 @@ public class AperturaTableta : MonoBehaviour
 
 	public void OverTable(bool value)
 	{
-		if (MenuPausa.Paused) return;
+		if (MenuPausa.Paused || Boton3D.globalStop) return;
 		anim.SetBool(over, value);
 	}
 
 	public void OpenTablet(bool value)
 	{
-		if (MenuPausa.Paused) return;
+		if (MenuPausa.Paused || Boton3D.globalStop) return;
 		if (value) Rellenar();
 		anim.SetBool(open, value);
 		opened = value;
 	}
-	public void SwitchStateTablet()
+	public void ForceClose()
 	{
-		if (MenuPausa.Paused) return;
-		opened = !opened;
-		if (opened) Rellenar();
-		anim.SetBool(open, opened);
-	}
+        opened = false;
+    }
+	public void SwitchStateTablet() { OpenTablet(!opened); }
 
 
 	public void Rellenar()
@@ -58,7 +57,5 @@ public class AperturaTableta : MonoBehaviour
 			bte.Inicializar(bloque);
 			elementos.Add(bte.gameObject);
 		}
-
-		//if (contenedor.TryGetComponent(out ContentScaler cs)) cs.Actualizar();
 	}
 }

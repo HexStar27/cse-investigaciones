@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -18,24 +17,26 @@ public class Boton3D : MonoBehaviour
     public string exitAnim;
 
     private bool clickable = true;
+    private bool playAnimation = true;
+    public static bool globalStop = false;
 
     private void OnMouseEnter()
     {
-        if (MenuPausa.Paused) return;
+        if (MenuPausa.Paused || globalStop) return;
         onEnter.Invoke();
-        if (animator != null && enterAnim != "") animator.Play(enterAnim);
+        if (CanPlayAnim(enterAnim)) animator.Play(enterAnim);
     }
 
     private void OnMouseExit()
     {
-        if (MenuPausa.Paused) return;
+        if (MenuPausa.Paused || globalStop) return;
         onExit.Invoke();
-        if (animator != null && exitAnim != "") animator.Play(exitAnim);
+        if (CanPlayAnim(exitAnim)) animator.Play(exitAnim);
     }
 
     private void OnMouseUp()
     {
-        if (MenuPausa.Paused) return;
+        if (MenuPausa.Paused || globalStop) return;
         SendClick();
     }
 
@@ -48,11 +49,19 @@ public class Boton3D : MonoBehaviour
 
     public void SendClick()
     {
-        if (clickable && !MenuPausa.Paused)
+        if (clickable)
         {
             if(clickDelay > 0) StartCoroutine(Delay());
             onClick.Invoke();
-            if (animator != null && clickAnim != "") animator.Play(clickAnim);
+            if (CanPlayAnim(clickAnim)) animator.Play(clickAnim);
         }
+    }
+
+    public void SetAnimationBlock(bool block) => playAnimation = !block;
+
+    private bool CanPlayAnim(string stateName)
+    {
+        return animator != null && playAnimation && stateName != "" &&
+            !animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
     }
 }

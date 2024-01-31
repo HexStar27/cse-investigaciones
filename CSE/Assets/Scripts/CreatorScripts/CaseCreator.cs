@@ -13,4 +13,7 @@ public class CaseCreator : MonoBehaviour
     {
         json = JsonUtility.ToJson(caso, bonito);
     }
+
+    [ContextMenu("Actualizar JSON")]
+    public void Actualizar() => json = JsonUtility.ToJson(caso, bonito);
 }

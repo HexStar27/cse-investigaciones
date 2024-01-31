@@ -4,11 +4,17 @@ public class InscryptionLikeCameraState : MonoBehaviour
 {
     [SerializeField] private CameraState camS;
     public bool loopable = false;
-    public static bool bypass = false;
+    protected static bool bypass = false;
     private bool ready = true;
     private int estadoActual = 0;
     public int initialState = 1;
     public bool useScroll = true;
+
+    public static void SetBypass(bool value)
+    {
+        //print("BYPASS set to " + value);
+        bypass = value;
+    }
 
     private void Ready()
     {
@@ -37,8 +43,10 @@ public class InscryptionLikeCameraState : MonoBehaviour
         if (nuevoEstado >= camS.States()) nuevoEstado = camS.States() - 1;
         estadoActual = nuevoEstado;
     }
+    public void SetCameraState(CameraState cam) { camS = cam; }
 
     public int GetEstadoActual() { return estadoActual; }
+    public CameraState GetCamState() { return camS; }
 
     public void Go2NextState()
     {

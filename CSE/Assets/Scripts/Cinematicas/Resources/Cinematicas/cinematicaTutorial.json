@@ -1,0 +1,95 @@
+{ 
+	"cinematica": [
+		{
+			"instrucciones": [
+				"EmpezarDialogo - INTRO",
+				"HoldPause - 1"
+			],
+			"separador":"Fin Dialogo",
+			"indices":[1,1,11]
+		},
+		{
+			"instrucciones":[
+				"SetCameraStalker - 2"
+			],
+			"separador":"Sep_Evento",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"EmpezarDialogo - RELOJ&MAPA"
+			],
+			"separador":"Fin Dialogo",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"HoldPause - 0",
+				"SetGameplayCycleStalker - 1"
+			],
+			"separador":"Sep_Evento",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"EmpezarDialogo - INFORME"
+			],
+			"separador":"Fin Dialogo",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"SetCameraStalker - 1"
+			],
+			"separador":"Sep_Evento",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				 "SetCameraStalker - 2"
+			],
+			"separador":"Sep_Evento",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"ExternalCall - check_query_mode",
+				"EmpezarDialogo - OBJETIVO"
+			],
+			"separador":"Fin Dialogo",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"ExternalCall - change_query_mode",
+				"EmpezarDialogo - RESOLVER"
+			],
+			"separador":"Fin Dialogo",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"SetGameplayCycleStalker - 2",
+				"PauseBeforeNextCycle"
+			],
+			"separador":"Sep_Evento",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"EmpezarDialogo - FIN_CASO"
+			],
+			"separador":"Fin Dialogo",
+			"indices":[]
+		},
+		{
+			"instrucciones":[
+				"ExternalCall - check_tutorial_skip",
+				"SetDialogueEvent - tutorial = false",
+				"HoldPause - 0"
+			],
+			"separador":"",
+			"indices":[]
+		}
+	]
+}

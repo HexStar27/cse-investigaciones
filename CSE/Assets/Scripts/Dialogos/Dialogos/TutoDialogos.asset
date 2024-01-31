@@ -1,0 +1,460 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c57dfb6ab18aab140be35e08444775b2, type: 3}
+  m_Name: TutoDialogos
+  m_EditorClassIdentifier: 
+  asset: {fileID: 4900000, guid: 6ee90168306cc724a93e21654e1c87ba, type: 3}
+  entries:
+  - txt: "Muy buenas, <val[nick]> \xBFNo?"
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    - tipo: 5
+      value: true
+    - tipo: 6
+      value: fix_state true
+    group: INTRO
+  - txt: Bienvenido al <#0000FF>Centro de Seguridad Espacial<#FFFFFF>,
+    fx: []
+    group: INTRO
+  - txt: somos una agencia de inteligencia privada centrada en prestar nuestros recursos
+      a cualquiera,
+    fx: []
+    group: INTRO
+  - txt: "desde una corporaci\xF3n,"
+    fx: []
+    group: INTRO
+  - txt: hasta a tu vecino el del quinto.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: INTRO
+  - txt: "Aunque imagino que eso ya lo sab\xEDas,"
+    fx:
+    - tipo: 0
+      value: Capi neutro2
+    group: INTRO
+  - txt: "sino no hubieses aceptado este puesto de trabajo\u2026"
+    fx: []
+    group: INTRO
+  - txt: Pero ya me entiendes, formalidades.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: INTRO
+  - txt: "En fin, deber\xE1s usar tu habilidad con las bases de datos y tu astucia
+      para resolver los casos de nuestros clientes."
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    group: INTRO
+  - txt: "Por supuesto ofrecemos una serie de <#0000FF>herramientas<#FFFFFF> en tu
+      oficina que te ayudar\xE1n en el trabajo."
+    fx: []
+    group: INTRO
+  - txt: "\xBFQuieres que te explique el funcionamiento de las <#0000FF>herramientas<#FFFFFF>?"
+    fx:
+    - tipo: 3
+      value: "S\xED @ tuto_ok; S\xED porfa\u2026 @ tuto_ok; No hace falta @ tuto_no"
+    group: INTRO
+  - txt: "Est\xE1 bien, te dejo a lo tuyo entonces."
+    fx:
+    - tipo: 5
+      value: false
+    - tipo: 4
+      value: -1
+    - tipo: 6
+      value: fix_state false
+    - tipo: 7
+      value: win_condition:tuto_fin
+    group: INTRO
+  - txt: "Muy bien, empecemos acerc\xE1ndonos al escritorio."
+    fx:
+    - tipo: 5
+      value: false
+    group: INTRO
+  - txt: "Puedes moverte presionando <#0000FF>W<#FFFFFF> y <#0000FF>A<#FFFFFF>, o
+      girando la <#0000FF>rueda del rat\xF3n<#FFFFFF>."
+    fx: []
+    group: INTRO
+  - txt: "Tambi\xE9n puedes usar los botones <#FFFF00>amarillos<#FFFFFF> que hay
+      arriba a la izquierda."
+    fx:
+    - tipo: 6
+      value: fix_state false
+    group: INTRO
+  - txt: Muy bien <val[nick]>.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    - tipo: 6
+      value: fix_state true
+    group: RELOJ&MAPA
+  - txt: "\xBFVes este cacharro? Muestra siempre 3 n\xFAmeros."
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    - tipo: 6
+      value: focus 0
+    group: RELOJ&MAPA
+  - txt: "El primero indica el n\xFAmero de <#0000FF>consultas<#FFFFFF> que puedes
+      hacer,"
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "las consultas que hagas mientras NO est\xE9s resolviendo un caso no bajar\xE1n
+      este n\xFAmero."
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "Pero si llega a 0 durante un caso, me temo que tendr\xE1s que dejarle el
+      caso a otra persona, adem\xE1s tu d\xEDa de trabajo terminar\xE1,"
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "lo cual no es bueno para ti porque te pagamos por caso resuelto\u2026"
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: RELOJ&MAPA
+  - txt: "En fin, el n\xFAmero central es un <#0000FF>cron\xF3metro<#FFFFFF> que
+      indica el tiempo que has estado trabajando en el caso,"
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    group: RELOJ&MAPA
+  - txt: "si no est\xE1s trabajando en ning\xFAn caso como ahora mismo, el cron\xF3metro
+      se mantendr\xE1 en 0."
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "Y por \xFAltimo tenemos a la derecha el n\xFAmero de <#0000FF>agentes<#FFFFFF>
+      que tienes a tu disposici\xF3n."
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "Los agentes son los que se encargan de reunir informaci\xF3n y datos clave
+      para resolver el caso."
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "Si en alg\xFAn momento te quedas sin agentes los jefes te van a <#FF0000>despedir<#FFFFFF>."
+    fx:
+    - tipo: 6
+      value: cam 2
+    group: RELOJ&MAPA
+  - txt: Siento sonar tan duro pero los agentes son un cuerpo voluntario que elige
+      si ayudarte o no.
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "Resolver casos con \xE9xito har\xE1 que la fama de la agencia aumente,"
+    fx: []
+    group: RELOJ&MAPA
+  - txt: consiguiendo nuevos agentes voluntarios en el proceso.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: RELOJ&MAPA
+  - txt: Pero ten cuidado <val[nick]>, <b>no todo tipo de fama va a atraer voluntarios</b>.
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: RELOJ&MAPA
+  - txt: "Por otra parte, resolver casos exitosamente tambi\xE9n podr\xE1 hacer que
+      otras corporaciones presten sus recursos"
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    group: RELOJ&MAPA
+  - txt: consiguiendo mejoras para nuestros servidores.
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "Si esto ocurre, podremos aumentarte el n\xFAmero de <#0000FF>casos m\xE1ximos
+      disponibles<#FFFFFF> al d\xEDa."
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: RELOJ&MAPA
+  - txt: Bien, ahora vamos a lo principal, resolver casos.
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    group: RELOJ&MAPA
+  - txt: Los iconos que ves en esta pantalla son solicitudes, algunas de ciudadanos,
+      otras de empresas.
+    fx:
+    - tipo: 6
+      value: cam 3
+    group: RELOJ&MAPA
+  - txt: Los <#00FF00>verdes<#FFFFFF> rectangulares son importantes y deben de resolverse,
+    fx:
+    - tipo: 1
+      value: CasoPrincipal
+    group: RELOJ&MAPA
+  - txt: los <#FFFF00>amarillos<#FFFFFF> redondos son opcionales,
+    fx:
+    - tipo: 1
+      value: CasoSecundario
+    group: RELOJ&MAPA
+  - txt: "y de vez en cuando aparecer\xE1n iconos <#FF0000>rojos<#FFFFFF> triangulares,"
+    fx:
+    - tipo: 1
+      value: CasoExamen
+    group: RELOJ&MAPA
+  - txt: "estos son casos cr\xEDticos que deben solucionarse cuanto antes."
+    fx: []
+    group: RELOJ&MAPA
+  - txt: Para mandar un agente a hacer el informe de un caso simplemente selecciona
+      el icono,
+    fx:
+    - tipo: 1
+      value: 
+    group: RELOJ&MAPA
+  - txt: "el n\xFAmero que aparece cerca del icono es el n\xFAmero de agentes recomendado
+      para recabar informaci\xF3n,"
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "si no tienes los agentes suficientes no podr\xE1s pedir el caso en ese
+      momento."
+    fx: []
+    group: RELOJ&MAPA
+  - txt: "\xA1Solicita el caso de prueba que aparece en la pantalla!"
+    fx:
+    - tipo: 6
+      value: fix_state false
+    group: RELOJ&MAPA
+  - txt: "Perfecto <val[nick]>, ahora para leer los detalles del informe debes irte
+      al <#0000FF>caj\xF3n de informes<#FFFFFF>."
+    fx: []
+    group: INFORME
+  - txt: En este caso el supuesto cliente nos pide nombre y apellidos del culpable,
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    - tipo: 6
+      value: cam 3
+    - tipo: 6
+      value: fix_state true
+    group: OBJETIVO
+  - txt: y nosotros debemos enviar a la central la consulta que tenga como resultado
+      al culpable.
+    fx:
+    - tipo: 6
+      value: cam 2
+    group: OBJETIVO
+  - txt: "Ya la central se encargar\xE1 de hacer el papeleo y contactar con quien
+      sea necesario para cerrar el caso."
+    fx:
+    - tipo: 0
+      value: Capi neutro2
+    - tipo: 2
+      value: modo_consulta
+    group: OBJETIVO
+  - txt: Por cierto... me he dado cuenta de que tienes el modo <b>Consulta Manual</b>
+      activado.
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: OBJETIVO
+  - txt: "Este modo de crear consultas es m\xE1s r\xE1pido que mediante bloques pero
+      tambi\xE9n es m\xE1s dif\xEDcil de dominar\u2026"
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: OBJETIVO
+  - txt: "S\xF3lo lo recomiendo si ya tienes experiencia construyendo consultas.
+      \xBFQuieres dejarlo as\xED?"
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    - tipo: 3
+      value: "D\xE9jalo tal cual, yo controlo @ p_si ; Voy a probar mejor eso de
+        los bloques\u2026 @ p_no"
+    group: OBJETIVO
+  - txt: Muy bien.
+    fx:
+    - tipo: 7
+      value: modo_consulta:modo_manual
+    - tipo: 4
+      value: -1
+    group: OBJETIVO
+  - txt: Muy bien.
+    fx:
+    - tipo: 7
+      value: modo_consulta:modo_bloque
+    group: OBJETIVO
+  - txt: "\xBFY c\xF3mo creo las consultas? Te preguntar\xE1s,"
+    fx:
+    - tipo: 0
+      value: Capi contento
+    - tipo: 2
+      value: modo_consulta
+    group: RESOLVER
+  - txt: pues en este modo poco tengo que decirte, selecciona la pantalla para acercarte
+      y poder escribir.
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    group: RESOLVER
+  - txt: "Saldr\xE1 un listado de palabras parecidas a la que escribes, si presionas
+      TAB, se va a autocompletar con la primera palabra de la lista."
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: RESOLVER
+  - txt: "Cuando termines de esribir la consulta selecciona el bot\xF3n OK."
+    fx:
+    - tipo: 4
+      value: tuto_consulta_listo
+    group: RESOLVER
+  - txt: <#0000FF>Conectando<#FFFFFF> bloques, claro.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: RESOLVER
+  - txt: Puedes generar todos los bloques que veas necesarios usando la <#0000FF>tableta<#FFFFFF>
+      que tienes a tu derecha.
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    group: RESOLVER
+  - txt: "Una vez hayas construido la consulta debes <#0000FF>fusionarla<#FFFFFF>
+      en un \xFAnico bloque,"
+    fx: []
+    group: RESOLVER
+  - txt: "para hacer eso arrastra los bloques unidos al <#0000FF>agrupador de bloques<#FFFFFF>,
+      la m\xE1quina que hay al fondo a la izquierda."
+    fx:
+    - tipo: 6
+      value: focus 1
+    group: RESOLVER
+  - txt: "Por \xFAltimo colocas el bloque resultante en el <#0000FF>Socket<#FFFFFF>
+      del centro."
+    fx:
+    - tipo: 6
+      value: focus 2
+    group: RESOLVER
+  - txt: "\xA1Y listo! Consulta preparada."
+    fx:
+    - tipo: 6
+      value: cam 2
+    group: RESOLVER
+  - txt: "Para enviar la consulta puedes pulsar el bot\xF3n rojo central y te mostrar\xE1
+      el resultado de esta,"
+    fx:
+    - tipo: 6
+      value: focus 4
+    group: RESOLVER
+  - txt: "si crees que tu consulta es la correcta, pulsa el bot\xF3n rojo de la izquierda
+      y se enviar\xE1 a la central directamente."
+    fx:
+    - tipo: 6
+      value: focus 3
+    group: RESOLVER
+  - txt: "Si ves que no vas a poder resolver el caso puedes rendirte d\xE1ndole al
+      bot\xF3n rojo de la derecha para poder intentar otro caso distinto."
+    fx:
+    - tipo: 0
+      value: Capi neutro2
+    - tipo: 6
+      value: focus 5
+    group: RESOLVER
+  - txt: Te invito a que intentes resolverlo.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    - tipo: 6
+      value: cam 2
+    - tipo: 6
+      value: fix_state false
+    group: RESOLVER
+  - txt: "\xBFYa has terminado?"
+    fx:
+    - tipo: 0
+      value: Capi neutro
+    - tipo: 6
+      value: fix_state true
+    - tipo: 2
+      value: win_condition
+    group: FIN_CASO
+  - txt: "Perfecto <val[nick]>. Dir\xEDa que ya est\xE1s listo para empezar."
+    fx:
+    - tipo: 0
+      value: Capi contento
+    - tipo: 4
+      value: tuto_fin
+    group: FIN_CASO
+  - txt: "Vaya\u2026"
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: FIN_CASO
+  - txt: "Bueno, no pasa nada <val[nick]>, ya te ir\xE1s acostumbrando."
+    fx:
+    - tipo: 0
+      value: Capi neutro2
+    - tipo: 4
+      value: tuto_fin
+    group: FIN_CASO
+  - txt: "\xBFEn serio <val[nick]>?"
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: FIN_CASO
+  - txt: "\xBFTe has rendido en el tutorial?"
+    fx: []
+    group: FIN_CASO
+  - txt: "No te recomiendo rendirte muy a menudo. Si no completas casos que has aceptado\u2026"
+    fx:
+    - tipo: 0
+      value: Capi neutro2
+    group: FIN_CASO
+  - txt: "puede que el cliente se enfade, o que recibas alg\xFAn tipo de\u2026"
+    fx: []
+    group: FIN_CASO
+  - txt: "<#FF0000>PENALIZACI\xD3N<#FFFFFF>"
+    fx:
+    - tipo: 0
+      value: Capi sus
+    - tipo: 4
+      value: tuto_fin
+    group: FIN_CASO
+  - txt: Como consejo extra, si quieres quitar bloques para despejar la mesa, puedes
+      arrastrarlos fuera de esta.
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: FIN_CASO
+  - txt: "Y poco m\xE1s. Si tienes alguna duda no dudes en no preguntarme."
+    fx:
+    - tipo: 0
+      value: Capi sus
+    group: FIN_CASO
+  - txt: Es broma jajajaja,
+    fx:
+    - tipo: 0
+      value: Capi contento
+    group: FIN_CASO
+  - txt: "Si necesitas ayuda te dejo mi contacto, puedes hacer una llamada desde
+      el <b>Men\xFA de Pausa</b>"
+    fx:
+    - tipo: 6
+      value: fix_state false
+    group: FIN_CASO
+  labels:
+  - tuto_no
+  - tuto_ok
+  - preguntar_modo
+  - p_si
+  - p_no
+  - modo_manual
+  - modo_bloque
+  - tuto_consulta_listo
+  - tuto_win
+  - tuto_lose
+  - tuto_meh
+  - tuto_fin
+  labelIndex: 0b0000000c0000002f000000320000003300000035000000380000003d0000004300000044000000460000004b000000

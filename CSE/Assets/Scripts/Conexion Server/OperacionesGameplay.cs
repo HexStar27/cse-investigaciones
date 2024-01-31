@@ -1,24 +1,33 @@
 ﻿// Esta clase se va a encargar de mandar peticiones específicas del juego al servidor a través del Conexión Handler
 
+using System.Threading.Tasks;
 using UnityEngine;
 using Hexstar;
-using System;
-using System.Threading.Tasks;
+using Hexstar.Dialogue;
 using SimpleJSON;
+
+using ResultType = UnityEngine.Networking.UnityWebRequest.Result;
 
 public class OperacionesGameplay : MonoBehaviour
 {
-    private static Action[] LUTEfectos = new Action[16];
-    public static int eventoId = 0;
+    private static int eventoId = 0;
 
     [SerializeField] private GameObject dangerController;
-    private static GameObject dc;
+    private static GameObject s_dangerController;
+    
+    public static int s_lastScore = 0;
+
+    public static int EventoId { get => eventoId; set => eventoId = value; }
+
+    private static readonly string msg_consultaVacia = "NO SE ENVÍAN CONSULTAS VACIAS";
+    private static readonly string msg_crimenNoResuelto = "CRIMEN NO RESUELTO";
+    private static readonly string msg_noCasoActivo = "NO HAY CASO ACTIVO";
+    private static readonly string msg_eliminarCaso = "ELIMINANDO CASO...";
+
 
     private void Awake()
     {
-        if (dangerController == null) 
-            Debug.LogError("Error, hace falta objeto Danger Controller en OperacionesGameplay.");
-        dc = dangerController;
+        if (dangerController != null) s_dangerController = dangerController;
     }
 
     public void RealizarConsultaD()
@@ -30,7 +39,8 @@ public class OperacionesGameplay : MonoBehaviour
         string consulta = LectorConsulta.GetQuery();
         if (consulta.Length <= 0)
         {
-            TempMessageController.Instancia.GenerarMensaje("Inserta un bloque agrupado en el conector central para enviar consultas");
+            TempMessageController.Instancia.GenerarMensaje(msg_consultaVacia);
+            CSE.XAPI_Builder.CreateStatement_TrySendQuery(true,false,false);
             return;
         }
 
@@ -39,74 +49,107 @@ public class OperacionesGameplay : MonoBehaviour
         form.AddField("consulta", consulta);
 
         await ConexionHandler.APost(ConexionHandler.baseUrl + "case/check", form);
+        if (!CheckInternetConection()) return;
         string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
-
-        resultado = resultado.Substring(1, resultado.Length - 2);
+        resultado = resultado[1..^1];
         ImpresorResultado.Instancia.IntroducirResultado(resultado);
-        TempMessageController.Instancia.GenerarMensaje("Consulta realizada!");
+        
+        //TempMessageController.Instancia.GenerarMensaje("Consulta realizada!");
 
-        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
             ResourceManager.ConsultasDisponibles--;
-            PuzzleManager.consultasRealizadasActuales++;
-            ActualizarDC();
+            PuzzleManager.ConsultasRealizadasActuales++;
+            await DataUpdater.Instance.ShowConsultasDisponibles();
+            ActualizarDangerController();
         }
+
+        bool correctSyntax = !ImpresorResultado.Instancia.LastQueryWasNotCorrect();
+        bool isLost = ResourceManager.ConsultasDisponibles == 0;
+        CSE.XAPI_Builder.CreateStatement_TrySendQuery(false, correctSyntax, isLost);
     }
 
-    public static void ActualizarDC()
+    public static void ActualizarDangerController()
     {
-        dc.SetActive(ResourceManager.ConsultasDisponibles <= 1);
+        if (s_dangerController == null) return;
+        bool resolviendoCaso = GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso;
+        bool leQuedanConsultas = ResourceManager.ConsultasDisponibles <= 1;
+        s_dangerController.SetActive(leQuedanConsultas && resolviendoCaso);
     }
 
-    public void ComprobarCasoD()
-    {
-        ComprobarCaso();
-    }
+    public void ComprobarCasoD() => ComprobarCaso();
+    
     public static async void ComprobarCaso()
     {
-        //Sólo comprueba el caso si hay uno activo
-        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        string consulta = LectorConsulta.GetQuery();
+        if (consulta.Length <= 0)
         {
-            //Se ha completado el caso?
-            int ind = PuzzleManager.Instance.casoActivo;
+            TempMessageController.Instancia.GenerarMensaje(msg_consultaVacia);
+            CSE.XAPI_Builder.CreateStatement_TrySolveCase(false, false, null, .0f, 0, 0);
+            return;
+        }
+
+        //Sólo comprueba el caso si hay uno activo
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        {
+            //Pregunta al servidor si se ha completado el caso
+            Caso caso = PuzzleManager.GetCasoActivo();
             WWWForm form = new WWWForm();
             form.AddField("authorization", SesionHandler.sessionKEY);
-            form.AddField("caseid", PuzzleManager.Instance.casosCargados[ind].id);
+            form.AddField("caseid", caso.id);
             form.AddField("caso", LectorConsulta.GetQuery());
+            //TempMessageController.Instancia.GenerarMensaje("Enviando solución...");
             await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
-            TempMessageController.Instancia.GenerarMensaje("Enviando solución...");
+            if (!CheckInternetConection()) return;
             string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
             bool completado = response[0] == 't'; // "true"
             
-            PuzzleManager.Instance.solucionCorrecta = completado;
-            if (!PuzzleManager.GetCasoActivo().secundario) ResourceManager.UltimoCasoPrincipalGanado = completado;
+            PuzzleManager.SolucionCorrecta = completado;
+
+            PuzzleManager.ConsultasRealizadasActuales++;
+            ResourceManager.ConsultasDisponibles--;
+            await DataUpdater.Instance.ShowConsultasDisponibles();
 
             //Informar del resultado al jugador
             if (completado)
             {
-                ResourceManager.CasosCompletados++;
+                ResourceManager.CasosCompletados.Add(caso.id);
+                ResourceManager.CasosCompletados_ListaDeEstados.Add(1); // 1 == Ganado
+
+                float t = PuzzleManager.GetSetTiempoEmpleado();
+
                 await CalcularYGuardarPuntuacion();
-                TerminarCaso();
+                if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.WIN);
+
+                CSE.XAPI_Builder.CreateStatement_TrySolveCase(true, true, caso, t,
+                    PuzzleManager.ConsultasRealizadasActuales, s_lastScore);
+                
+                TerminarFaseCaso();
             }
             else
             {
-                TempMessageController.Instancia.GenerarMensaje("Crimen no resuelto...");
-            }
-
-            PuzzleManager.consultasRealizadasActuales++;
-            ResourceManager.ConsultasDisponibles--;
-            ActualizarDC();
+                TempMessageController.Instancia.GenerarMensaje(msg_crimenNoResuelto);
+                bool casoNoTerminadoPeroPerdido = ResourceManager.ConsultasDisponibles == 0;
+                CSE.XAPI_Builder.CreateStatement_TrySolveCase(casoNoTerminadoPeroPerdido, false, caso, .0f, 0, 0);
+            }            
+            ActualizarDangerController();
         }
-        else TempMessageController.Instancia.GenerarMensaje("Actualmente no se está resolviendo ningún caso");
+        else TempMessageController.Instancia.GenerarMensaje(msg_noCasoActivo);
+    }
+    private static bool CheckTutorialPlaying()
+    {
+        string v = ControladorDialogos.GetDialogueEventValue("tutorial");
+        return v.Equals("true");
     }
 
-    private static void TerminarCaso()
+    /// <summary>
+    /// Si hay algún caso empezado, pide que el estado del gameplay cambie a "FinCaso".
+    /// </summary>
+    private static void TerminarFaseCaso()
     {
-        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            //PuzzleManager.TerminarStatsCaso();
-            PuzzleManager.LimpiarFlags(); //???
-            GameplayCycle.Instance.SetState(EstadosDelGameplay.FinCaso);
+            GameplayCycle.EnqueueState(EstadosDelGameplay.FinCaso);
         }
     }
 
@@ -116,40 +159,60 @@ public class OperacionesGameplay : MonoBehaviour
     }
     public static void Rendirse()
     {
-        if(GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        if(GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            TerminarCaso();
-            TempMessageController.Instancia.GenerarMensaje("Dejando caso... :(");
+            if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.SURR);
+            
+            int idCaso = PuzzleManager.GetIdCasoActivo();
+            ResourceManager.CasosCompletados.Add(idCaso);
+            ResourceManager.CasosCompletados_ListaDeEstados.Add(0); // 0 == Rendido
+
+            TempMessageController.Instancia.GenerarMensaje(msg_eliminarCaso);
+            TerminarFaseCaso();
+
+            CSE.XAPI_Builder.CreateStatement_Surrender();
         }
         else
         {
-            TempMessageController.Instancia.GenerarMensaje("No se puede descartar caso, no hay casos activos.");
+            TempMessageController.Instancia.GenerarMensaje(msg_noCasoActivo);
         }
     }
 
+    /// <summary>
+    /// Se debe ejecutar cuando el jugador se queda sin consultas disponibles.
+    /// </summary>
     public static void SinConsultas()
     {
-        if (GameplayCycle.Instance.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            GameplayCycle.Instance.SetState(EstadosDelGameplay.FinCaso);
+            if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.LOST);
+            
+            int idCaso = PuzzleManager.GetIdCasoActivo();
+            if(idCaso >= 0) //No es necesario pero bueno. Por si acaso.
+            {
+                ResourceManager.CasosCompletados.Add(idCaso);
+                ResourceManager.CasosCompletados_ListaDeEstados.Add(-1); // -1 == Perdido
+            }
+
+            TerminarFaseCaso();
         }
-        else GameplayCycle.Instance.SetState(EstadosDelGameplay.FinDia);
     }
 
     public static async Task CalcularYGuardarPuntuacion()
     {
-        int id = PuzzleManager.GetCasoActivo().id;
-        int time = Mathf.FloorToInt(PuzzleManager.GetTiempoEmpleado());
+        int id = PuzzleManager.GetIdCasoActivo();
+        int time = Mathf.FloorToInt(PuzzleManager.UltimoTiempoEmpleado);
         WWWForm form = new WWWForm();
         form.AddField("authorization", SesionHandler.sessionKEY);
         form.AddField("caso", id);
-        form.AddField("consultas", PuzzleManager.consultasRealizadasActuales);
+        form.AddField("consultas", PuzzleManager.ConsultasRealizadasActuales);
         form.AddField("tiempo", time);
-        form.AddField("examen", PuzzleManager.Instance.casoExamen ? 1 : 0);
-        form.AddField("reto", 0); //TODO: Comprobar si retos opcionales completados (cuando los eventos estén bien)
+        form.AddField("examen", PuzzleManager.CasoActivoEsExamen() ? 1 : 0);
+        form.AddField("reto", PuzzleManager.NRetosCumplidos);
         form.AddField("dificultad", ResourceManager.DificultadActual);
         form.AddField("consulta", LectorConsulta.GetQuery());
         await ConexionHandler.APost(ConexionHandler.baseUrl + "score/calculate", form);
+        if (!CheckInternetConection()) return;
 
         string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
         if (json == "{}") Debug.LogError("Ha habido un error en el servidor al calcular la puntuación :(");
@@ -157,7 +220,7 @@ public class OperacionesGameplay : MonoBehaviour
         {
             JSONNode jNodo = JSON.Parse(ConexionHandler.download);
             int puntuacion = jNodo["res"].AsInt;
-            
+            s_lastScore = puntuacion;
 
             form = new WWWForm();
             form.AddField("authorization", SesionHandler.sessionKEY);
@@ -165,38 +228,32 @@ public class OperacionesGameplay : MonoBehaviour
             form.AddField("caso", id);
             form.AddField("punt", puntuacion);
             form.AddField("dif", ResourceManager.DificultadActual);
-            form.AddField("used", PuzzleManager.consultasRealizadasActuales);
+            form.AddField("used", PuzzleManager.ConsultasRealizadasActuales);
             form.AddField("time", time);
             await ConexionHandler.APost(ConexionHandler.baseUrl + "score/save", form);
+            if (!CheckInternetConection()) return;
 
             json = ConexionHandler.ExtraerJson(ConexionHandler.download);
             if (json == "{}") Debug.LogError("Ha habido un error al intentar guardar la puntuación :(");
             else
             {
-                //TODO: Mostrar asíncronamente la puntuación que ha obtenido el jugador
                 await PuntuacionController.PresentarPuntuaciones(puntuacion);
+                while (PuntuacionController.puntuacionEnPantalla) { await Task.Delay(200); }
             }
         }
     }
 
     /// <summary>
-    /// Introduce los eventos recividos del servidor al banco de eventos del juego
-    /// (No los ejecuta, solo los almacena)
+    /// Interpreta la última conexión con el servidor, devuelve verdadero si la conexión es correcta, si la conexión falló enviará un mensaje al jugador.
     /// </summary>
-    public static void CargarEventos()
+    private static bool CheckInternetConection()
     {
-        //1º Acceder a servidor y pedir eventos según el nivel de dificultad
-        int nEventos = 0;
-        Evento[] eventos = new Evento[0];
-        //StartCoroutine(ConexionHandler.Get(ConexionHandler.baseUrl + "event");
-        //2º Añadir cada evento al banco de eventos
-        BancoEventos banco = BancoEventos.Instance();
-        if (banco != null) banco.Clear();
-        else Debug.Log("El banco de eventos no está inicializado...");
-        for (int i = 0; i < nEventos; i++)
+        if(ConexionHandler.result == ResultType.ConnectionError)
         {
-            banco.Add(eventos[i]);
+            TempMessageController.Instancia.GenerarMensaje("# <color=\"red\">NO HAY ACCESO A INTERNET<color=\"white\"> #");
+            return false;
         }
+        return true;
     }
 
     /// <summary>
@@ -204,107 +261,6 @@ public class OperacionesGameplay : MonoBehaviour
     /// </summary>
     public static void Snapshot()
     {
-        ResourceManager.checkpoint.Fijar();
-    }
-
-    public static async Task EjecutarEventoAleatorio()
-    {
-        //TODO
-
-        // 1º Obtener el evento
-        //int nEventos = BancoEventos.Instance().Count();
-        //int e = UnityEngine.Random.Range(0,nEventos);
-        //Evento evento = BancoEventos.Instance().Get(e);
-        // 2º Realizar cambios del evento
-        //BancoEventos.Instance().Activate(evento);
-        await Task.Yield();
-    }
-
-    public static void AplicarEfectosCaso(Caso caso, bool ganado, int consultasUsadas, float tiempoEmpleado)
-    {
-        foreach (var ev in caso.eventosCaso)
-        {
-            int i = (int)ev.efecto;
-            bool aplicar = false;
-            switch (ev.condicion)
-            {
-                case Caso.Condiciones.Ganar:
-                    aplicar = ganado;
-                    break;
-                case Caso.Condiciones.Perder:
-                    aplicar = !ganado;
-                    break;
-                case Caso.Condiciones.MaxConsultas1:
-                    aplicar = consultasUsadas <= 1 && ganado;
-                    break;
-                case Caso.Condiciones.MaxConsultas2:
-                    aplicar = consultasUsadas <= 2 && ganado;
-                    break;
-                case Caso.Condiciones.TiempoLimite30s:
-                    aplicar = tiempoEmpleado <= 30 && ganado;
-                    break;
-                case Caso.Condiciones.TiempoLimite1min:
-                    aplicar = tiempoEmpleado <= 60 && ganado;
-                    break;
-                case Caso.Condiciones.TiempoLimite2min:
-                    aplicar = tiempoEmpleado <= 120 && ganado;
-                    break;
-                case Caso.Condiciones.TiempoLimite3min:
-                    aplicar = tiempoEmpleado <= 180 && ganado;
-                    break;
-                case Caso.Condiciones.Siempre:
-                    aplicar = true;
-                    break;
-            }
-
-            if (i == 2) aplicar = !aplicar; //Las penalizaciones ocurren cuando no se ha alcanzado una condición
-
-            if (aplicar)
-            {
-                if (i == 0 && caso.eventoId > 0) eventoId = caso.eventoId; // Evento
-                
-                LUTEfectos[i]();
-            }
-        }
-    }
-
-    public static void InicializarLUTEventos()
-    {
-        LUTEfectos[0] = () => //Evento
-        {
-            // TODO
-            TempMessageController.Instancia.GenerarMensaje("El mensaje...");
-        };
-        LUTEfectos[1] = () => //Reto
-        {
-            int i = UnityEngine.Random.Range(7,13);
-            LUTEfectos[i]();
-        };
-        LUTEfectos[2] = () => //Penalizacion
-        {
-            int i = UnityEngine.Random.Range(13,17);
-            LUTEfectos[i]();
-        };
-        LUTEfectos[3] = () => //Papeleo
-        {
-            // TODO
-            TempMessageController.Instancia.GenerarMensaje("El mensaje...");
-        };
-        LUTEfectos[4] = () => //Incertidumbre
-        {
-            // TODO
-            TempMessageController.Instancia.GenerarMensaje("El mensaje...");
-        };
-        LUTEfectos[5] = () => //MasDificultad
-        {
-            ResourceManager.DificultadActual++;
-            //PuntoGuardado.Fijar();
-            TempMessageController.Instancia.GenerarMensaje("LA DIFICULTAD HA SIDO AUMENTADA");
-        };
-        LUTEfectos[6] = () => //FinDelJuego...
-        {
-            // TODO
-        };
-        //Hasta el 16...
+        ResourceManager.checkpoint.CopiarDatosDelSistema();
     }
 }
