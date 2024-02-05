@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using xAPI = CSE.XAPI_Builder;
 
 namespace Hexstar
 {
@@ -60,7 +61,8 @@ namespace Hexstar
 			await ConexionHandler.APost(url, formulario);
 			nickname = ConexionHandler.ExtraerJson(ConexionHandler.download);
 			nickname = nickname.Trim('"');
-		}
+			xAPI.AutoSetupActor();
+        }
 
 		private static void SetKey(string dh)
 		{

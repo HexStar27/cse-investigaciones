@@ -7,7 +7,7 @@ public class CaseCreator : MonoBehaviour
     public bool bonito = true;
     [TextArea(15,20)]
     public string json;
-    public Caso caso;
+    public Hexstar.CSE.Caso caso;
 
     public void FixedUpdate()
     {

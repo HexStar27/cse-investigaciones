@@ -9,7 +9,6 @@ public class ControladorDeOtrosEfectos : MonoBehaviour
 
     [SerializeField] CameraState focus;
     [SerializeField] CameraState principal;
-    [SerializeField] InscryptionLikeCameraState ilcs;
 
     public void AplicarEfecto(string value)
     {
@@ -45,7 +44,7 @@ public class ControladorDeOtrosEfectos : MonoBehaviour
         if (idx >= 0)
         {
             principal.Transition(idx);
-            ilcs.SetEstadoActual(idx);
+            InscryptionLikeCameraState.Instance.SetEstadoActual(idx);
         }
     }
 }

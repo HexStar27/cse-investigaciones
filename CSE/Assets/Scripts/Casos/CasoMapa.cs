@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using CSE;
+using Hexstar.CSE.Informes;
 
 public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -79,9 +80,11 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         ResourceManager.AgentesDisponibles -= datosCaso.coste;
         await DataUpdater.Instance.ShowAgentesDisponibles();
         CasoDescripcion.Instance.Abrir(false);
+		//await animación de imprimir papel de informe?
         PuzzleManager.IniciarStatsCaso(indiceCaso);
 
         if (datosCaso.secundario == false) ResourceManager.UltimoCasoPrincipalEmpezado = datosCaso.id;
+		CarpetaInformesController.Informes.Add(new Informe(datosCaso));
         GameplayCycle.EnqueueState(EstadosDelGameplay.InicioCaso);
         if (speaker != null) speaker.PlayOneShot(audioSelect);
         XAPI_Builder.CreateStatement_CaseRequest(true);

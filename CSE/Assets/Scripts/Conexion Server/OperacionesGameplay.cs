@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Hexstar;
 using Hexstar.Dialogue;
+using Hexstar.CSE;
 using SimpleJSON;
 
 using ResultType = UnityEngine.Networking.UnityWebRequest.Result;

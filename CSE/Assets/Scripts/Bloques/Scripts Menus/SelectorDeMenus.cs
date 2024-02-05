@@ -11,7 +11,6 @@ public class SelectorDeMenus : MonoBehaviour
     int currentlyActive = -1;
     [SerializeField] private List<Transform> acomodadores;
 
-    [SerializeField] InscryptionLikeCameraState ilcs;
     [SerializeField] int targetCameraState;
     public static UnityEvent onCloseMenu = new UnityEvent();
 
@@ -23,7 +22,7 @@ public class SelectorDeMenus : MonoBehaviour
     public void SeleccionarMenu(int idx)
     {
         InscryptionLikeCameraState.SetBypass(true);
-        if(ilcs != null && ilcs.GetEstadoActual() != targetCameraState) {
+        if(InscryptionLikeCameraState.Instance.GetEstadoActual() != targetCameraState) {
             CerrarMenus();
             return;
         }

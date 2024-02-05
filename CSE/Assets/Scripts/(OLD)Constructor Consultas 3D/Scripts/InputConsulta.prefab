@@ -390,6 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   modoBloques: {fileID: 777292500016015719}
   modoManual: {fileID: 4850031346115196357}
+  tableta: {fileID: 0}
 --- !u!1001 &7456426862334963297
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -451,21 +452,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 1080
-      objectReference: {fileID: 0}
-    - target: {fileID: 2608790802588195748, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.0012
-      objectReference: {fileID: 0}
-    - target: {fileID: 2608790802588195748, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.0012
-      objectReference: {fileID: 0}
-    - target: {fileID: 2608790802588195748, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
-        type: 3}
-      propertyPath: m_LocalScale.z
-      value: 0.0012
       objectReference: {fileID: 0}
     - target: {fileID: 2608790802588195748, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
         type: 3}
@@ -532,15 +518,15 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 2608790802588195749, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
-        type: 3}
-      propertyPath: m_RenderMode
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 2608790802588195750, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
         type: 3}
       propertyPath: m_PresetInfoIsWorld
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2608790802588195751, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
+        type: 3}
+      propertyPath: m_BlockingObjects
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2608790802837311029, guid: 1d2bb00b7f6faf64b9d5f07c54292875,
         type: 3}
@@ -586,10 +572,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 0}
-  speed: 1
+  speed: 6
   estados:
-  - posicion: {x: 0, y: 0, z: 0}
-    rotacion: {x: 0, y: 0, z: 0}
+  - posicion: {x: 0, y: 2, z: -0.45}
+    rotacion: {x: 90, y: 0, z: 0}
   onFinished:
     m_PersistentCalls:
       m_Calls: []
@@ -624,6 +610,11 @@ PrefabInstance:
         type: 3}
       propertyPath: connectorOffset
       value: -0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1801104590693234559, guid: daa50ab30fdb97f43844c52fd0943819,
+        type: 3}
+      propertyPath: sendXAPIStatement
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2137002580328971022, guid: daa50ab30fdb97f43844c52fd0943819,
         type: 3}

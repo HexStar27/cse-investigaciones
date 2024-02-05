@@ -17,6 +17,7 @@ public class PuntoGuardado
 	public int[] casosCompletados;
 	public int ultimoCasoPrincipalEmpezado;
 	public int[] casosCompletados_listaDeEstados;
+	public Hexstar.CSE.Informes.Informe[] informes;
 
 	public string dialogueEventList;
 	public int[] eventosEjecutados;
@@ -38,6 +39,7 @@ public class PuntoGuardado
 		tableCodes = new string[0];
 		hasCompletedTutorial = false;
 		dialogueEventList = "";
+		informes = new Hexstar.CSE.Informes.Informe[0];
     }
 
 	public void CopiarDatosDelSistema()
@@ -67,6 +69,8 @@ public class PuntoGuardado
 		tableCodes = ResourceManager.TableCodes.ToArray();
 
 		dialogueEventList = Hexstar.Dialogue.ControladorDialogos.GetAllEventsFromDict();
+
+		informes = Hexstar.CSE.Informes.CarpetaInformesController.Informes.ToArray();
     }
 
 	public void CargarDatosAlSistema()
@@ -96,5 +100,9 @@ public class PuntoGuardado
 		ResourceManager.TableCodes = codes;
 		
 		Hexstar.Dialogue.ControladorDialogos.SetAllEventsToList(dialogueEventList, true);
+
+		Hexstar.CSE.Informes.CarpetaInformesController.Informes.Clear();
+        for (int i = 0; i < informes.Length; i++)
+			Hexstar.CSE.Informes.CarpetaInformesController.Informes.Add(informes[i]);
     }
 }

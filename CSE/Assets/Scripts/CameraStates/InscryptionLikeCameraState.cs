@@ -2,6 +2,8 @@
 
 public class InscryptionLikeCameraState : MonoBehaviour
 {
+    public static InscryptionLikeCameraState Instance { get; private set; }
+
     [SerializeField] private CameraState camS;
     public bool loopable = false;
     protected static bool bypass = false;
@@ -12,7 +14,6 @@ public class InscryptionLikeCameraState : MonoBehaviour
 
     public static void SetBypass(bool value)
     {
-        //print("BYPASS set to " + value);
         bypass = value;
     }
 
@@ -90,5 +91,10 @@ public class InscryptionLikeCameraState : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.W) || scrollDelta > 0) Go2NextState();
             else if (Input.GetKeyDown(KeyCode.S) || scrollDelta < 0) Go2PrevState();
         }
+    }
+
+    void Awake()
+    {
+        Instance = this;
     }
 }

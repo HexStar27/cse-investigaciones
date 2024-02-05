@@ -2,6 +2,7 @@ using SimpleJSON;
 using System;
 using System.Collections.Generic;
 using Hexstar;
+using Hexstar.CSE;
 
 namespace CSE
 {
@@ -10,7 +11,7 @@ namespace CSE
         private static JSONNode actor = new JSONObject();
         private static List<string> statements = new();
 
-        private static void AutoSetupActor()
+        public static void AutoSetupActor()
         {
             if (actor.HasKey("name")) return;
             actor.Add("name", SesionHandler.nickname);
@@ -312,7 +313,7 @@ namespace CSE
         #region Utils
         private static string GetTimeStamp()
         {
-            return DateTime.Now.ToString("es-ES");
+            return DateTime.UtcNow.ToString("yyyy/MM/dd HH:mm:ss");
         }
         private static JSONObject GetSimpleTranslation(string lang, string data)
         {

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Hexstar;
+using Hexstar.CSE;
 using SimpleJSON;
 using System.Threading.Tasks;
 

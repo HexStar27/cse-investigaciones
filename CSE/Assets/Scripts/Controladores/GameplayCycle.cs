@@ -109,7 +109,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		startedCasesInDay++;
         //TODO: Cambiar la música. Ahora mismo no tengo otra
 
-        CajonPistas.instancia.RellenarCajonConCasoActivo();
 		AlmacenDePalabras.CargarPistasDeCasoActivo();
 		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
 
@@ -150,7 +149,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		}
 
         //Elimina las pistas del caso
-        CajonPistas.instancia.VaciarCajon();
 		AlmacenDePalabras.palabras[(int)TabType.Pistas].Clear();
 
         PuzzleManager.LimpiarFlagsDeCasoActual();
