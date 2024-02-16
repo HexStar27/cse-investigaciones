@@ -83,7 +83,6 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		//await animación de imprimir papel de informe?
         PuzzleManager.IniciarStatsCaso(indiceCaso);
 
-        if (datosCaso.secundario == false) ResourceManager.UltimoCasoPrincipalEmpezado = datosCaso.id;
 		CarpetaInformesController.Informes.Add(new Informe(datosCaso));
         GameplayCycle.EnqueueState(EstadosDelGameplay.InicioCaso);
         if (speaker != null) speaker.PlayOneShot(audioSelect);

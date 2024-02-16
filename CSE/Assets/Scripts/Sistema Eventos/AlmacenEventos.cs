@@ -1,3 +1,5 @@
+using Hexstar.Dialogue;
+using SimpleJSON;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,9 +21,9 @@ namespace Hexstar.CSE.SistemaEventos
         /// <summary>
         /// Obtiene los eventos almacenados en el servidor y lo prepara todo listo para usar
         /// </summary>
-        public static void DescargarEventosServidor() 
+        public async static Task DescargarEventosServidor() 
         {
-            ConexionHandler.AGet(ConexionHandler.baseUrl + "event/all").RunSynchronously();
+            await ConexionHandler.AGet(ConexionHandler.baseUrl + "event/all");
             CargarEventosArchivo(ConexionHandler.download);
             ActualizarEventosEjecutados();
         }
@@ -46,10 +48,21 @@ namespace Hexstar.CSE.SistemaEventos
         /// </summary>
         private static void CargarEventosArchivo(string text)
         {
-            Debug.Log(text);
-            // 1º Parsear todo
-            // 2º Añadir cada evento a la listaDeEventos
-            throw new NotImplementedException();
+            var json = JSON.Parse(text);
+            if (json == null) throw new NullReferenceException();
+            var array = json["res"];
+            for(int i = 0; i < array.Count; i++)
+            {
+                Evento ev = JsonUtility.FromJson<Evento>(array[i]["data"].ToString());
+                if (ev == null) { Debug.LogWarning("Unable to parse json into Evento :("); continue; }
+                ev.ParsearCondicion();
+                IncluirNuevoEvento(ev);
+            }
+        }
+        private static void IncluirNuevoEvento(Evento e)
+        {
+            listaDeEventos.Add(e);
+            eventosEjecutados.Add(false);
         }
 
         /// <summary>
@@ -106,14 +119,15 @@ namespace Hexstar.CSE.SistemaEventos
         public enum Comprobable { AL_INICIO_DIA = 0, AL_FIN_CASO = 2 };
 
         //La ID debería ser siempre igual al índice dentro de la lista.
-        [UnityEngine.HideInInspector] public int id;
+        [HideInInspector] public int id;
         public string titulo;
         public bool diario;
         public Comprobable momentoComprobable;
         public string condicionUnparsed;
         [NonSerialized] public CondicionEvento condicion;
-        [UnityEngine.Range(0, 100)] public int probabilidad = 100;
+        [Range(0, 100)] public int probabilidad = 100;
         public string cinematicFile;
+        public string dialogueDataBaseFile;
         public string tableCodesNuevos;
         public string modVarGameplay;
 
@@ -134,9 +148,12 @@ namespace Hexstar.CSE.SistemaEventos
             // Se ejecutan los elementos del evento en orden
             if (cinematicFile.Length > 0)
             {
+                if (dialogueDataBaseFile.Length <= 0)
+                    Debug.LogWarning("Se está inicializando una cinemática sin una DialogueDataBase... ¿Estás seguro de que esa era la intención?");
+                else ControladorDialogos.ddb.LoadFromString(dialogueDataBaseFile);
                 ControladorCinematica.Instance.InterpretarCadenaComoJSON(cinematicFile);
-                ControladorCinematica.Instance.alTerminarCinematica.AddListener(FinishedCinematic);
                 
+                ControladorCinematica.Instance.alTerminarCinematica.AddListener(FinishedCinematic);
                 AlmacenEventos.EventoOcupado = true;
                 ControladorCinematica.Instance.IniciarCinematica();
 
@@ -251,6 +268,9 @@ namespace Hexstar.CSE.SistemaEventos
 //////////////////////////////////////////////////
 // CinematicFile:
 // - Se usa el mismo formato que acepta el sistema de cinemáticas
+//////////////////////////////////////////////////
+// DialogueDataBaseFile:
+// - Se usa el mismo formato que acepta el sistema de diálogos
 //////////////////////////////////////////////////
 /* Condición:
  

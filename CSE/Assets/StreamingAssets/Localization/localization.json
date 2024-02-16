@@ -1,0 +1,158 @@
+{
+    ".menu.salir":{
+        "es":"Salir",
+        "en":"Exit"
+    },
+    ".menu.conectarse":{
+        "es":"Conectarse",
+        "en":"Connect"
+    },
+    ".menu.cambiar":{
+        "es":"Cambiar",
+        "en":"Change"
+    },
+    ".menu.volver":{
+        "es":"Volver",
+        "en":"Return"
+    },
+    ".menu.creditos":{
+        "es":"Créditos",
+        "en":"Credits"
+    },
+    ".menu.credenciales.correo_ejemplo":{
+        "es":"Correo@alum.uca.es",
+        "en":"Email@alum.uca.es"
+    },
+    ".menu.credenciales.contraseña_ejemplo":{
+        "es":"contraseña",
+        "en":"password"
+    },
+    ".menu.credenciales.nick_ejemplo":{
+        "es":"Nombre refachero aquí",
+        "en":"Really cool name here"
+    },
+    ".menu.credenciales.nuevo_nick":{
+        "es":"Nuevo nick aquí",
+        "en":"New nick here"
+    },
+    ".no_internet_msg":{
+        "es":"No se ha podido conectar al servidor, comprueba la conexión e inténtalo de nuevo",
+        "en":"Couldn't connect to the server, please check your internet connection and try again"
+    },
+    ".menu.iniciar_sesion":{
+        "es":"Iniciar Sesión",
+        "en":"Log in"
+    },
+    ".menu.cerrar_sesion":{
+        "es":"Cerrar Sesión",
+        "en":"Log out"
+    },
+    ".menu.sugerencia.iniciar_sesion":{
+        "es":"¿Ya tienes cuenta?",
+        "en":"Already have an account?"
+    },
+    ".menu.crear_cuenta":{
+        "es":"Crear Cuenta",
+        "en":"Create Account"
+    },
+    ".menu.sugerencia.crear_cuenta":{
+        "es":"¿No tienes cuenta?",
+        "en":"Don't have an account yet?"
+    },
+    ".menu.terminos_condiciones.check":{
+        "es":"Acepto los términos y condiciones",
+        "en":"Accept terms and conditions"
+    },
+    ".yo":{
+        "es":"Yo:",
+        "en":"me:"
+    },
+    ".menu.nueva_partida":{
+        "es":"Nueva Partida",
+        "en":"New Game"
+    },
+    ".menu.continuar_partida":{
+        "es":"Continuar Partida",
+        "en":"Continue Game"
+    },
+    ".menu.opciones":{
+        "es":"Opciones",
+        "en":"Options"
+    },
+    ".menu.msg.nueva_partida":{
+        "es":"¿Quieres empezar una nueva partida?",
+        "en":"Do you want to start a new game?"
+    },
+    ".menu.msg.cerrar_sesion":{
+        "es":"¿Quieres cambiar de cuenta?",
+        "en":"Do you want to change accounts?"
+    },
+    ".menu.msg.salir":{
+        "es":"¿De verdad quieres irte? :(",
+        "en":"Are you really sure you want to go? :("
+    },
+    ".menu.reanudar":{
+        "es":"Reanudar",
+        "en":"Resume"
+    },
+    ".si_1":{
+        "es":"Sí",
+        "en":"Yes"
+    },
+    ".si_2":{
+        "es":"Así es.",
+        "en":"Indeed."
+    },
+    ".si_3":{
+        "es":"Sí :(",
+        "en":"Yes :("
+    },
+    ".menu.msg.controles":{
+        "es":"<b>Controles:</b>\n<b>Abrir/Cerrar Opciones: </b>\n    Escape\n\n<b>Seleccionar: </b>\n    Click Izq\n\n<b>Desplazamiento por el escritorio: </b>\n    W / S / Rueda Ratón",
+        "en":"<b>Controls:</b>\n<b>Open/Close Options: </b>\n    Escape\n\n<b>Select: </b>\n    Left Click\n\n<b>Movement through the desktop: </b>\n    W / S / Scroll Wheel"
+    },
+    ".menu.opciones.audio":{
+        "es":"AUDIO",
+        "en":"AUDIO"
+    },
+    ".menu.opciones.vol_principal":{
+        "es":"Volumen General",
+        "en":"General Volume"
+    },
+    ".menu.opciones.vol_musica":{
+        "es":"Volumen Música",
+        "en":"Music Volume"
+    },
+    ".menu.opciones.vol_efectos":{
+        "es":"Volumen Efectos",
+        "en":"SFX Volume"
+    },
+    ".menu.opciones.accesibilidad":{
+        "es":"ACCESIBILIDAD",
+        "en":"ACCESIBILITY"
+    },
+    ".menu.opciones.intensidad_vfx":{
+        "es":"Intensidad VFX",
+        "en":"VFX Intensity"
+    },
+    ".menu.opciones.rendimiento":{
+        "es":"RENDIMIENTO",
+        "en":"PERFORMANCE"
+    },
+    ".menu.opciones.calidad_visual":{
+        "es":"Calidad Visual",
+        "en":"Visual Quality"
+    },
+    ".menu.opciones.calidad_visual.valores":{
+        "es":"Baja;Media;Alta",
+        "en":"Low;Mid;High"
+    },
+    ".menu.opciones.preferencias":{
+        "es":"PREFERENCIAS",
+        "en":"PREFERENCES"
+    },
+    ".menu.opciones.mqm":{
+        "es":"Usar Modo Consulta Manual",
+        "en":"Use Manual Query Mode"
+    }
+}

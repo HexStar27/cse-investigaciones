@@ -308,6 +308,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: iconos para bloques_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ca8eebd4297d094f99fc091327731eb
+      internalID: -1470762271
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -320,6 +341,7 @@ TextureImporter:
     secondaryTextures: []
     nameFileIdTable:
       iconos para bloques_1: 5449120442547015431
+      iconos para bloques_6: -1470762271
       iconos para bloques_5: 5965678177466589318
       iconos para bloques_4: -7995157942444557209
       iconos para bloques_2: 3864745171142170114

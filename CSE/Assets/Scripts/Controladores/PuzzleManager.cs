@@ -47,7 +47,8 @@ public class PuzzleManager : MonoBehaviour, ISingleton
     {
 		CasoActivoIndice = indiceCaso;
 		ConsultasRealizadasActuales = 0;
-		tiempoInicioCaso = Time.realtimeSinceStartup;
+        NRetosCumplidos = 0;
+        tiempoInicioCaso = Time.realtimeSinceStartup;
     }
 	
 	/// <summary>
@@ -56,14 +57,14 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	public static float GetSetTiempoEmpleado() { return UltimoTiempoEmpleado = Time.realtimeSinceStartup - tiempoInicioCaso; }
 
     /// <summary>
-    /// Carga casos principales, secundarios, y rellena el mapa.
+    /// Carga casos principales y rellena el mapa.
     /// </summary>
     /// <param name="buscarEnArchivoGuardado"> si verdadero, cargará los datos que encuentre en el archivo de guardado</param>
     public static async Task PrepararCasosParaInicioDia(bool buscarEnArchivoGuardado = false)
     {
 		Instance.QuitarTodos();
 
-		if(buscarEnArchivoGuardado)
+		if(buscarEnArchivoGuardado) // Carga los casos de las ids guardadas (de casos aún no completados)
 		{
             int n = ResourceManager.checkpoint.casosCargados.Length;
             for (int i = 0; i < n; i++)
@@ -72,22 +73,16 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 		else //Procedimiento normal
 		{
             //Cargar casos principales
-            int ultimoCaso = ResourceManager.UltimoCasoPrincipalEmpezado;
-            if (ultimoCaso < 0) await Instance.LoadCasoEspecifico(primerCasoPrincipalDelJuego);
-            else await Instance.LoadSiguientesPrincipales();
+			if (ResourceManager.CasosCompletados.Count == 0)
+			{
+				await Instance.LoadCasoEspecifico(primerCasoPrincipalDelJuego);
+			}
+			else await Instance.LoadCasosSiguientes();
         }
 
         Instance.MostrarCasosEnPantalla();
 		ObtenerPuntuacionesDeCasosCargados();
 	}
-
-	/*
-	public static async Task RellenarCasoFinCaso(int casosNuevos)
-    {
-		await Instance.LoadCasosSecundarios(casosNuevos);
-		Instance.MostrarCasosEnPantalla();
-		ObtenerPuntuacionesDeCasosCargados(true);
-	}*/
 
 	private static async void ObtenerPuntuacionesDeCasosCargados(bool dontClearJustAdd = false)
     {
@@ -136,16 +131,18 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	}
 
 	/// <summary>
-	/// Añade el (o los) siguientes casos principales a la lista
+	/// Añade el (o los) siguientes casos a la lista según el resultado del último caso completado.
+	/// Debe usarse justo después de completar un caso...
 	/// </summary>
-	public async Task LoadSiguientesPrincipales()
+	public async Task LoadCasosSiguientes()
 	{
 		if (ResourceManager.CasosCompletados_ListaDeEstados.Count == 0) return;
+		int ultimaId = ResourceManager.CasosCompletados[^1];
         int ultimoGanado = ResourceManager.CasosCompletados_ListaDeEstados[^1];
 
         WWWForm form = new();
 		form.AddField("authorization", SesionHandler.sessionKEY);
-		form.AddField("id", ResourceManager.UltimoCasoPrincipalEmpezado);
+		form.AddField("id", ultimaId);
 		form.AddField("win",  ultimoGanado);
 		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/next", form);
 		ParsearRawJsonACasos(ConexionHandler.download);
@@ -197,16 +194,6 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 		{
 			Destroy(casosGO[i]);
 		}
-	}
-
-	public static bool HayAlMenos1CasoPrincipal()
-	{
-		int n = casosCargados.Count;
-		for (int i = 0; i < n; i++)
-		{
-			if (!casosCargados[i].secundario) return true;
-		}
-		return false;
 	}
 
 	public void MostrarCasosEnPantalla()
@@ -383,7 +370,6 @@ public static class ListAlgorithms
 	/// <returns>El índice en el grid para el caso</returns>
 	public static Vector2 HashCaso2Pos(this Vector2 tamGrid, Caso caso)
 	{
-		//TODO: Asegurarse de que no puedan aparecer 2 casos en una misma posición...
 		int lTitulo = caso.titulo.Length;
 		Vector2 r = new();
 		for (int i = 0; i < lTitulo; i++)

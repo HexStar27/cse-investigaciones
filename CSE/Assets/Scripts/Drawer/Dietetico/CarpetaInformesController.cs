@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -15,12 +16,16 @@ namespace Hexstar.CSE.Informes
         [SerializeField] TextMeshProUGUI listaRecompensas;
         [SerializeField] TextMeshProUGUI pistasCaso;
         [SerializeField] TextMeshProUGUI contadorPagPistas;
+        [SerializeField] Image sello;
         [SerializeField] Button boton_pagSig;
         [SerializeField] Button boton_pagAnt;
         [SerializeField] Button boton_pagPistaSig;
         [SerializeField] Button boton_pagPistaAnt;
 
         [SerializeField] Boton3D seleccionCarpeta;
+
+        private Sprite sello_win;
+        private Sprite sello_lose;
 
         Animator anim;
         readonly string cambioDePagina  = "cambioDePagina";
@@ -36,7 +41,11 @@ namespace Hexstar.CSE.Informes
         public void MostrarEnCajon()
         {
             if (carpetaEnCajon) anim.Play(mostrarEnCajon);
-            else anim.Play(devolverACajon);
+            else
+            {
+                anim.Play(devolverACajon);
+                Boton3D.globalStop = false;
+            }
             carpetaEnCajon = true;
         }
         public void EsconderEnCajon()
@@ -48,6 +57,7 @@ namespace Hexstar.CSE.Informes
             carpetaEnCajon = false;
             FijarEstadoCamara();
             anim.Play(sacarDeCajon);
+            Boton3D.globalStop = true;
         }
 
         public static void ForzarPaginaInforme(int idx)
@@ -97,10 +107,13 @@ namespace Hexstar.CSE.Informes
             if (c != null) paginaActual = IndiceDeInformeCorrespondiente(c);
             MostrarInforme();
         }
+
+        //Llamado en la animación de cambio de página
         public void MostrarInforme()
         {
-            if (paginaActual >= 0 && paginaActual < Informes.Count)
+            if (Informes.Count > 0)
             {
+                paginaActual = Math.Clamp(paginaActual, 0, Informes.Count);
                 var inf = Informes[paginaActual];
                 tituloCaso.SetText(inf.FormarTitulo());
                 descripcionCaso.SetText(inf.descripcion);
@@ -108,6 +121,7 @@ namespace Hexstar.CSE.Informes
                 pistasCaso.SetText(inf.FormarPistasCaso());
                 pistasCaso.pageToDisplay = 1;
                 ActualizarContadorPaginasPistas();
+                PrepararSello(inf.id);
             }
             else
             {
@@ -116,8 +130,26 @@ namespace Hexstar.CSE.Informes
                 listaRecompensas.SetText("");
                 pistasCaso.SetText("");
                 contadorPagPistas.SetText("");
+                sello.color = new(1, 1, 1, 0);
             }
             ActualizarBotones();
+        }
+        private void PrepararSello(int idCaso)
+        {
+            if (idCaso != PuzzleManager.GetIdCasoActivo())
+            {
+                int idx = ResourceManager.CasosCompletados.IndexOf(idCaso);
+                if (idx < 0) sello.color = new(1, 1, 1, 0);
+                else
+                {
+                    bool casoGanado = ResourceManager.CasosCompletados_ListaDeEstados[idx] == 1;
+                    sello.sprite = casoGanado ? sello_win : sello_lose;
+                    float angulo = MiniHash(idCaso, -20, 20);
+                    sello.transform.Rotate(new(0, 0, angulo));
+                    sello.color = new(1, 1, 1, 1);
+                }
+            }
+            else sello.color = new(1,1,1,0);
         }
         private void ActualizarBotones()
         {
@@ -158,6 +190,19 @@ namespace Hexstar.CSE.Informes
             boton_pagPistaAnt.onClick.AddListener(PistaPaginaAnterior);
 
             seleccionCarpeta.onClick.AddListener(SacarDeCajon);
+
+            sello_win =  Resources.Load<Sprite>("Sprites/CarpetaCasos/Aproved_Seal");
+            sello_lose = Resources.Load<Sprite>("Sprites/CarpetaCasos/Upsie_Seal");
+        }
+
+        private int MiniHash(int x,int min,int max)
+        {
+            x = ((x >> 16) ^ x) * 0x45d9f3b;
+            x = ((x >> 16) ^ x) * 0x45d9f3b;
+            x = (x >> 16) ^ x;
+            x %= (max - min);
+            x += min;
+            return x;
         }
     }
 

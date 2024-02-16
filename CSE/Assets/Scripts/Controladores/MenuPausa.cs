@@ -5,6 +5,7 @@ using UnityEngine.Events;
 public class MenuPausa : MonoBehaviour
 {
 	public GameObject menu;
+	public GameObject progressLossWarning;
 	public static bool Paused { get; private set; } = false;
 
 	/// <summary>
@@ -29,12 +30,25 @@ public class MenuPausa : MonoBehaviour
 
 	public void IrAMenuPrincipal()
 	{
-		Paused = false;
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        {
+            //Asumir caso actual como "caso rendido"
+            OperacionesGameplay.SilentSurrender();
+        }
+
+        Paused = false;
 		OperacionesGameplay.Snapshot();
 		MenuPartidaController.GuardarPartidaEnCurso_S();
         XAPI_Builder.CreateStatement_GameSession(false); // finishing session
         XAPI_Builder.SendAllStatements();
         onExitLevel?.Invoke(); //Reiniciar Singletons del gameplay
         GameManager.CargarEscena(GameManager.GameScene.MENU_PARTIDA);
+	}
+
+	public void CheckProgressLoss()
+	{
+		bool enMedioDeUnCaso = GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso;
+		progressLossWarning.SetActive(enMedioDeUnCaso);
+		if (!enMedioDeUnCaso) IrAMenuPrincipal();
 	}
 }

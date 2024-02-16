@@ -29,16 +29,20 @@ public class ExternalCallHooker : MonoBehaviour
         }
     }
 
-    private void HasSkippedTutorial()
+    /*private void HasSkippedTutorial()
     {
         if(ControladorDialogos.GetDialogueEventValue("tuto_skip").Equals("true"))
         {
             XAPI_Builder.CreateStatement_TutorialSkip();
         }
+    }*/
+
+
+    private void CheckCalls(string value) 
+    {
+        if (calls.TryGetValue(value, out var result)) result();
+        else Debug.LogError("EXTERNAL CALL \""+value+"\""+" NOT FOUND");
     }
-
-
-    private void CheckCalls(string value) { if(calls.TryGetValue(value, out var result)) result(); }
 
     private void Awake()
     {
@@ -46,7 +50,7 @@ public class ExternalCallHooker : MonoBehaviour
         {
             { "check_query_mode", CheckManualQueryMode },
             { "change_query_mode", ChangeQueryMode },
-            { "check_tutorial_skip", HasSkippedTutorial },
+            //{ "check_tutorial_skip", HasSkippedTutorial },
         };
     }
     private void OnEnable()

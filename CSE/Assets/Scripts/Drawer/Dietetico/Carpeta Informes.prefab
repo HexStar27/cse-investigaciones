@@ -71,6 +71,7 @@ MonoBehaviour:
   listaRecompensas: {fileID: 5712892031758660337}
   pistasCaso: {fileID: 4265697226166718623}
   contadorPagPistas: {fileID: 8072214046350972281}
+  sello: {fileID: 7325994122265636261}
   boton_pagSig: {fileID: 8120728758126208896}
   boton_pagAnt: {fileID: 7591972446329178659}
   boton_pagPistaSig: {fileID: 4800712943874881531}
@@ -193,11 +194,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3280020108666670264, guid: d756df81282039c4182e2646aeebc40e,
-        type: 3}
-      propertyPath: m_CastShadows
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7288334378539879971, guid: d756df81282039c4182e2646aeebc40e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -222,21 +218,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7980173876998346497, guid: d756df81282039c4182e2646aeebc40e,
-        type: 3}
-      propertyPath: m_CastShadows
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9149342571672518567, guid: d756df81282039c4182e2646aeebc40e,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9149342571672518567, guid: d756df81282039c4182e2646aeebc40e,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -180
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d756df81282039c4182e2646aeebc40e, type: 3}
@@ -328,6 +309,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7325994122265636261 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1563059704322916310, guid: d756df81282039c4182e2646aeebc40e,
+    type: 3}
+  m_PrefabInstance: {fileID: 8077824217512071795}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7591972446329178659 stripped

@@ -10,18 +10,15 @@ public class PuntoGuardado
 
 	public int dificultadActual;
 	public int dia;
-	public int casoEnCurso;			//Indice del caso en curso del array de casos cargados
 	public int[] casosCargados;
 	public string[] tableCodes;
 
 	public int[] casosCompletados;
-	public int ultimoCasoPrincipalEmpezado;
 	public int[] casosCompletados_listaDeEstados;
 	public Hexstar.CSE.Informes.Informe[] informes;
 
 	public string dialogueEventList;
 	public int[] eventosEjecutados;
-	public bool hasCompletedTutorial;
 
 	public PuntoGuardado()
 	{
@@ -32,12 +29,9 @@ public class PuntoGuardado
 		dificultadActual = 1;
 		dia = 0;
 		casosCargados = new int[0];
-		casoEnCurso = -1;
-		ultimoCasoPrincipalEmpezado = -1;
 		casosCompletados_listaDeEstados = new int[0];
         eventosEjecutados = new int[0];
 		tableCodes = new string[0];
-		hasCompletedTutorial = false;
 		dialogueEventList = "";
 		informes = new Hexstar.CSE.Informes.Informe[0];
     }
@@ -61,8 +55,6 @@ public class PuntoGuardado
         }
 		casosCargados = idCasos.ToArray();
 		
-		casoEnCurso = PuzzleManager.CasoActivoIndice;
-		ultimoCasoPrincipalEmpezado = ResourceManager.UltimoCasoPrincipalEmpezado;
 		casosCompletados_listaDeEstados = ResourceManager.CasosCompletados_ListaDeEstados.ToArray();
 
 		eventosEjecutados = ResourceManager.EventosEjecutados.ToArray();
@@ -91,7 +83,6 @@ public class PuntoGuardado
         ee.AddRange(eventosEjecutados);
         ResourceManager.EventosEjecutados = ee;
 
-        ResourceManager.UltimoCasoPrincipalEmpezado = ultimoCasoPrincipalEmpezado;
 		ResourceManager.DificultadActual = dificultadActual;
 		ResourceManager.Dia = dia;
 

@@ -29,13 +29,9 @@ public static class GameManager
         {
             isLoading = true;
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(escenaId);
-
-            // Wait until the asynchronous scene fully loads
-            while (!asyncLoad.isDone)
-            {
-                //Poner aquí todo lo que controla la pantalla de carga
-                yield return null;
-            }
+            yield return new WaitUntil(() => asyncLoad.isDone);
+            
+            //TODO: Poner aquí todo lo que controla la pantalla de carga
 
             isLoading = false;
         }

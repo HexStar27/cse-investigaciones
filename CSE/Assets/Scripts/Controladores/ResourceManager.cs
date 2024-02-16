@@ -36,6 +36,7 @@ public static class ResourceManager
         get => consultasDisponibles; set
         {
             consultasDisponibles = value;
+            if (consultasDisponibles > consultasMaximas) consultasDisponibles = consultasMaximas;
             if (consultasDisponibles <= 0)
             {
                 consultasDisponibles = 0;
@@ -48,7 +49,7 @@ public static class ResourceManager
         get => consultasMaximas; set
         {
             consultasMaximas = value;
-            if (consultasMaximas < 0) consultasMaximas = 0;
+            if (consultasMaximas < 1) consultasMaximas = 1;
         }
     }
 
@@ -91,12 +92,6 @@ public static class ResourceManager
     /// Lista de códigos que desbloquean tablas de la base de datos al jugador.
     /// </summary>
     public static List<string> TableCodes { get; set; } = new();
-
-    /// <summary>
-    /// Atajo a la ID del último caso principal 
-    /// (para moverse por el grafo de casos principales y saber cuál es el siguiente)
-    /// </summary>
-    public static int UltimoCasoPrincipalEmpezado { get; set; }
 
     /// <summary>
     /// Un caso es completado cuando se ha comprado y posteriormente se ha terminado,

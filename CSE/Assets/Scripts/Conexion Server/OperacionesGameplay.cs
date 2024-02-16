@@ -15,6 +15,7 @@ public class OperacionesGameplay : MonoBehaviour
 
     [SerializeField] private GameObject dangerController;
     private static GameObject s_dangerController;
+    private static AudioClip s_clip_caseBridge;
     
     public static int s_lastScore = 0;
 
@@ -29,6 +30,7 @@ public class OperacionesGameplay : MonoBehaviour
     private void Awake()
     {
         if (dangerController != null) s_dangerController = dangerController;
+        s_clip_caseBridge = Resources.Load<AudioClip>("Audio/Music/MT_CaseBridge");
     }
 
     public void RealizarConsultaD()
@@ -99,7 +101,6 @@ public class OperacionesGameplay : MonoBehaviour
             form.AddField("authorization", SesionHandler.sessionKEY);
             form.AddField("caseid", caso.id);
             form.AddField("caso", LectorConsulta.GetQuery());
-            //TempMessageController.Instancia.GenerarMensaje("Enviando solución...");
             await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
             if (!CheckInternetConection()) return;
             string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
@@ -114,10 +115,10 @@ public class OperacionesGameplay : MonoBehaviour
             //Informar del resultado al jugador
             if (completado)
             {
-                ResourceManager.CasosCompletados.Add(caso.id);
-                ResourceManager.CasosCompletados_ListaDeEstados.Add(1); // 1 == Ganado
-
                 float t = PuzzleManager.GetSetTiempoEmpleado();
+                
+                MeterCasoEnCompletadosYCargarSiguiente(1); // 1 = Ganado
+                GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
 
                 await CalcularYGuardarPuntuacion();
                 if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.WIN);
@@ -130,6 +131,7 @@ public class OperacionesGameplay : MonoBehaviour
             else
             {
                 TempMessageController.Instancia.GenerarMensaje(msg_crimenNoResuelto);
+                _ = LED_Controller.Instance.TurnRed();
                 bool casoNoTerminadoPeroPerdido = ResourceManager.ConsultasDisponibles == 0;
                 CSE.XAPI_Builder.CreateStatement_TrySolveCase(casoNoTerminadoPeroPerdido, false, caso, .0f, 0, 0);
             }            
@@ -164,9 +166,8 @@ public class OperacionesGameplay : MonoBehaviour
         {
             if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.SURR);
             
-            int idCaso = PuzzleManager.GetIdCasoActivo();
-            ResourceManager.CasosCompletados.Add(idCaso);
-            ResourceManager.CasosCompletados_ListaDeEstados.Add(0); // 0 == Rendido
+            MeterCasoEnCompletadosYCargarSiguiente(0); // 0 = Rendido
+            GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
 
             TempMessageController.Instancia.GenerarMensaje(msg_eliminarCaso);
             TerminarFaseCaso();
@@ -178,25 +179,36 @@ public class OperacionesGameplay : MonoBehaviour
             TempMessageController.Instancia.GenerarMensaje(msg_noCasoActivo);
         }
     }
-
+    public static void SilentSurrender()
+    {
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        {
+            MeterCasoEnCompletadosYCargarSiguiente(0); // 0 = Rendido
+            TerminarFaseCaso();
+            CSE.XAPI_Builder.CreateStatement_Surrender();
+        }
+    }
     /// <summary>
     /// Se debe ejecutar cuando el jugador se queda sin consultas disponibles.
     /// </summary>
     public static void SinConsultas()
     {
-        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
+        if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso && !PuzzleManager.SolucionCorrecta)
         {
             if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.LOST);
-            
-            int idCaso = PuzzleManager.GetIdCasoActivo();
-            if(idCaso >= 0) //No es necesario pero bueno. Por si acaso.
-            {
-                ResourceManager.CasosCompletados.Add(idCaso);
-                ResourceManager.CasosCompletados_ListaDeEstados.Add(-1); // -1 == Perdido
-            }
 
+            MeterCasoEnCompletadosYCargarSiguiente(-1); // -1 = Perdido
+            GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
             TerminarFaseCaso();
         }
+    }
+
+    private static void MeterCasoEnCompletadosYCargarSiguiente(int estado)
+    {
+        int idCaso = PuzzleManager.GetIdCasoActivo();
+        if (idCaso < 0) return; //Por si acaso...
+        ResourceManager.CasosCompletados.Add(idCaso);
+        ResourceManager.CasosCompletados_ListaDeEstados.Add(estado);
     }
 
     public static async Task CalcularYGuardarPuntuacion()
@@ -238,6 +250,7 @@ public class OperacionesGameplay : MonoBehaviour
             if (json == "{}") Debug.LogError("Ha habido un error al intentar guardar la puntuación :(");
             else
             {
+                await LED_Controller.Instance.TurnGreen();
                 await PuntuacionController.PresentarPuntuaciones(puntuacion);
                 while (PuntuacionController.puntuacionEnPantalla) { await Task.Delay(200); }
             }

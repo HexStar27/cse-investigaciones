@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -7,7 +6,7 @@ using UnityEngine.UI;
 namespace Hexstar.Dialogue {
     public class ControladorDialogos : MonoBehaviour
     {
-        public DialogueDataBase ddb;
+        public static DialogueDataBase ddb;
         public ControladorCajaDialogos dialogueBox;
 
         public UnityEvent onDialogueFinish = new();
@@ -39,6 +38,10 @@ namespace Hexstar.Dialogue {
         private string grupoDialogoInicial = ""; //Grupo en el que se empezó el diálogo
         private int primerIndiceDelGrupo = 0; //Indice absoluto en la base de datos de la primera entrada del grupo actual
 
+        private void Awake()
+        {
+            if(ddb == null) ddb = ScriptableObject.CreateInstance<DialogueDataBase>();
+        }
         private void Start()
         {
             SetNickname();
@@ -222,7 +225,7 @@ namespace Hexstar.Dialogue {
                 case DialogueFX.Tipo.DarOpciones:
                     if(controladorOpciones != null)
                     {
-                        var ops = fx.value.Split(';');
+                        var ops = fx.value.Split('|');
                         List<string> contenido = new();
                         List<int> etiquetas = new();
                         for(int i = 0; i < ops.Length; i++)

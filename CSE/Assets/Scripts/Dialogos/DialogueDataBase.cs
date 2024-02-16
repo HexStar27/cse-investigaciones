@@ -9,7 +9,6 @@ namespace Hexstar.Dialogue
     {
         public TextAsset asset;
         public List<Entry> entries = new();
-        //private Dictionary<string, int> labelsLUT = new();
         [SerializeField] private List<string> labels = new();
         [SerializeField] private List<int> labelIndex = new();
 
@@ -26,19 +25,29 @@ namespace Hexstar.Dialogue
                 return -1;
         }
 
+        public void LoadFromString(string ddbContent)
+        {
+            LoadDDB(CSVReader.ReadString(ddbContent));
+        }
         public void LoadFromAsset()
         {
             if (asset == null) return;
-            List<Dictionary<string,object>> data = CSVReader.Read(asset);
+            LoadDDB(CSVReader.Read(asset));
+        }
+        private void LoadDDB(List<Dictionary<string, object>> data)
+        {
             int n = data.Count;
-            if (n <= 0) return;
+            if (n <= 0)
+            {
+                Debug.LogError("Data not found trying to load a dialogue database");
+                return;
+            }
 
             entries.Clear();
-            //labelsLUT.Clear();
             labels.Clear();
             labelIndex.Clear();
 
-            for (int i = 0; i < n; i++) 
+            for (int i = 0; i < n; i++)
             {
                 var row = data[i];
 
@@ -47,7 +56,6 @@ namespace Hexstar.Dialogue
 
                 if (!etiqueta.Equals(""))
                 {
-                    //labelsLUT.TryAdd(etiqueta, entries.Count);
                     labels.Add(etiqueta);
                     labelIndex.Add(entries.Count);
                 }

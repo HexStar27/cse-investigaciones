@@ -84,7 +84,6 @@
 		},
 		{
 			"instrucciones":[
-				"ExternalCall - check_tutorial_skip",
 				"SetDialogueEvent - tutorial = false",
 				"HoldPause - 0"
 			],

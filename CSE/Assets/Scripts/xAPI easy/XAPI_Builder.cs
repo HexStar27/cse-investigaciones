@@ -37,6 +37,7 @@ namespace CSE
             form.AddField("registros", json.ToString());
             await ConexionHandler.APost(ConexionHandler.baseUrl + "lrs", form);
             _ = ConexionHandler.ExtraerJson(ConexionHandler.download); //Para comprobar que se ha enviado bien.
+            //FIX: Sigue estando bugueada la llamada API ???
         }
 
         #region High Level Statements
@@ -284,7 +285,8 @@ namespace CSE
         #region Specific Statements
         // skipped - tutorial
         // switched - desktop zone
-        public static void CreateStatement_TutorialSkip()
+
+        public static void CreateStatement_TutorialSkip() //Unused right now
         {
             JSONNode statement = new JSONObject();
             statement.Add("actor", actor);

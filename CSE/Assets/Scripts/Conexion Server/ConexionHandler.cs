@@ -10,7 +10,7 @@ namespace Hexstar
     public static class ConexionHandler
     {
         public readonly static string baseUrl = "https://cse.uca.es/game/";
-        public static bool debugMode = true;
+        public static bool debugMode = false;
 
         public class DownloadEvent : UnityEvent<DownloadHandler> { }
         public static DownloadEvent onFinishRequest = new DownloadEvent();

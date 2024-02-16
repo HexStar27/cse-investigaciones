@@ -11,7 +11,7 @@ using CSE;
 using Hexstar.CSE;
 using Hexstar.Dialogue;
 using Hexstar.CSE.SistemaEventos;
-using CSE.Feedback;
+using System.Collections;
 
 [System.Serializable] public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
 public class GameplayCycle : MonoBehaviour, ISingleton
@@ -23,13 +23,14 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	[SerializeField] DayCounter _dayCounter;
 	[SerializeField] Transform gameOverMenu;
 	[SerializeField] AudioSource bgmSource;
-	[SerializeField] Hexstar.ControladorCinematica controladorCinematica;
+	AudioClip bgm_resolviendoCaso;
+	AudioClip bgm_oficineando;
 	[SerializeField] AwaiterUntilPressed popupFinDia;
 
 	static int estadoActual = 0;
 	static bool gameover = false;
 	static bool terminarBucleExtractor = false;
-	static bool recargarCasosDePartidaAnterior = false;
+	static bool recargarCasosDePartidaGuardada = false;
 
 	public static UnityEvent OnCycleTaskFinished { get; set; } = new();
 	private static Queue<int> pilaEstadosSiguientes = new Queue<int>();
@@ -70,31 +71,22 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         if (ResourceManager.Dia == 0) //Inicio del juego
 		{
 			ResourceManager.ConsultasMaximas = 4;
-
-			if (!TutorialIsEnabled())
-			{
-				SetTutorialEvent(true);
-				controladorCinematica.CargarJSON();
-                controladorCinematica.IniciarCinematica();
-			}
 			ResourceManager.AgentesDisponibles = ResourceManager.agentesInciales;
             DataUpdater.Instance.ResetSingleton();
         }
-		else //El resto de días
-		{
-			await AlmacenEventos.EncargarseDeEventosAptos();
 
-            if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent())
-			{
-				await GameOver();
-				return;
-			}
-		}
+        await AlmacenEventos.EncargarseDeEventosAptos();
+
+        if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent())
+        {
+            await GameOver();
+            return;
+        }
 
         // Carga los casos necesarios al iniciar el día
-        await PuzzleManager.PrepararCasosParaInicioDia(recargarCasosDePartidaAnterior);
+        await PuzzleManager.PrepararCasosParaInicioDia(recargarCasosDePartidaGuardada);
 
-        if (recargarCasosDePartidaAnterior) recargarCasosDePartidaAnterior = false;
+        if (recargarCasosDePartidaGuardada) recargarCasosDePartidaGuardada = false;
 		else
 		{
 			ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
@@ -107,9 +99,9 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	private async Task InicioCaso()
 	{
 		startedCasesInDay++;
-        //TODO: Cambiar la música. Ahora mismo no tengo otra
+		PlayCaseTrack();
 
-		AlmacenDePalabras.CargarPistasDeCasoActivo();
+        AlmacenDePalabras.CargarPistasDeCasoActivo();
 		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
 
 		await Task.Yield();
@@ -124,6 +116,8 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 
 		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
 		await PuzzleManager.GetCasoActivo().ComprobarYAplicarBounties(ganado,nConsultas,tiempo);
+
+		//StartCoroutine(PrepareEndOfCaseTrack()); //TODO: Descomentar cuando haga creado este soundtrack
 
 		await AlmacenEventos.EncargarseDeEventosAptos();
 
@@ -179,6 +173,29 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	}
 
 	public AudioSource Get_BGM_Source() { return bgmSource; }
+	public void PlayInstead(AudioClip audio, bool oneshot = false)
+	{
+		bgmSource.Stop();
+		if (oneshot) bgmSource.PlayOneShot(audio);
+		else
+		{
+			bgmSource.clip = audio;
+			bgmSource.Play();
+		}
+    }
+	private IEnumerator PrepareEndOfCaseTrack()
+    {
+		WaitWhile mientrasSuene = new(() => { return bgmSource.isPlaying; });
+		yield return mientrasSuene;
+		bgmSource.clip = bgm_oficineando;
+		bgmSource.Play();
+	}
+	private void PlayCaseTrack()
+	{
+		bgmSource.Stop();
+		bgmSource.clip = bgm_resolviendoCaso;
+        bgmSource.Play();
+    }
 
 	public async Task GameOver()
 	{
@@ -210,29 +227,21 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		GameManager.CargarEscena(GameManager.GameScene.MENU_PARTIDA); 
 	}
 
-	private void SetTutorialEvent(bool enabled)
-	{
-		ControladorDialogos.SetDialogueEvent("tutorial", enabled ? "true" : "false");
-	}
-    private bool TutorialIsEnabled()
-    {
-        string v = ControladorDialogos.GetDialogueEventValue("tutorial");
-        return v.Equals("true");
-    }
-
     private void Awake()
 	{
 		if(Instance == null) Instance = this;
 		EstadosPosibles = 4;
 
 		BucleExtractor();
+
+		bgm_resolviendoCaso = Resources.Load<AudioClip>("Audio/Music/WF_5.-_Hunch");
+		//bgm_oficineando = Resources.Load<AudioClip>("Audio/Music/???");
 	}
 
-	private void Start()
+	private async void Start()
 	{
-		TryLoadGame();
-		if (ResourceManager.checkpoint.casoEnCurso < 0) EnqueueState(EstadosDelGameplay.InicioDia);
-		else EnqueueState(EstadosDelGameplay.InicioCaso);
+		await TryLoadGame();
+		EnqueueState(EstadosDelGameplay.InicioDia);
 	}
 
     public void ResetSingleton()
@@ -245,7 +254,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
     }
     private void OnEnable()
 	{
-		//PauseGameplayCycle(false, "self");
 		ResourceManager.OnOutOfQueries.AddListener(OperacionesGameplay.SinConsultas);
 		MenuPausa.onExitLevel.AddListener(ResetSingleton);
 	}
@@ -253,7 +261,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	{
         MenuPausa.onExitLevel.RemoveListener(ResetSingleton);
         ResourceManager.OnOutOfQueries.RemoveListener(OperacionesGameplay.SinConsultas);
-		//PauseGameplayCycle(true, "self");
 		terminarBucleExtractor = true;
 
     }
@@ -298,12 +305,12 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	}
 
 
-	private void TryLoadGame()
+    private async Task TryLoadGame()
     {
 		AlmacenDePalabras.CargarPalabras();
-		recargarCasosDePartidaAnterior = ResourceManager.checkpoint.casosCargados.Length > 0;
-		PuzzleManager.CasoActivoIndice = ResourceManager.checkpoint.casoEnCurso;
-		Task.Run(() => AlmacenEventos.DescargarEventosServidor());
+		recargarCasosDePartidaGuardada = ResourceManager.checkpoint.casosCargados.Length > 0;
+		await AlmacenEventos.DescargarEventosServidor(); //Lo descarga en el main thread, será un problema?
+		//A lo mejor hace falta meter una barra de carga...
 	}
 
     [ContextMenu("Loggear Estado de Pausas")]
