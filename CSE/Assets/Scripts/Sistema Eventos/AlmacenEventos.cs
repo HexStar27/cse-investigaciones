@@ -1,3 +1,4 @@
+using CSE.Local;
 using Hexstar.Dialogue;
 using SimpleJSON;
 using System;
@@ -151,14 +152,18 @@ namespace Hexstar.CSE.SistemaEventos
                 if (dialogueDataBaseFile.Length <= 0)
                     Debug.LogWarning("Se está inicializando una cinemática sin una DialogueDataBase... ¿Estás seguro de que esa era la intención?");
                 else ControladorDialogos.ddb.LoadFromString(dialogueDataBaseFile);
-                ControladorCinematica.Instance.InterpretarCadenaComoJSON(cinematicFile);
+                ControladorCinematica.Instance.InicializarCinematicaConJSON(cinematicFile);
                 
-                ControladorCinematica.Instance.alTerminarCinematica.AddListener(FinishedCinematic);
-                AlmacenEventos.EventoOcupado = true;
-                ControladorCinematica.Instance.IniciarCinematica();
+                if(!ControladorCinematica.Instance.independiente)
+                {
+                    ControladorCinematica.Instance.alTerminarCinematica.AddListener(FinishedCinematic);
+                    AlmacenEventos.EventoOcupado = true;
+                    ControladorCinematica.Instance.IniciarCinematica();
 
-                while (AlmacenEventos.EventoOcupado) await Task.Delay(100);
-                ControladorCinematica.Instance.alTerminarCinematica.RemoveListener(FinishedCinematic);
+                    while (AlmacenEventos.EventoOcupado) await Task.Delay(100);
+                    ControladorCinematica.Instance.alTerminarCinematica.RemoveListener(FinishedCinematic);
+                }
+                else ControladorCinematica.Instance.IniciarCinematica();
             }
             if (modVarGameplay.Length > 0)
             {
@@ -169,7 +174,7 @@ namespace Hexstar.CSE.SistemaEventos
                 string[] tc = tableCodesNuevos.Split(separadores, StringSplitOptions.RemoveEmptyEntries);
                 ResourceManager.TableCodes.AddRange(tc);
 
-                TempMessageController.Instancia.GenerarMensaje("NUEVAS TABLAS DISPONIBLES EN LA BASE DE DATOS");
+                TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".nuevas_tablas"));
             }
 
             ResourceManager.EventosEjecutados.Add(id);

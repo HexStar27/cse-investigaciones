@@ -39,6 +39,10 @@
         "es":"No se ha podido conectar al servidor, comprueba la conexión e inténtalo de nuevo",
         "en":"Couldn't connect to the server, please check your internet connection and try again"
     },
+    ".no_internet_msg_2":{
+        "es":"Error de conexión, comprueba que tenga acceso a internet y vuelve a cargar el juego :(",
+        "en":"Connection error, check your internet access and reload your game again :("
+    },
     ".menu.iniciar_sesion":{
         "es":"Iniciar Sesión",
         "en":"Log in"
@@ -107,9 +111,21 @@
         "es":"Sí :(",
         "en":"Yes :("
     },
+    ".si_4":{
+        "es":"Sí, soy cobarde",
+        "en":"Yes, i'm a coward"
+    },
+    ".no_4":{
+        "es":"No, perdón no sabía",
+        "en":"No, sorry I didn't know"
+    },
     ".menu.msg.controles":{
         "es":"<b>Controles:</b>\n<b>Abrir/Cerrar Opciones: </b>\n    Escape\n\n<b>Seleccionar: </b>\n    Click Izq\n\n<b>Desplazamiento por el escritorio: </b>\n    W / S / Rueda Ratón",
         "en":"<b>Controls:</b>\n<b>Open/Close Options: </b>\n    Escape\n\n<b>Select: </b>\n    Left Click\n\n<b>Movement through the desktop: </b>\n    W / S / Scroll Wheel"
+    },
+    ".menu.msg.aviso_perdida":{
+        "es":"AVISO, se ha detectado un caso en curso, si terminas la partida se perderá el caso automáticamente\n(<size=60%>contará como rendirse<size=100%>)\n¿De verdad quieres salir?",
+        "en":"WARNING, a case in progress has been detected, the case will be lost automatically if you exit\n(<size=60%>it will count as surrender<size=100%>)\nAre you sure you want to exit?"
     },
     ".menu.opciones.audio":{
         "es":"AUDIO",
@@ -154,5 +170,149 @@
     ".menu.opciones.mqm":{
         "es":"Usar Modo Consulta Manual",
         "en":"Use Manual Query Mode"
+    },
+    ".msg.temp.mas_dificultad":{
+        "es":"LA DIFICULTAD HA SIDO AUMENTADA",
+        "en":"DIFFICULTY HAS BEEN INCREASED"
+    },
+    ".msg.temp.consulta_vacia":{
+        "es":"NO SE ENVÍAN CONSULTAS VACIAS",
+        "en":"CANNOT SEND EMPTY QUERIES"
+    },
+    ".msg.temp.caso_no_resuelto":{
+        "es":"CASO NO RESUELTO",
+        "en":"CASE NOT SOLVED"
+    },
+    ".msg.temp.no_caso_activo":{
+        "es":"NO HAY CASO ACTIVO",
+        "en":"THERE'S NO ACTIVE CASE"
+    },
+    ".msg.temp.eliminar_caso":{
+        "es":"ELIMINANDO CASO...",
+        "en":"DELETING CASE..."
+    },
+    ".msg.temp.no_internet":{
+        "es":"NO HAY ACCESO A INTERNET",
+        "en":"THERE'S NO INTERNET ACCESS"
+    },
+    ".escritorio.recompensas":{
+        "es":"RECOMPENSAS",
+        "en":"BOUNTIES"
+    },
+    ".escritorio.rumores":{
+        "es":"RUMORES",
+        "en":"RUMORS"
+    },
+    ".escritorio.solicitar_informe":{
+        "es":"SOLICITAR INFORME",
+        "en":"REQUEST REPORT"
+    },
+    ".escritorio.zona_consulta":{
+        "es":"Escribe la consulta aquí...",
+        "en":"Write the query here..."
+    },
+    ".escritorio.datos_obtenidos":{
+        "es":"DATOS OBTENIDOS:",
+        "en":"OBTAINED DATA:"
+    },
+    ".condicion.siempre":{
+        "es":"Garantizado    ",
+        "en":"Guaranteed     "
+    },
+    ".condicion.ganar":{
+        "es":"Gana el caso   ",
+        "en":"Win the case   "
+    },
+    ".condicion.perder":{
+        "es":"PIERDE A POSTA ",
+        "en":"JUST <b>LOSE</b>      "
+    },
+    ".nuevas_tablas":{
+        "es":"NUEVAS TABLAS DISPONIBLES EN LA BASE DE DATOS",
+        "en":"NEW TABLES AVAILABLE IN THE DATA BASE"
+    },
+    ".caso.necesitas_agentes":{
+        "es":"NECESITAS MÁS AGENTES",
+        "en":"YOU NEED MORE AGENTS"
+    },
+    ".caso.no_consultas":{
+        "es":"NO TE QUEDAN CONSULTAS",
+        "en":"NO QUERIES LEFT"
+    },
+    ".caso.ya_hay_caso_activo":{
+        "es":"SÓLO UN CASO A LA VEZ",
+        "en":"ONLY ONE CASE AT A TIME"
+    },
+    ".popup.fin_dia":{
+        "es":"Ya no te quedan consultas disponibles",
+        "en":"ONLY ONE CASE AT A TIME"
+    },
+    ".popup.terminar_dia":{
+        "es":"Terminar día",
+        "en":"Finish day"
+    },
+    ".tooltip.enviar_solucion":{
+        "es":"Enviar Solución (doble click)",
+        "en":"Send Solution (double click)"
+    },
+    ".tooltip.consultar":{
+        "es":"Realizar Consulta",
+        "en":"Send Query"
+    },
+    ".tooltip.rendirse":{
+        "es":"Rendirse",
+        "en":"Surrender"
+    },
+    ".tooltip.n_consultas":{
+        "es":"Consultas Disponibles (<sprite name=\"icono_consultas\">)",
+        "en":"Available Queries (<sprite name=\"icono_consultas\">)"
+    },
+    ".tooltip.crono":{
+        "es":"Cronómetro",
+        "en":"Stopwatch"
+    },
+    ".tooltip.n_agentes":{
+        "es":"Agentes Voluntarios Disponibles (<sprite name=\"icono_agentes\">)",
+        "en":"Available Voluntary Agents (<sprite name=\"icono_agentes\">)"
+    },
+    ".tooltip.input_consulta":{
+        "es":"Base de Consulta (suelta aquí el bloque agrupado)",
+        "en":"Query Slot (connect your grouped block here)"
+    },
+    ".tooltip.agrupador":{
+        "es":"Agrupador de Bloques",
+        "en":"Block Grouper"
+    },
+    ".tooltip.boton_agrupar":{
+        "es":"Agrupar",
+        "en":"Make Group"
+    },
+    ".tooltip.base_escritorio":{
+        "es":"Cambiar Base del Escritorio",
+        "en":"Change Desktop Base"
+    },
+    ".tooltip.carpeta_informes":{
+        "es":"Abrir Carpeta de Informes",
+        "en":"Open Report's Binder"
+    },
+    ".bloques.titulo.columnas_renombradas":{
+        "es":"Columnas Renombradas:",
+        "en":"Renamed Columns:"
+    },
+    ".bloques.titulo.columnas_disponibles":{
+        "es":"Columnas disponibles:",
+        "en":"Available columns:"
+    },
+    ".bloques.titulo.tablas_disponibles":{
+        "es":"Tablas disponibles:",
+        "en":"Available tables:"
+    },
+    ".menu.gameover.ir_a_menu_principal":{
+        "es":"Ir al menú principal",
+        "en":"Go to Main Menu"
+    },
+    ".menu.gameover.reintentar":{
+        "es":"Cargar último punto de guardado",
+        "en":"Load last checkpoint"
     }
 }

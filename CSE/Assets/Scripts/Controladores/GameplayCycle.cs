@@ -12,6 +12,7 @@ using Hexstar.CSE;
 using Hexstar.Dialogue;
 using Hexstar.CSE.SistemaEventos;
 using System.Collections;
+using CSE.Local;
 
 [System.Serializable] public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
 public class GameplayCycle : MonoBehaviour, ISingleton
@@ -25,6 +26,8 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	[SerializeField] AudioSource bgmSource;
 	AudioClip bgm_resolviendoCaso;
 	AudioClip bgm_oficineando;
+	AudioClip bgm_gameOver;
+	AudioClip bgm_intro_gameOver;
 	[SerializeField] AwaiterUntilPressed popupFinDia;
 
 	static int estadoActual = 0;
@@ -67,20 +70,13 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         startedCasesInDay = 0;
         completedCasesInDay = 0;
         PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
+        StartCoroutine(PrepareOutOfCaseTrack());
 
         if (ResourceManager.Dia == 0) //Inicio del juego
 		{
 			ResourceManager.ConsultasMaximas = 4;
 			ResourceManager.AgentesDisponibles = ResourceManager.agentesInciales;
             DataUpdater.Instance.ResetSingleton();
-        }
-
-        await AlmacenEventos.EncargarseDeEventosAptos();
-
-        if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent())
-        {
-            await GameOver();
-            return;
         }
 
         // Carga los casos necesarios al iniciar el día
@@ -93,8 +89,16 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 			if (ResourceManager.Dia > 0) await DataUpdater.Instance.ShowAgentesDisponibles();
         }
 
-        OperacionesGameplay.ActualizarDangerController();
-	}
+        await AlmacenEventos.EncargarseDeEventosAptos();
+
+        if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent())
+        {
+            await GameOver();
+            return;
+        }
+
+        //OperacionesGameplay.ActualizarDangerController();
+    }
 
 	private async Task InicioCaso()
 	{
@@ -117,7 +121,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
 		await PuzzleManager.GetCasoActivo().ComprobarYAplicarBounties(ganado,nConsultas,tiempo);
 
-		//StartCoroutine(PrepareEndOfCaseTrack()); //TODO: Descomentar cuando haga creado este soundtrack
+		StartCoroutine(PrepareOutOfCaseTrack());
 
 		await AlmacenEventos.EncargarseDeEventosAptos();
 
@@ -137,7 +141,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 			if (ganado && PuzzleManager.CasoActivoEsExamen())
 			{
 				ResourceManager.DificultadActual++;
-				TempMessageController.Instancia.GenerarMensaje("LA DIFICULTAD HA SIDO AUMENTADA");
+				TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.mas_dificultad"));
 				XAPI_Builder.CreateStatement_DifficultyIncrease(ResourceManager.DificultadActual);
 			}
 		}
@@ -183,8 +187,9 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 			bgmSource.Play();
 		}
     }
-	private IEnumerator PrepareEndOfCaseTrack()
+	private IEnumerator PrepareOutOfCaseTrack()
     {
+		if (bgmSource.clip == bgm_oficineando) yield break;
 		WaitWhile mientrasSuene = new(() => { return bgmSource.isPlaying; });
 		yield return mientrasSuene;
 		bgmSource.clip = bgm_oficineando;
@@ -197,14 +202,21 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         bgmSource.Play();
     }
 
+	[ContextMenu("Forzar GameOver")]
 	public async Task GameOver()
 	{
 		//Debería ser el fin del juego cuando 
 		gameover = true;
         InscryptionLikeCameraState.SetBypass(true);
-        if (bgmSource != null) bgmSource.Stop(); //Cambiar por música de gameover
-		if (gameOverMenu != null) gameOverMenu.gameObject.SetActive(true);
-		await Task.Yield();
+        if (gameOverMenu != null) gameOverMenu.gameObject.SetActive(true);
+        if (bgmSource != null)
+		{
+			bgmSource.Stop(); //Cambiar por música de gameover
+			bgmSource.PlayOneShot(bgm_intro_gameOver);
+			await Task.Delay(5100);
+			bgmSource.clip = bgm_gameOver;
+			bgmSource.Play();
+		}
 	}
 
 	private static bool CheckGameOverEvent()
@@ -235,8 +247,10 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		BucleExtractor();
 
 		bgm_resolviendoCaso = Resources.Load<AudioClip>("Audio/Music/WF_5.-_Hunch");
-		//bgm_oficineando = Resources.Load<AudioClip>("Audio/Music/???");
-	}
+		bgm_oficineando = Resources.Load<AudioClip>("Audio/Music/WF_12.-_Bossa_Relajossa");
+		bgm_gameOver = Resources.Load<AudioClip>("Audio/Music/MT_Estas_Fuegado");
+		bgm_intro_gameOver = Resources.Load<AudioClip>("Audio/Music/MT_Ups");
+    }
 
 	private async void Start()
 	{

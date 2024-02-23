@@ -1,4 +1,4 @@
-{ 
+{
 	"cinematica": [
 		{
 			"instrucciones": [
@@ -90,5 +90,8 @@
 			"separador":"",
 			"indices":[]
 		}
-	]
+	],
+	"meta":{
+		"independiente":true
+	}
 }

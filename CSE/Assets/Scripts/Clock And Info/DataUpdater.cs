@@ -46,12 +46,12 @@ public class DataUpdater : MonoBehaviour, ISingleton
         if (force)
         {
             QCV_Button.SetAnimationBlock(true);
-            QCV_Button.animator.Play(QCV_Button.enterAnim);
+            QCV_Button.ForceAnimation(QCV_Button.enterAnim);
         }
         else
         {
             QCV_Button.SetAnimationBlock(false);
-            QCV_Button.animator.Play(QCV_Button.exitAnim);
+            QCV_Button.ForceAnimation(QCV_Button.exitAnim);
         }
     }
 

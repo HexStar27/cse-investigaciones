@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using CSE.Local;
+using TMPro;
 using UnityEngine;
 
 public class TooltipManager : MonoBehaviour
@@ -18,6 +19,12 @@ public class TooltipManager : MonoBehaviour
     {
         _panel.SetActive(true);
         _texto.SetText(text);
+    }
+
+    public void SetLocalizedString(string key)
+    {
+        _panel.SetActive(true);
+        _texto.SetText(Localizator.GetString(key));
     }
 
     public void Abrir(bool value)

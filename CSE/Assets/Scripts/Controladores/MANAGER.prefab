@@ -43,8 +43,8 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 8841602893069008394, guid: 051b6a24d0b1ab342ac2ca2601c5a439,
     type: 2}
-  m_audioClip: {fileID: 8300000, guid: bfae0f2c220424e40be18f812b6795a6, type: 3}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -180,7 +180,6 @@ MonoBehaviour:
   _dayCounter: {fileID: 0}
   gameOverMenu: {fileID: 0}
   bgmSource: {fileID: 140237513}
-  controladorCinematica: {fileID: 0}
   popupFinDia: {fileID: 0}
 --- !u!114 &1566547577
 MonoBehaviour:
@@ -231,3 +230,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menu: {fileID: 0}
+  progressLossWarning: {fileID: 0}

@@ -6,6 +6,7 @@ using Hexstar;
 using Hexstar.CSE;
 using SimpleJSON;
 using System.Threading.Tasks;
+using CSE.Local;
 
 /// <summary>
 /// singleton
@@ -157,7 +158,7 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 		if (json == "{}")
 		{
 			Debug.LogError("Ha habido un error en el servidor al pedir los casos :(");
-			TempMessageController.Instancia.GenerarMensaje("Error de conexión, comprueba que tenga acceso a internet y vuelve a cargar el juego :(");
+			TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".no_internet_msg_2"));
 			return;
 		}
 
@@ -235,7 +236,7 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 
             if (AlreadyACaseThere(mPos,i)) //Evitar superposición
             {
-				Debug.Log("Evitando superposición");
+				if (showMapGrid) Debug.Log("Evitando superposición");
 				Vector2 newPos = FindFreeCell(gridSize, gPos, offset, i);
 				if(newPos != -Vector2.one) mPos = newPos;
             }

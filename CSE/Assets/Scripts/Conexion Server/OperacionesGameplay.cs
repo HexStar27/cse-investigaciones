@@ -8,6 +8,7 @@ using Hexstar.CSE;
 using SimpleJSON;
 
 using ResultType = UnityEngine.Networking.UnityWebRequest.Result;
+using CSE.Local;
 
 public class OperacionesGameplay : MonoBehaviour
 {
@@ -20,12 +21,6 @@ public class OperacionesGameplay : MonoBehaviour
     public static int s_lastScore = 0;
 
     public static int EventoId { get => eventoId; set => eventoId = value; }
-
-    private static readonly string msg_consultaVacia = "NO SE ENVÍAN CONSULTAS VACIAS";
-    private static readonly string msg_crimenNoResuelto = "CRIMEN NO RESUELTO";
-    private static readonly string msg_noCasoActivo = "NO HAY CASO ACTIVO";
-    private static readonly string msg_eliminarCaso = "ELIMINANDO CASO...";
-
 
     private void Awake()
     {
@@ -42,7 +37,7 @@ public class OperacionesGameplay : MonoBehaviour
         string consulta = LectorConsulta.GetQuery();
         if (consulta.Length <= 0)
         {
-            TempMessageController.Instancia.GenerarMensaje(msg_consultaVacia);
+            TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.consulta_vacia"));
             CSE.XAPI_Builder.CreateStatement_TrySendQuery(true,false,false);
             return;
         }
@@ -56,8 +51,6 @@ public class OperacionesGameplay : MonoBehaviour
         string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
         resultado = resultado[1..^1];
         ImpresorResultado.Instancia.IntroducirResultado(resultado);
-        
-        //TempMessageController.Instancia.GenerarMensaje("Consulta realizada!");
 
         if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
@@ -87,7 +80,7 @@ public class OperacionesGameplay : MonoBehaviour
         string consulta = LectorConsulta.GetQuery();
         if (consulta.Length <= 0)
         {
-            TempMessageController.Instancia.GenerarMensaje(msg_consultaVacia);
+            TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.consulta_vacia"));
             CSE.XAPI_Builder.CreateStatement_TrySolveCase(false, false, null, .0f, 0, 0);
             return;
         }
@@ -130,14 +123,14 @@ public class OperacionesGameplay : MonoBehaviour
             }
             else
             {
-                TempMessageController.Instancia.GenerarMensaje(msg_crimenNoResuelto);
+                TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.caso_no_resuelto"));
                 _ = LED_Controller.Instance.TurnRed();
                 bool casoNoTerminadoPeroPerdido = ResourceManager.ConsultasDisponibles == 0;
                 CSE.XAPI_Builder.CreateStatement_TrySolveCase(casoNoTerminadoPeroPerdido, false, caso, .0f, 0, 0);
             }            
             ActualizarDangerController();
         }
-        else TempMessageController.Instancia.GenerarMensaje(msg_noCasoActivo);
+        else TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.no_caso_activo"));
     }
     private static bool CheckTutorialPlaying()
     {
@@ -169,14 +162,14 @@ public class OperacionesGameplay : MonoBehaviour
             MeterCasoEnCompletadosYCargarSiguiente(0); // 0 = Rendido
             GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
 
-            TempMessageController.Instancia.GenerarMensaje(msg_eliminarCaso);
+            TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.eliminar_caso"));
             TerminarFaseCaso();
 
             CSE.XAPI_Builder.CreateStatement_Surrender();
         }
         else
         {
-            TempMessageController.Instancia.GenerarMensaje(msg_noCasoActivo);
+            TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.no_caso_activo"));
         }
     }
     public static void SilentSurrender()
@@ -264,7 +257,8 @@ public class OperacionesGameplay : MonoBehaviour
     {
         if(ConexionHandler.result == ResultType.ConnectionError)
         {
-            TempMessageController.Instancia.GenerarMensaje("# <color=\"red\">NO HAY ACCESO A INTERNET<color=\"white\"> #");
+            string msg = "# <color=\"red\">" + Localizator.GetString(".msg.temp.no_internet") + "<color=\"white\"> #";
+            TempMessageController.Instancia.GenerarMensaje(msg);
             return false;
         }
         return true;

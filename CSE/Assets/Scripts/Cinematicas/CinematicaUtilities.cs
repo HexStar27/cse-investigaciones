@@ -6,7 +6,7 @@ namespace Hexstar {
     public static class CinematicaUtilities
     {
         internal static InstruccionesReferenciaCinematicas instrucciones = null;
-        public static void InicializarCinematicaConJSON(ControladorCinematica controlador, string texto)
+        public static void InicializarCinematicaConJSON(this ControladorCinematica controlador, string texto)
         {
             var json = JSON.Parse(texto);
             var nodosJson = json["cinematica"];
@@ -21,6 +21,15 @@ namespace Hexstar {
                 ProcesarIndices(nodo["indices"], ref nodos[i]);
             }
             controlador.nodos = nodos;
+            
+            controlador.independiente = false;
+            if (json.HasKey("meta"))
+            {
+                if(json["meta"].HasKey("independiente"))
+                {
+                    controlador.independiente = json["meta"]["independiente"].AsBool;
+                }
+            }
         }
 
         private static void ProcesarInstrucciones(JSONNode instrLeidas, ref NodoCinematica nodo)

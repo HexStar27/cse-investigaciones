@@ -1,4 +1,3 @@
-using CSE;
 using Hexstar;
 using Hexstar.Dialogue;
 using System;
@@ -14,17 +13,18 @@ public class ExternalCallHooker : MonoBehaviour
     /// </summary>
     private void CheckManualQueryMode()
     {
+        //print("Query Mode: "+QueryModeController.IsQueryModeOnManual());
         if(QueryModeController.IsQueryModeOnManual())
             ControladorDialogos.SetDialogueEvent("modo_consulta","preguntar_modo");
         else
-            ControladorDialogos.SetDialogueEvent("modo_consulta", "BREAK");
+            ControladorDialogos.SetDialogueEvent("modo_consulta", "modo_bloque");
     }
 
     private void ChangeQueryMode()
     {
         if (ControladorDialogos.GetDialogueEventValue("modo_consulta").Equals("modo_bloque"))
         {
-            QueryModeController.ChangeQM(false);
+            QueryModeController.ChangeQM2Manual(false);
             QueryModeController.ForceSave();
         }
     }

@@ -46,7 +46,7 @@ namespace Hexstar.CSE
         public enum TipoEfecto
         {
             AGENTES_DISPONIBLES = 0, CONSULTAS_DISPONIBLES, CONSULTAS_MAXIMAS,
-            REPUTACION_PUEBLO, RESPUTACION_EMPRESA
+            REPUTACION_PUEBLO, REPUTACION_EMPRESA
         };
         public enum Condicion
         {
@@ -101,7 +101,7 @@ namespace Hexstar.CSE
                     case TipoEfecto.REPUTACION_PUEBLO:
                         ResourceManager.ReputacionPueblo += cantidad;
                         break;
-                    case TipoEfecto.RESPUTACION_EMPRESA:
+                    case TipoEfecto.REPUTACION_EMPRESA:
                         ResourceManager.ReputacionEmpresas += cantidad;
                         break;
                 }
@@ -159,7 +159,7 @@ namespace Hexstar.CSE
                 TipoEfecto.CONSULTAS_DISPONIBLES => "<sprite name=\"icono_mas_consultas\">",
                 TipoEfecto.CONSULTAS_MAXIMAS => "<sprite name=\"icono_mas_max_consultas\">",
                 TipoEfecto.REPUTACION_PUEBLO => "<sprite name=\"icono_reputacion_pueblo\">",
-                TipoEfecto.RESPUTACION_EMPRESA => "<sprite name=\"icono_reputacion_empresa\">",
+                TipoEfecto.REPUTACION_EMPRESA => "<sprite name=\"icono_reputacion_empresa\">",
                 _ => "ERROR",
             };
         }

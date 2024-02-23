@@ -23,7 +23,7 @@ public class QueryModeController : OptionMB
         PlayerPrefs.SetInt("OPTIONS/Query_Mode", manualQueryMode);
     }
 
-    public static void ChangeQM(bool v) {
+    public static void ChangeQM2Manual(bool v) {
         manualQueryMode = v ? 1 : 0;
         onModeChanged?.Invoke();
     }
@@ -38,11 +38,11 @@ public class QueryModeController : OptionMB
 
     private void OnEnable()
     {
-        m_Toggle.onValueChanged.AddListener(ChangeQM);
+        m_Toggle.onValueChanged.AddListener(ChangeQM2Manual);
     }
     private void OnDisable()
     {
-        m_Toggle.onValueChanged.RemoveListener(ChangeQM);
+        m_Toggle.onValueChanged.RemoveListener(ChangeQM2Manual);
     }
     private void Awake()
     {

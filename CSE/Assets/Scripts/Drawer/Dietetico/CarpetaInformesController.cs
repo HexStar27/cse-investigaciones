@@ -23,6 +23,9 @@ namespace Hexstar.CSE.Informes
         [SerializeField] Button boton_pagPistaAnt;
 
         [SerializeField] Boton3D seleccionCarpeta;
+        
+        [SerializeField] AudioSource audioS;
+        AudioClip cambioPagina;
 
         private Sprite sello_win;
         private Sprite sello_lose;
@@ -58,6 +61,7 @@ namespace Hexstar.CSE.Informes
             FijarEstadoCamara();
             anim.Play(sacarDeCajon);
             Boton3D.globalStop = true;
+            TooltipManager.Instance.Abrir(false);
         }
 
         public static void ForzarPaginaInforme(int idx)
@@ -88,17 +92,20 @@ namespace Hexstar.CSE.Informes
             ActualizarContadorPaginasPistas();
         }
 
+        [ContextMenu("Testear Cambio Pagina")]
         private void InformePaginaSiguiente()
         {
             paginaActual++;
             if (paginaActual >= Informes.Count) paginaActual = Informes.Count - 1;
             anim.Play(cambioDePagina);
+            audioS.PlayOneShot(cambioPagina,1);
         }
         private void InformePaginaAnterior()
         {
             paginaActual--;
             if (paginaActual < 0) paginaActual = 0;
             anim.Play(cambioDePagina);
+            audioS.PlayOneShot(cambioPagina,1);
         }
 
         public void PrepararCarpeta()
@@ -193,6 +200,7 @@ namespace Hexstar.CSE.Informes
 
             sello_win =  Resources.Load<Sprite>("Sprites/CarpetaCasos/Aproved_Seal");
             sello_lose = Resources.Load<Sprite>("Sprites/CarpetaCasos/Upsie_Seal");
+            cambioPagina = Resources.Load<AudioClip>("Audio/Sfx/CambioPaginaCarpeta");
         }
 
         private int MiniHash(int x,int min,int max)

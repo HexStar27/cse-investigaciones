@@ -17,6 +17,7 @@ namespace Hexstar
         [Header("Extras")]
         public UnityEvent alTerminarCinematica = new();
         private bool pausado;
+        public bool independiente = false;
 
         public bool showDebug;
 
@@ -37,13 +38,9 @@ namespace Hexstar
         {
             if (cinematicJSON != null)
             {
-                CinematicaUtilities.InicializarCinematicaConJSON(this, cinematicJSON.text);
+                this.InicializarCinematicaConJSON(cinematicJSON.text);
             }
             else Debug.LogWarning("cinematicJSON TextAsset is null, proceding to ignore action to load it.");
-        }
-        public void InterpretarCadenaComoJSON(string supuestoJSON)
-        {
-            CinematicaUtilities.InicializarCinematicaConJSON(this, supuestoJSON);
         }
 
         public void PausarCinematica(bool value)
@@ -79,7 +76,7 @@ namespace Hexstar
                 nodos[nodoActual].evento.Invoke();
                 if (nodos[nodoActual].separador != null)
                 {
-                    if (showDebug) print("Esperando aviso del separador");
+                    if (showDebug) print("Esperando aviso del separador \"" + nodos[nodoActual].separador.name + "\"");
                     yield return StartCoroutine(nodos[nodoActual].separador.Cuerpo());
                     nodos[nodoActual].separador.Reiniciar();
                     if (showDebug) print("Fin del separador");

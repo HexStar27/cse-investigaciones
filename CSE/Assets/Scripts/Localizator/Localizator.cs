@@ -81,6 +81,11 @@ namespace CSE.Local
         }
         public static string GetString(string code)
         {
+            if (_translation.Count == 0)
+            {
+                Debug.Log("Tried to use Localizator without it being loaded, trying to load now.");
+                ReadTranslations();
+            }
             if (!_translation.ContainsKey(code))
             {
                 Debug.LogError("Entry "+code+" not found in the Localizator");

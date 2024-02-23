@@ -12,6 +12,8 @@ using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using CSE;
 using Hexstar.CSE.Informes;
+using CSE.Local;
+using System.Collections;
 
 public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
@@ -26,6 +28,7 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private void Start()
     {
 		speaker = transform.parent.GetComponent<AudioSource>();
+		StartCoroutine(Spawn());
     }
 
 	public void Seleccionar()
@@ -39,14 +42,14 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
 		if(!SePuedeComprar())
 		{
-			TempMessageController.Instancia.GenerarMensaje("NECESITAS MÁS AGENTES");
+			TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".caso.necesitas_egentes"));
 			if (speaker != null) speaker.PlayOneShot(audioError);
 			XAPI_Builder.CreateStatement_CaseRequest(false);
 			return;
 		}
 		if(ResourceManager.ConsultasDisponibles <= 0)
 		{
-            TempMessageController.Instancia.GenerarMensaje("NO TE QUEDAN CONSULTAS");
+            TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".caso.no_contulas"));
             if (speaker != null) speaker.PlayOneShot(audioError);
             XAPI_Builder.CreateStatement_CaseRequest(false);
             return;
@@ -54,7 +57,7 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 		// Ya hay otro caso activo
 		if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
 		{
-			TempMessageController.Instancia.GenerarMensaje("SÓLO UN CASO A LA VEZ");
+			TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".caso.ya_hay_caso_activo"));
 			if (speaker != null) speaker.PlayOneShot(audioError);
             XAPI_Builder.CreateStatement_CaseRequest(false);
             return;
@@ -110,4 +113,11 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	}
 
 	public void OnPointerExit(PointerEventData eventData) {}
+
+	private IEnumerator Spawn()
+	{
+		var anim = GetComponent<Animator>();
+		yield return new WaitForSeconds(Random.Range(0,0.5f));
+		anim.Play("aparecer");
+    }
 }

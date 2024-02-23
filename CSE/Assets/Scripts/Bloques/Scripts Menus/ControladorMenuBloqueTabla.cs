@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CSE.Local;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,7 @@ public class ControladorMenuBloqueTabla : MonoBehaviour
     [SerializeField] ToggleGroup tGroupTablas;
     [SerializeField] ToggleGroup tGroupColumnas;
 
+    string cadena_colsRen_usada = "Columnas Renombradas:";
     public void SeleccionarBloqueAConfigurar(ConfiguradorBloqueValor bloque)
     {
         bloqueConfigurandoActual = bloque;
@@ -55,7 +57,7 @@ public class ControladorMenuBloqueTabla : MonoBehaviour
             {
                 tabla = txt.Substring(7); // "Tabla: "
                 //Filtrar columnas si Tabla no presente
-                if (txt.Contains("Columnas Renombradas:")) deletionMode = false;
+                if (txt.Contains(cadena_colsRen_usada)) deletionMode = false;
                 else deletionMode = !MenuTablesFilter.activados.Find(Busqueda);
             }
             else if (deletionMode) columnas.RemoveAt(idx--);
@@ -94,7 +96,8 @@ public class ControladorMenuBloqueTabla : MonoBehaviour
             }
         }
         //Incluir columnas renombradas al final
-        columnas.Add("Columnas Renombradas:");
+        cadena_colsRen_usada = Localizator.GetString(".bloques.titulo.columnas_renombradas");
+        columnas.Add(cadena_colsRen_usada);
         foreach (var par in Almacen.aliasParaColumnas)
         {
             List<string> renombres = par.Value;
