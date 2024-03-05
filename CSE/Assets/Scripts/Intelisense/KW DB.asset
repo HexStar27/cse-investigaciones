@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed77bacd2e0b3214b86c4c63a10359b6, type: 3}
+  m_Name: KW DB
+  m_EditorClassIdentifier: 
+  kWords:
+  - name: SELECT
+    description: (Keyword)
+  - name: FROM
+    description: (Keyword)
+  - name: WHERE
+    description: (Keyword)
+  - name: HAVING
+    description: (Keyword)
+  - name: GROUP BY
+    description: (Keyword)
+  - name: ORDER BY
+    description: (Keyword)
+  kw:
+  - name: ciudadanos
+    description: (Tabla)
+  - name: viviendas
+    description: (Tabla)
+  - name: alojadoEn
+    description: (Tabla)
+  - name: coches
+    description: (Tabla)
+  - name: asistenteVoz
+    description: (Tabla)
+  - name: '*'
+    description: (Columna)
+  - name: altura
+    description: (Columna)
+  - name: apellidos
+    description: (Columna)
+  - name: colorPelo
+    description: (Columna)
+  - name: dni
+    description: (Columna)
+  - name: edad
+    description: (Columna)
+  - name: nombre
+    description: (Columna)
+  - name: direccion
+    description: (Columna)
+  - name: esPiso
+    description: (Columna)
+  - name: id
+    description: (Columna)
+  - name: titular
+    description: (Columna)
+  - name: ciudadano
+    description: (Columna)
+  - name: vivienda
+    description: (Columna)
+  - name: color
+    description: (Columna)
+  - name: marca
+    description: (Columna)
+  - name: matricula
+    description: (Columna)
+  - name: titular_id
+    description: (Columna)
+  - name: fecha
+    description: (Columna)
+  - name: id
+    description: (Columna)
+  - name: log
+    description: (Columna)
+  - name: propietario
+    description: (Columna)
+  - name: AND
+    description: (Operador)
+  - name: OR
+    description: (Operador)
+  - name: NOT
+    description: (Operador)
+  - name: BETWEEN
+    description: (Operador)
+  - name: IN
+    description: (Operador)
+  - name: LIKE
+    description: (Operador)
+  - name: ALL
+    description: (Operador)
+  - name: ANY
+    description: (Operador)
+  - name: EXIST
+    description: (Operador)
+  - name: SELECT
+    description: (Keyword)
+  - name: FROM
+    description: (Keyword)
+  - name: WHERE
+    description: (Keyword)
+  - name: HAVING
+    description: (Keyword)
+  - name: GROUP BY
+    description: (Keyword)
+  - name: ORDER BY
+    description: (Keyword)

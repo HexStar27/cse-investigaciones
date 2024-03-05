@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using Hexstar;
-using System.Threading.Tasks;
+using CSE;
 
 public class MenuPartidaController : MonoBehaviour
 {
     public static bool existePartida = false;
     private static bool cerrojo = false;
+    public static bool continuandoPartida = false;
 
     // Cargar Partida
     public void CargarPartidaGuardada()
@@ -33,9 +34,11 @@ public class MenuPartidaController : MonoBehaviour
     {
         PuntoGuardado pg = new PuntoGuardado();
         ResourceManager.checkpoint = pg;
-        pg.Cargar();
+        pg.CargarDatosAlSistema();
         existePartida = true;
-        GameManager.CargarEscena(2);
+        continuandoPartida = false;
+        XAPI_Builder.CreateStatement_GameSession(true, true); // Starting session + new game
+        GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
     }
 
 
@@ -49,6 +52,16 @@ public class MenuPartidaController : MonoBehaviour
         GameManager.CerrarAplicacion();
     }
 
+    public void CerrarSesion()
+    {
+        SesionHandler.ResetSesionValues();
+        GameManager.CargarEscena(GameManager.GameScene.INICIO_SESION);
+    }
+
+    /// <summary>
+    /// Try to load a saved file from the server. Will create a new file if none was found.
+    /// </summary>
+    /// <param name="loadScene"></param>
     private static async void TryGetSavedFile(bool loadScene)
     {
         if(!existePartida)
@@ -64,29 +77,37 @@ public class MenuPartidaController : MonoBehaviour
             {
                 pg = JsonConverter.PasarJsonAObjeto<PuntoGuardado>(json);
                 existePartida = true;
+                continuandoPartida = true;
             }
             else //Si devuelve una cadena vacía significa que no ha encontrado un archivo de guardado.
             {
                 pg = new PuntoGuardado();
                 existePartida = false;
+                continuandoPartida = false;
             }
 
             ResourceManager.checkpoint = pg;
-            pg.Cargar();
+            pg.CargarDatosAlSistema();
 
             cerrojo = false;
         }
+        else continuandoPartida = true;
 
-        if(loadScene) GameManager.CargarEscena(2);
+        if (loadScene)
+        {
+            GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
+            XAPI_Builder.CreateStatement_GameSession(true,!existePartida); // starting session
+        }
     }
 
     private static async void GuardarPartidaEnServer()
     {
         cerrojo = true;
+        string archivoGuardado = JsonConverter.ConvertirAJson(ResourceManager.checkpoint);
         WWWForm form = new WWWForm();
         form.AddField("authorization", SesionHandler.sessionKEY);
         form.AddField("user", GameManager.user);
-        form.AddField("save", JsonConverter.ConvertirAJson(ResourceManager.checkpoint));
+        form.AddField("save", archivoGuardado);
         await ConexionHandler.APost(ConexionHandler.baseUrl +"save", form);
         string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
         //Debug.Log("Respuesta:\n" + json);

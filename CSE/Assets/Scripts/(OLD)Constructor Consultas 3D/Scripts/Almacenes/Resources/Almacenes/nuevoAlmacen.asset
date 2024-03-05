@@ -27,11 +27,11 @@ MonoBehaviour:
     titulo: WHERE
   - prefab: {fileID: 1711424462339358555, guid: 8d1d253e80e11a64eac5687bb41da7e3,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: GROUP BY
   - prefab: {fileID: 5512188063596356509, guid: 98956eaf432fcd643a624670e2da555f,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: HAVING
   - prefab: {fileID: 6285268189366427423, guid: 9688f222feaa0dd409de8fd55225e845,
       type: 3}
@@ -65,41 +65,45 @@ MonoBehaviour:
       type: 3}
     disponibleEnDificultad: 0
     titulo: Op Relacional
+  - prefab: {fileID: 3064252422129886177, guid: 226579f8878d0a34ba622dcf80b0de6d,
+      type: 3}
+    disponibleEnDificultad: 1
+    titulo: LIKE
   - prefab: {fileID: 729866779978605911, guid: c43bfe2ef76498c45bb7ee500c4aaa9b, type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: IN
   - prefab: {fileID: 729866779978605911, guid: e57f463b3ab7e2642bfe1cb0ec95e66f, type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: EXIST
   - prefab: {fileID: 729866779978605911, guid: 260e8c02d3ebe8b4f8c2d44cedc189ab, type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: ANY
   - prefab: {fileID: 729866779978605911, guid: 7d9ad47d6d0370146ac3b087a0559dfa, type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: ALL
   - prefab: {fileID: 3931597870867859610, guid: d98a26f380959b3449a11c219fca09ab,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: COUNT
   - prefab: {fileID: 3931597870867859610, guid: 32be009464a0e9349b4d1c3ba9f876b9,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: MAX
   - prefab: {fileID: 3931597870867859610, guid: 8d0da08665f67504993631895d4bc79e,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: MIN
   - prefab: {fileID: 3931597870867859610, guid: 97d2c24274118c041bfbb72316fd43b0,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: SUM
   - prefab: {fileID: 3931597870867859610, guid: 4c5df0dd8217a914f8171517f9aad572,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: AVG
   - prefab: {fileID: 3209334121000878702, guid: b041d284f07992444a0483510b4f64bf,
       type: 3}
-    disponibleEnDificultad: 0
+    disponibleEnDificultad: 1
     titulo: JOIN
   - prefab: {fileID: 3209334121000878702, guid: 5206bc975e5f11b418c209e73e8806b1,
       type: 3}

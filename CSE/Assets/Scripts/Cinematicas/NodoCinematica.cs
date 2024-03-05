@@ -8,7 +8,7 @@ namespace Hexstar
     {
         public UnityEvent evento = null;
         public ElementoSeparador separador = null;
-        [SerializeField] protected int[] indicesPosibles = { -1 };
+        [SerializeField] protected int[] indicesPosibles = new int[0];
         private int indiceSeleccionado = 0;
         /// <summary>
         /// Indica el nodo que debe ser ejecutado después de este
@@ -17,7 +17,8 @@ namespace Hexstar
         public virtual int Siguiente()
         {
             if (indicesPosibles.Length == 0)
-                Debug.LogError("El Nodo de la cinemática debe tener al menos 1 indice posible siguiente. Si no desea continuar con más nodos, debe poner -1 como índice.");
+                Debug.LogError("El Nodo de la cinemática debe tener al menos 1 indice posible siguiente " +
+                    "para poder llamar a esta función. Si no desea continuar con más nodos, debe poner -1 como índice.");
 
             return indicesPosibles[indiceSeleccionado];
         }
@@ -26,6 +27,13 @@ namespace Hexstar
         {
             if (seleccion < 0 || seleccion >= indicesPosibles.Length) seleccion = 0;
             indiceSeleccionado = seleccion;
+        }
+
+        public virtual bool NoNextIndex() { return indicesPosibles.Length == 0; }
+        public virtual void SetNewIndexList(ref int[] indexList)
+        {
+            indicesPosibles = new int[indexList.Length];
+            indexList.CopyTo(indicesPosibles,0);
         }
     }
 

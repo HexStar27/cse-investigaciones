@@ -11,6 +11,7 @@ public class SelectorDeMenus : MonoBehaviour
     int currentlyActive = -1;
     [SerializeField] private List<Transform> acomodadores;
 
+    [SerializeField] int targetCameraState;
     public static UnityEvent onCloseMenu = new UnityEvent();
 
     private void Awake()
@@ -20,6 +21,12 @@ public class SelectorDeMenus : MonoBehaviour
 
     public void SeleccionarMenu(int idx)
     {
+        InscryptionLikeCameraState.SetBypass(true);
+        if(InscryptionLikeCameraState.Instance.GetEstadoActual() != targetCameraState) {
+            CerrarMenus();
+            return;
+        }
+
         if (idx < 0 || idx >= listaMenus.Count) return;
         foreach (var m in listaMenus) m.gameObject.SetActive(false);
         listaMenus[idx].gameObject.SetActive(true);
@@ -33,6 +40,8 @@ public class SelectorDeMenus : MonoBehaviour
         currentlyActive = -1;
         foreach (var m in acomodadores) m.gameObject.SetActive(false);
         onCloseMenu?.Invoke();
+
+        InscryptionLikeCameraState.SetBypass(false);
     }
 
     public Transform GetMenuSelected()

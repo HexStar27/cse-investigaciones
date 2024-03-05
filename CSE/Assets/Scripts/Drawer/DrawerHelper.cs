@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using Hexstar.CSE.Informes;
+using UnityEngine;
 
 public class DrawerHelper : MonoBehaviour
 {
 	[SerializeField] Animator _anim;
-	[SerializeField] CameraState _state;
+	[SerializeField] CarpetaInformesController _cic;
+    [SerializeField] CameraState _state;
 	[Header("Opcional")]
 	[SerializeField] AudioSource _audio;
 	[SerializeField] AudioClip[] clips;
@@ -15,10 +17,10 @@ public class DrawerHelper : MonoBehaviour
 
 	public void TWO()
 	{
-		int state = _state.GetState();
-		if ((state == drawerState + 1 || state == drawerState - 1) && opened) 
+        int state = _state.GetState();
+		if ((state != drawerState) && opened) 
 		{
-			_anim.SetTrigger(triggerNames[1]);
+            _anim.SetTrigger(triggerNames[1]);
 			opened = false;
 		}
 	}
@@ -27,7 +29,7 @@ public class DrawerHelper : MonoBehaviour
 	{
 		if(nextState == drawerState && !opened)
 		{
-			_anim.SetTrigger(triggerNames[0]);
+            _anim.SetTrigger(triggerNames[0]);
 			opened = true;
 		}
 	}
@@ -38,6 +40,9 @@ public class DrawerHelper : MonoBehaviour
 		if (clip >= clips.Length || clip < 0) return;
 		_audio.PlayOneShot(clips[clip]);
     }
+
+	public void MostrarCarpeta() => _cic.MostrarEnCajon();
+	public void EsconderCarpeta() => _cic.EsconderEnCajon();
 
 	private void OnEnable()
 	{

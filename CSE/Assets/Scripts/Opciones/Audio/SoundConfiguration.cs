@@ -1,51 +1,48 @@
 ﻿using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Events;
 
-[CreateAssetMenu(fileName ="SoundConfiguration",menuName ="Hexstar/Configuration/Sound")]
-public class SoundConfiguration : ScriptableObject
+public class SoundConfiguration : OptionMB
 {
+    public static SoundConfiguration Instance { get; private set; }
     public AudioMixer mixer;
-    public float sfxVolume = 0, bgmVolume = 0, generalVolume = 0;
+    private string[] mixerNames = { "SfxVolume", "MusicVolume", "MasterVolume" };
+    [HideInInspector] public float[] volumeArray = new float[3];
+    public UnityEvent onLoad = new UnityEvent();
+    public UnityEvent onSave = new UnityEvent();
 
-    private void OnEnable()
+    private void Awake()
     {
-        sfxVolume = PlayerPrefs.GetFloat("sfxVolume", 0);
-        bgmVolume = PlayerPrefs.GetFloat("bgmVolume", 0);
-        generalVolume = PlayerPrefs.GetFloat("generalVolume", 0);
-        mixer.SetFloat("SfxVolume", sfxVolume);
-        mixer.SetFloat("MusicVolume", bgmVolume);
-        mixer.SetFloat("MasterVolume", generalVolume);
+        Instance = this;
     }
 
-    public void SetSfxVolume(float val)
+    public void SetVolume(int channel, float val)
     {
         if (val == 0) val = mute;
         else val = Mathf.Lerp(lowerLimit, upperLimit, val);
-        sfxVolume = val;
-        mixer.SetFloat("SfxVolume", sfxVolume);
-    }
-    public void SetBgmVolume(float val)
-    {
-        if (val == 0) val = mute;
-        else val = Mathf.Lerp(lowerLimit, upperLimit, val);
-        bgmVolume = val;
-        mixer.SetFloat("MusicVolume", bgmVolume);
-    }
-    public void SetGeneralVolume(float val)
-    {
-        if (val == 0) val = mute;
-        else val = Mathf.Lerp(lowerLimit, upperLimit, val);
-        generalVolume = val;
-        mixer.SetFloat("MasterVolume", generalVolume);
+        volumeArray[channel] = val;
+        mixer.SetFloat(mixerNames[channel], volumeArray[channel]);
     }
 
-    private void OnDisable()
+    public override void Save()
     {
-        PlayerPrefs.SetFloat("SfxVolume",sfxVolume);
-        PlayerPrefs.SetFloat("BgmVolume",bgmVolume);
-        PlayerPrefs.SetFloat("GeneralVolume",generalVolume);
-        PlayerPrefs.Save();
+        onSave?.Invoke();
+        for (int i = 0; i < 3; i++)
+        {
+            PlayerPrefs.SetFloat(mixerNames[i], volumeArray[i]);
+        }
     }
+    public override void Load()
+    {
+        if(Instance == null) Instance = this;
+        for (int i = 0; i < 3; i++)
+        {
+            volumeArray[i] = PlayerPrefs.GetFloat(mixerNames[i], 0);
+            mixer.SetFloat(mixerNames[i], volumeArray[i]);
+        }
+        onLoad?.Invoke();
+    }
+
     public static readonly float lowerLimit = -40;
     public static readonly float mute = -80;
     public static readonly float upperLimit = 4;

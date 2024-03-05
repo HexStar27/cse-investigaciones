@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CSE;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Hexstar.CSE
@@ -16,15 +17,19 @@ namespace Hexstar.CSE
 
 		[SerializeField] BlockData bd;
 		[SerializeField] BlockMovConfig config;
+		[SerializeField] Transform bloqueCuerpo;
 
 		bool wantToDeleteBlock;
 		GameObject currentGhost;
 		GameObject currentDeletionBlock;
 		Conector oldConector = null;
-		[SerializeField] Vector3 blockSize = new Vector3(2.1f, 0f, 0.75f);
+		protected static readonly float block2UnitScale = 0.1f;
+		public float connectorOffset = 0.05f;
+		[SerializeField] float ghostBlockScale = 0.5f;
 
 		[SerializeField] bool cancelGrab = false;
-		public UnityEvent onBlockConectionChanged = new UnityEvent();
+		[SerializeField] bool sendXAPIStatement = true;
+		[HideInInspector] public UnityEvent onBlockConectionChanged = new UnityEvent();
 
 		[Header("Conectores")]
 		[SerializeField] Conector cT;
@@ -48,6 +53,8 @@ namespace Hexstar.CSE
 
 		//Para type checking
 		private BlockType seccionPresente = null;
+
+		public string GetBlockTitle() => bd.title;
 
 		#region Drag
 		private void BeginDrag()
@@ -85,6 +92,7 @@ namespace Hexstar.CSE
 					
 					currentGhost.transform.localPosition = 
 						salida.ElBloque().CalculatePositionForConectedBlock(ghostBlockParent,c);
+					currentGhost.transform.localScale = new Vector3(bloqueCuerpo.localScale.x * ghostBlockScale, 1, 1);
 				}
 			}
 			else if (c != null)
@@ -97,14 +105,16 @@ namespace Hexstar.CSE
 				currentGhost = Instantiate(config.ghostBlock, ghostBlockParent.transform.parent);
 				currentGhost.transform.localPosition = 
 					salida.ElBloque().CalculatePositionForConectedBlock(ghostBlockParent,c);
+				currentGhost.transform.localScale = new Vector3(bloqueCuerpo.localScale.x * ghostBlockScale, 1, 1);
 			}
 			oldConector = c;
 
 			CheckDistanceForDeletion();
-			//Logic for the spawning of the block
+			//Logic for the deletion of the block
 			if (currentGhost == null && wantToDeleteBlock)
             {
 				if(currentDeletionBlock == null) currentDeletionBlock = Instantiate(config.deletionBlock, trans, false);
+				currentDeletionBlock.transform.localScale = new Vector3(bloqueCuerpo.localScale.x * ghostBlockScale, 1, 1);
             }
             else if (currentDeletionBlock != null) Destroy(currentDeletionBlock);
 		}
@@ -119,18 +129,20 @@ namespace Hexstar.CSE
 		public Vector3 CalculatePositionForConectedBlock(Conector cSalida, Conector cEntrada)
 		{
 			var s = cEntrada.ElBloque().GetBlockSize();
-			float x = blockSize.x + s.x; //Suponemos que la funcion se ha llamado
-			float z = blockSize.z + s.z; //con el bloque perteneciente a la salida
+			//Suponemos que la funcion se ha llamado con el bloque perteneciente a la salida
+			float x = block2UnitScale * (bloqueCuerpo.localScale.x + s) + connectorOffset;
+			float z = 0.15f;
+
 			switch (cSalida.Tipo())
 			{
-				case Conector.ConexionType.TOP:		return new Vector3( 0, blockSize.y, z);
-				case Conector.ConexionType.LEFT:	return new Vector3(-x, blockSize.y, 0);
-				case Conector.ConexionType.BOTTOM:	return new Vector3( 0, blockSize.y,-z);
-				case Conector.ConexionType.RIGHT:	return new Vector3( x, blockSize.y, 0);
+				case Conector.ConexionType.TOP:		return new Vector3( 0, 0, z);
+				case Conector.ConexionType.LEFT:	return new Vector3(-x, 0, 0);
+				case Conector.ConexionType.BOTTOM:	return new Vector3( 0, 0,-z);
+				case Conector.ConexionType.RIGHT:	return new Vector3( x, 0, 0);
 				default: return Vector3.zero;
 			}
 		}
-		public Vector3 GetBlockSize() { return blockSize; }
+		public float GetBlockSize() { return bloqueCuerpo.transform.localScale.x; }
 
 		public bool TieneSalidaConectada()
         {
@@ -146,8 +158,8 @@ namespace Hexstar.CSE
 			cL.AplicarConexion(false);
 
 			BuscarTipoSeccion();
-			onBlockConectionChanged?.Invoke();
-			if (opuesto != null) opuesto.onBlockConectionChanged?.Invoke();
+			HundirOnConnectionChange();
+			if (opuesto != null) opuesto.FlotarOnConnectionChange();
 			
 			trans.parent = null;
 			return desconexion;
@@ -173,6 +185,8 @@ namespace Hexstar.CSE
         }
 
 		public BlockData GetBlockData() { return bd; }
+		public void SetBlockData(BlockData bd) { this.bd = bd; }
+
 		public static bool CheckConexionType(Conector salida, Conector entrada)
 		{
 			var infoEntrada = entrada.ElBloque().GetBlockData();
@@ -292,8 +306,12 @@ namespace Hexstar.CSE
 				if (BloqueRaizDeChunk(conector.ElBloque()) ==
 					BloqueRaizDeChunk(elOtro.ElBloque())) continue;
 
-				if (FormaParteDelChunk(conector) && conector.EstaConectado()) continue;
-				if (FormaParteDelChunk(elOtro) && elOtro.EstaConectado()) continue;
+				bool conectorEnChunk = FormaParteDelChunk(conector);
+				bool otroEnChunk = FormaParteDelChunk(elOtro);
+				if (conectorEnChunk && conector.EstaConectado()) continue;
+				if (otroEnChunk && elOtro.EstaConectado()) continue;
+				//Al menos uno de los conectores debe formar parte del bloque escogido
+				if (!(conectorEnChunk || otroEnChunk)) continue;
 
 				if (checkBlockType)
 				{
@@ -347,6 +365,19 @@ namespace Hexstar.CSE
 			return false;
 		}
 
+		public void FlotarOnConnectionChange(bool alsoCall = true)
+        {
+			if (alsoCall) onBlockConectionChanged?.Invoke();
+			var b = GetBloqueIzquierdo();
+			if (b != null) b.FlotarOnConnectionChange();
+        }
+		public void HundirOnConnectionChange( bool alsoCall = true)
+		{
+			if (alsoCall) onBlockConectionChanged?.Invoke();
+			var b = GetBloqueDerecho();
+			if (b != null) b.FlotarOnConnectionChange();
+		}
+
 		private Conector ConectorOpuestoA(Conector c)
 		{
 			var t = c.Tipo();
@@ -366,6 +397,11 @@ namespace Hexstar.CSE
 			return cancelGrab;
 		}
 
+		public void UpdateVisuals()
+        {
+			if (TryGetComponent(out BlockModelControl bmc)) bmc.Activar(bd.TOP, bd.LEFT, bd.BOTTOM, bd.RIGHT);
+		}
+
 		#region MAIN
 		private void Awake()
 		{
@@ -374,8 +410,10 @@ namespace Hexstar.CSE
 
 			coll = GetComponent<Collider>();
 			audioS = GetComponent<AudioSource>();
-			if (TryGetComponent(out BlockModelControl bmc)) bmc.Activar(bd.TOP, bd.LEFT, bd.BOTTOM, bd.RIGHT);
 			CQU = GetComponent<ContentQueryUnit>();
+			UpdateVisuals();
+
+			if(sendXAPIStatement) XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.GENERATED, bd.title);
 		}
 
 		private void OnMouseDown()
@@ -437,10 +475,15 @@ namespace Hexstar.CSE
 					if (cEntrada.EstaConectado())
 					{
 						var antiguaSalida = cEntrada.AplastarConexionConCercano();
-						//Conecta el bloque de la conexion anterior en el lado opuesto de este bloque
 						var entradaOpuesta = this.ConectorOpuestoA(antiguaSalida);
-						entradaOpuesta.ForzarConexion(antiguaSalida);
-						ColocarConexion(entradaOpuesta, antiguaSalida);
+
+						if (CheckConexionType(antiguaSalida, entradaOpuesta) &&
+							CheckSectionType(antiguaSalida, entradaOpuesta))
+                        {
+							//Conecta el bloque de la conexion anterior en el lado opuesto de este bloque
+							entradaOpuesta.ForzarConexion(antiguaSalida);
+							ColocarConexion(entradaOpuesta, antiguaSalida);
+						}
 					}
 					else
 					{
@@ -452,25 +495,36 @@ namespace Hexstar.CSE
 					Conector cSalida = cEntrada.ConectorConectado();
 					ColocarConexion(cEntrada, cSalida);
 
-					onBlockConectionChanged?.Invoke();
-					//Invocar evento en ambos bloques
-					if (cEntrada.ElBloque() == this) cSalida.ElBloque().onBlockConectionChanged?.Invoke();
-					else cEntrada.ElBloque().onBlockConectionChanged?.Invoke();
+					//Invocar evento por todo el grupo
+					FlotarOnConnectionChange();     //if (cEntrada.ElBloque() == this) cSalida.ElBloque().onBlockConectionChanged?.Invoke();
+					HundirOnConnectionChange(false);//else cEntrada.ElBloque().onBlockConectionChanged?.Invoke();
+					
 					audioS.PlayOneShot(config.blockConect);
-				}
+                    XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.CONNECTED, bd.title,cEntrada.ElBloque().bd.title);
+                }
 			}
 			else if (wantToDeleteBlock)
             {
 				Conector.distanciaEntradasTocando.Clear();
-				Destroy(this.gameObject);
+                XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.REMOVED, bd.title);
+                Destroy(this.gameObject);
             }
 
 			Conector.distanciaEntradasTocando.Clear();
 			CollisionEnabling(true);
 		}
-		#endregion
 
-		private void OnDrawGizmosSelected()
+        private void OnMouseOver()
+        {
+			var tooltip = TooltipManager.Instance;
+			if (tooltip != null && bd != null)
+            {
+				tooltip.SetString(bd.name);
+			}
+        }
+        #endregion
+
+        private void OnDrawGizmosSelected()
 		{
 			//Dibuja la zona donde el bloque tiene permitido moverse.
 			Gizmos.color = Color.red;

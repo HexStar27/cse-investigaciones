@@ -8,7 +8,9 @@ public static class GameManager
     public static UnityEvent OnPause = new UnityEvent();
     public static UnityEvent OnUnpause = new UnityEvent();
 
-    public static string user;
+    public enum GameScene { INICIO_SESION=0, MENU_PARTIDA=1, ESCENA_PRINCIPAL=2 };
+
+    public static string user =  "Unidentified User";
     private static bool isLoading;
 
     public static void CerrarAplicacion()
@@ -16,43 +18,22 @@ public static class GameManager
         Application.Quit();
     }
 
-    public static void CargarEscena(int escenaId)
+    public static void CargarEscena(GameScene escena)
     {
-        SceneManager.LoadScene(escenaId);
+        SceneManager.LoadScene((int)escena);
     }
 
-    public static IEnumerator CarganConPantallaDeCarga(int escenaId)
+    public static IEnumerator CarganConPantallaDeCarga(int escenaId) // No se usa ???
     {
         if (!isLoading)
         {
             isLoading = true;
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(escenaId);
-
-            // Wait until the asynchronous scene fully loads
-            while (!asyncLoad.isDone)
-            {
-                //Poner aquí todo lo que controla la pantalla de carga
-                yield return null;
-            }
+            yield return new WaitUntil(() => asyncLoad.isDone);
+            
+            //TODO: Poner aquí todo lo que controla la pantalla de carga
 
             isLoading = false;
         }
     }
-
-    /* Código zombi...
-    public void CargarEscenaConPCarga(int escenaId)
-    {
-        if(!isLoading) StartCoroutine(CarganConPantallaDeCarga(escenaId));
-    }
-
-    public static void Pausar()
-    {
-        OnPause.Invoke();
-    }
-
-    public static void Despausar()
-    {
-        OnUnpause.Invoke();
-    }*/
-
 }

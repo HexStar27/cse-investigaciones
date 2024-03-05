@@ -9,15 +9,15 @@ public class TempMessageController : MonoBehaviour
 
     [SerializeField] private GameObject prefabMensaje;
     [SerializeField] private RectTransform parent;
-    private float tiempoReinicio = 1 + ((float)TempMessage.duracion)/1000;
+    private readonly float tiempoReinicio = 1 + ((float)TempMessage.duracion)/1000;
     private float contador = 0;
-    [SerializeField] private bool terminado = true;
+    private bool terminado = true;
 
     public void GenerarMensaje(string mensaje)
     {
         terminado = false;
         contador = tiempoReinicio;
-        TempMessage a = Instantiate(prefabMensaje, parent).GetComponent<TempMessage>();
+        TempMessage a = Instantiate(prefabMensaje,Vector3.zero,Quaternion.identity, parent).GetComponent<TempMessage>();
         a.EjecutarMensaje(mensaje);
     }
 

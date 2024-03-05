@@ -13,6 +13,8 @@ namespace Hexstar.CSE
         private BlockMovAndConexion controlador;
         public enum ConexionType { TOP = 0, LEFT = 1, BOTTOM = 2, RIGHT = 3};
         [SerializeField] private ConexionType type;
+        [SerializeField] string raizTag = "Raiz";
+        [SerializeField] bool aceptaRaiz = false;
 
         [Header("Debug")]
         [SerializeField] bool conectado = false;
@@ -100,6 +102,7 @@ namespace Hexstar.CSE
             int iBest = 0;
             for (int i = 0; i < conectoresTocando.Count; i++)
             {
+                if (!conectoresTocando[i].gameObject.activeSelf) continue;
                 float distance = Vector3.Distance(transform.position, conectoresTocando[i].transform.position);
                 if (distance < closestDistance)
                 {
@@ -124,6 +127,7 @@ namespace Hexstar.CSE
             if (!other.TryGetComponent(out Conector entryConector)) return;
             if (entryConector.EstaConectado() || !EsOpuesto(entryConector.Tipo())) return;
             if (cConectado == entryConector) return;
+            if (!aceptaRaiz && other.CompareTag(raizTag)) return;
 
             if (!conectoresTocando.Contains(entryConector))
             {
@@ -136,6 +140,7 @@ namespace Hexstar.CSE
             if (!this.EsEntrada()) return;
             if (!other.TryGetComponent(out Conector exitConector)) return;
             if (!exitConector.EsOpuesto(Tipo())) return;
+            if (!aceptaRaiz && other.CompareTag(raizTag)) return;
 
             distanciaEntradasTocando[this] = CalculateClosestDistance();
         }
@@ -144,6 +149,7 @@ namespace Hexstar.CSE
         {
             if (!this.EsEntrada()) return;
             if (!other.TryGetComponent(out Conector exitConector)) return;
+            if (!aceptaRaiz && other.CompareTag(raizTag)) return;
 
             int i = conectoresTocando.IndexOf(exitConector);
             if (i >= 0)

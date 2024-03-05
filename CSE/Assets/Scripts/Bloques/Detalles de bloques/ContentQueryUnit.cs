@@ -45,5 +45,11 @@ namespace Hexstar.CSE
             
             return pq.ToString();
         }
+
+        public string GetBlockTextContent(int idx = 0)
+        {
+            if (idx < 0 || idx >= content.Length) return null;
+            return content[idx].text;
+        }
     }
 }

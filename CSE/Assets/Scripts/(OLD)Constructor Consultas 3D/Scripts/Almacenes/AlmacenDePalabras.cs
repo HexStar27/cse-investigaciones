@@ -13,14 +13,16 @@ namespace Hexstar.CSE
         public static List<string>[] palabras = { new List<string>(), new List<string>(),
             new List<string>(), new List<string>(), new List<string>() };
 
+        public static Dictionary<string, List<string>> aliasParaTablas = new Dictionary<string, List<string>>();
+        public static Dictionary<string, List<string>> aliasParaColumnas = new Dictionary<string, List<string>>();
+
         private static readonly string[] operadores = {
             "+","-","*","/", //Aritméticos (4)
             "=","<",">","<=",">=","<>", //Comparación (6)
             "(",")", //Otros... (2)
             "AND", "OR", "NOT", "BETWEEN", "IN", "LIKE", "ALL", "ANY", "EXIST", //Lógicos (3-3-3)
         };
-        //Not supported yet: IN, LIKE, subqueries (se arreglaría con un bloque doble con flecha)
-        public static readonly int[] difficultyToOPsAvilables = {10,15,17,21,21};
+
         private static readonly string[] funciones =
         {
             "LENGTH",
@@ -41,16 +43,18 @@ namespace Hexstar.CSE
             int pistaIdx = (int)TabType.Pistas;
             palabras[pistaIdx] = new List<string>();
             Caso c = PuzzleManager.GetCasoActivo();
-            foreach(var pista in c.pistas) palabras[pistaIdx].Add(pista.palabra);
+            foreach(var pista in c.pistas) palabras[pistaIdx].AddRange(pista.palabras);
         }
 
         public static void CargarPalabras()
         {
             for (int i = 0; i < 5; i++) palabras[i] = new List<string>();
             //1º Cargar tablas y columnas
-            
-            //Cambiar esto por los codigos que se guardaran en los archivos de guardado más adelante...
             string codigos = "\"ejemplo0\", \"ejemplo1\"";
+            
+            for(int i = 0; i < ResourceManager.TableCodes.Count; i++)
+                codigos += ", \""+ ResourceManager.TableCodes[i]+"\"";
+            
 
             WWWForm form1 = new WWWForm();
             form1.AddField("authorization",SesionHandler.sessionKEY);
@@ -68,7 +72,7 @@ namespace Hexstar.CSE
             ConexionHandler.onFinishRequest.RemoveListener(TablasYColumnas);
 
             //1º Tablas
-            palabras[1].Add("*");
+            aliasParaColumnas.Clear();
             JSONNode datos = JSON.Parse(obtenido);
             int n = datos.Count;
             for (int j = 0; j < n; j++)
@@ -79,6 +83,7 @@ namespace Hexstar.CSE
             }
 
             //2º Columnas
+            palabras[1].Add("*");
             for (int i = 0; i < palabras[0].Count; i++)
             {
                 WWWForm form = new WWWForm();
@@ -99,7 +104,7 @@ namespace Hexstar.CSE
             var col = datos["columns"];
             int n = col.Count;
 
-            palabras[1].Add("Tabla: "+t);
+            palabras[1].Add("Tabla: " + t);
             for(int i = 0; i < n; i++)
             {
                 palabras[1].Add(col[i]["COLUMN_NAME"].Value);
@@ -115,6 +120,31 @@ namespace Hexstar.CSE
         public static List<string> GetLista(int indice)
         {
             return palabras[indice];
+        }
+
+        public static List<string> GetColumnasDeTabla(string nombreTabla)
+        {
+            List<string> columnasEncontradas = new();
+            bool buscando = true, fin = false;
+            if(palabras[0].Contains(nombreTabla))
+            {
+                var columnas = palabras[1];
+                int n = columnas.Count;
+                for(int i = 0; i < n && !fin; i++)
+                {
+                    string col = columnas[i];
+                    if (buscando && col.Contains(':') && col.Contains(nombreTabla))
+                    {
+                        buscando = false;
+                    }
+                    else if(!buscando && !fin)
+                    {
+                        if(col.Contains(':')) fin = true;
+                        else columnasEncontradas.Add(col);
+                    }
+                }
+            }
+            return columnasEncontradas;
         }
 
         public static int TipoAIndice(TabType tipo)
@@ -140,6 +170,52 @@ namespace Hexstar.CSE
                 if (op.Contains(palabras[(int)TabType.Operadores][i])) return true;
             }
             return false;
+        }
+
+        public static void AddAliasToTable(string tabla, string newName)
+        {
+            if (!aliasParaTablas.ContainsKey(tabla))
+                aliasParaTablas.Add(tabla, new List<string>());
+            aliasParaTablas[tabla].Add(newName);
+        }
+
+        public static void AddAliasToColumn(string columna, string newName)
+        {
+            if (!aliasParaColumnas.ContainsKey(columna))
+                aliasParaColumnas.Add(columna, new List<string>());
+            aliasParaColumnas[columna].Add(newName);
+        }
+
+        public static List<string> GetOperadoresEspeciales()
+        {
+            List<string> ops = new(operadores[12..]);
+            return ops;
+        }
+
+        public static Dictionary<string,int> GenerarMapaSeparacionColumnasEnTablas()
+        {
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+
+            int nColumnas = palabras[1].Count;
+            for (int i = 0; i < nColumnas; i++)
+            {
+                int idx = palabras[1][i].IndexOf(':');
+                if (idx >= 0) dic.Add(palabras[1][i].Substring(idx + 2), i);
+            }
+            return dic;
+        }
+
+        public static Dictionary<string, int> MapaDeColumnasQueContenganX(List<string> p, string x)
+        {
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+
+            int nColumnas = p.Count;
+            for (int i = 0; i < nColumnas; i++)
+            {
+                int idx = p[i].IndexOf(':');
+                if (idx >= 0) dic.Add(p[i].Substring(idx + 2), i);
+            }
+            return dic;
         }
     }
 }

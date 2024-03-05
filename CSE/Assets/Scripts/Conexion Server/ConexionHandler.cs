@@ -10,11 +10,12 @@ namespace Hexstar
     public static class ConexionHandler
     {
         public readonly static string baseUrl = "https://cse.uca.es/game/";
-        public static bool debugMode = true;
+        public static bool debugMode = false;
 
         public class DownloadEvent : UnityEvent<DownloadHandler> { }
         public static DownloadEvent onFinishRequest = new DownloadEvent();
         public static string download;
+        public static UnityWebRequest.Result result;
 
         public static async Task AGet(string url)
         {
@@ -24,10 +25,11 @@ namespace Hexstar
 
                 if (debugMode)
                 {
-                    if (request.isNetworkError) Debug.Log("Error: " + request.error);
+                    if (request.result == UnityWebRequest.Result.ConnectionError) Debug.Log("Error: " + request.error);
                     else Debug.Log("Received: " + request.downloadHandler.text);
                 }
                 download = request.downloadHandler.text;
+                result = request.result;
                 onFinishRequest.Invoke(request.downloadHandler);
             }
         }
@@ -40,9 +42,11 @@ namespace Hexstar
 
                 if (debugMode)
                 {
-                    if (request.isNetworkError || request.isHttpError) Debug.Log(request.error);
+                    if (request.result == UnityWebRequest.Result.ConnectionError ||
+                        request.result == UnityWebRequest.Result.ProtocolError) Debug.Log(request.error);
                 }
                 download = request.downloadHandler.text;
+                result = request.result;
                 onFinishRequest.Invoke(request.downloadHandler);
             }
         }
@@ -103,19 +107,3 @@ namespace Hexstar
         }
     }
 }
-
-
-
-/* Como ejemplo
-public class ClaseEjemploJson
-{
-    public int i = 0;
-    public string h = "pepe";
-    public float[] f = { 0f, 1f };
-}
-public void GetJsonExample(DownloadHandler descarga)
-{
-    //Bastante OP
-    ClaseEjemploJson dic = JsonConverter.PasarJsonAObjeto<ClaseEjemploJson>(descarga.text);
-    Debug.Log(dic.i + "," + dic.h + ". " + dic.f[0]);
-}*/

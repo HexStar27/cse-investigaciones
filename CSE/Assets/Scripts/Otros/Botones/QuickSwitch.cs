@@ -23,10 +23,12 @@ public class QuickSwitch : MonoBehaviour
         if (m_Boton3d != null) m_Boton3d.onClick.RemoveListener(Swap);
     }
 
-    private void Swap()
+    public void Swap()
     {
         stateSwaped = !stateSwaped;
         if (stateSwaped) onState1?.Invoke();
         else onState0?.Invoke();
     }
+
+    public bool GetState() { return stateSwaped; }
 }

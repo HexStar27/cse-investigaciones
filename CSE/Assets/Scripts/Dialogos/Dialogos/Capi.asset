@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6907522a6789f04eab0dee1d5f1317e, type: 3}
+  m_Name: Capi
+  m_EditorClassIdentifier: 
+  portraits:
+  - {fileID: -757349166, guid: 56fa8251862f4eb4c924d0a9bdc68e10, type: 3}
+  - {fileID: 1708626652, guid: 56fa8251862f4eb4c924d0a9bdc68e10, type: 3}
+  - {fileID: 2044357862, guid: 56fa8251862f4eb4c924d0a9bdc68e10, type: 3}
+  - {fileID: -490883256, guid: 56fa8251862f4eb4c924d0a9bdc68e10, type: 3}
+  expressions:
+  - neutro
+  - neutro2
+  - contento
+  - sus

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using xAPI = CSE.XAPI_Builder;
 
 namespace Hexstar
 {
@@ -32,7 +33,26 @@ namespace Hexstar
 			SesionHandler.email = email;
 		}
 
-		public static async Task GetNickname() //NOT TESTED
+		public static void ResetSesionValues()
+        {
+			email = null;
+			sessionKEY = null;
+			nickname = null;
+        }
+
+		public static async Task ACrearCuenta(string nick, string email, string password)
+        {
+			string url = ConexionHandler.baseUrl + "signin";
+			WWWForm formulario = new WWWForm();
+			formulario.AddField("nickname",nick);
+			formulario.AddField("email", email);
+			formulario.AddField("password", Cifrar(password));
+			await ConexionHandler.APost(url, formulario);
+			SetKey(ConexionHandler.download);
+			SesionHandler.email = email;
+		}
+
+		public static async Task GetNickname()
 		{
 			string url = ConexionHandler.baseUrl + "nickname";
 			WWWForm formulario = new WWWForm();
@@ -40,7 +60,9 @@ namespace Hexstar
 			formulario.AddField("email", email);
 			await ConexionHandler.APost(url, formulario);
 			nickname = ConexionHandler.ExtraerJson(ConexionHandler.download);
-		}
+			nickname = nickname.Trim('"');
+			xAPI.AutoSetupActor();
+        }
 
 		private static void SetKey(string dh)
 		{
@@ -57,7 +79,7 @@ namespace Hexstar
 		}
 
 		/// <summary>
-		/// TODO: Cifra un mensaje :v
+		/// Cifra un mensaje :v
 		/// </summary>
 		/// <param name="texto"></param>
 		/// <returns></returns>

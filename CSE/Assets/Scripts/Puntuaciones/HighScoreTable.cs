@@ -4,17 +4,23 @@ using SimpleJSON;
 using TMPro;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using static Unity.Burst.Intrinsics.X86.Avx;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class HighScoreTable : MonoBehaviour
 {
     GameObject scoreRowPrefab;
-    readonly Color primero = new Color(.95f, 1, 0, 1);
-    readonly Color segundo = new Color(1, 0, .5f, 1);
+    readonly Color primero = new Color(.95f, 1f,  0f, 1f);
+    readonly Color segundo = new Color(1f,   0f, .5f, 1f);
+    readonly Color tercero = new Color(0f,  .95f, 1f, 1f);
 
     //If caso < 0, usa general, else la puntuacion del caso especificado
     [SerializeField] private int caso = -1 ;
     [HideInInspector] public List<GameObject> elements = new List<GameObject>();
     [SerializeField] bool loadOnStart = false;
+
+    [SerializeField] TextMeshProUGUI myHS;
+    public int maxElementsInTable = 10;
 
     private void Awake()
     {
@@ -35,9 +41,20 @@ public class HighScoreTable : MonoBehaviour
     {
         WWWForm form = new WWWForm();
         form.AddField("caso", caso);
+        form.AddField("tipo", -1);
         await ConexionHandler.APost(ConexionHandler.baseUrl + "score", form);
         if(deletePrevious) DeleteElements();
         GetData(ConexionHandler.download);
+
+        if(myHS != null)
+        {
+            form = new WWWForm();
+            form.AddField("authorization", SesionHandler.sessionKEY);
+            form.AddField("user", SesionHandler.email);
+            await ConexionHandler.APost(ConexionHandler.baseUrl + "score/total", form);
+            string datos = ConexionHandler.ExtraerJson(ConexionHandler.download);
+            myHS.text = datos[1..^1].Trim();
+        }
     }
 
     public void SetCasoID(int id) { caso = id; }
@@ -59,7 +76,7 @@ public class HighScoreTable : MonoBehaviour
             }
             else
             {
-                int n = json["res"].Count;
+                int n = System.Math.Min(json["res"].Count,maxElementsInTable);
                 for (int i = 0; i < n; i++)
                 {
                     GameObject row = Instantiate(scoreRowPrefab, transform);
@@ -72,6 +89,7 @@ public class HighScoreTable : MonoBehaviour
                         tmp.text = json["res"][i]["score"].Value;
                         if (i == 0) tmp.color = primero;
                         else if (i == 1) tmp.color = segundo;
+                        else tmp.color = tercero;
                     }
                     else Debug.Log("Ups no se pudo obtener la score");
                     elements.Add(row);
@@ -90,6 +108,16 @@ public class HighScoreTable : MonoBehaviour
     public void ShowOnlyRange(int from, int to)
     {
         int n = elements.Count;
-        for(int i = 0; i < n; i++) elements[i].SetActive(i >= from && i < to);
+        for (int i = 0; i < n; i++)
+        {
+            bool show = i >= from && i < to;
+            elements[i].SetActive(show);
+            if (show && elements[i].transform.GetChild(0).TryGetComponent(out TextMeshProUGUI tmp))
+            {
+                if (i == from) tmp.color = primero;
+                else if (i == from+1) tmp.color = segundo;
+                else tmp.color = tercero;
+            }
+        }
     }
 }

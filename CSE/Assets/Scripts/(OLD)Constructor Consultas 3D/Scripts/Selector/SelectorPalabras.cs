@@ -80,7 +80,7 @@ namespace Hexstar.CSE
             int n = seleccionadas.Count;
             for(int i = 0; i < n; i++)
             {
-
+                //TODO ???
             }
             //3º guardarlo en el contenidoActual
         }

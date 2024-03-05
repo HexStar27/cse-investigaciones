@@ -24,6 +24,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 2d786f2feb601574ebbeb82c27443a6f, type: 2}
     - {fileID: 11400000, guid: 93db409c3a82b544f8c98ab24c9afad0, type: 2}
     - {fileID: 11400000, guid: f2c1aeff5cc953f46b5498b865f9e6a4, type: 2}
+    - {fileID: 11400000, guid: 6fd175c2ba407604fad4a3dd1104ee6b, type: 2}
   salidaAbajo:
     tiposAceptados: []
   seccionesAceptadas:
@@ -31,4 +32,3 @@ MonoBehaviour:
     - {fileID: 11400000, guid: fcdcb73a1d096c84197ba5fa9e897cdf, type: 2}
     - {fileID: 11400000, guid: e8e9c6ce91cf6ab4185d249074ec6af0, type: 2}
     - {fileID: 11400000, guid: 500be1f28aa8c6a4e997d53891bc89f6, type: 2}
-  hasPepito: 0

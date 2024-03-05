@@ -12,31 +12,43 @@ public class AperturaTableta : MonoBehaviour
 
 	public GameObject BloqueTabletaPrefab;
 	public GameObject contenedor;
-	private List<GameObject> elementos = new List<GameObject>();
+	private List<GameObject> elementos = new();
 	public Transform zonaSpawnBloques;
+
+	private CameraStalker cs;
 
 	private void Awake()
 	{
 		if (anim == null) anim = GetComponent<Animator>();
+		cs = GetComponent<CameraStalker>();
 	}
 
 	public void OverTable(bool value)
 	{
+		if (MenuPausa.Paused || Boton3D.globalStop) return;
 		anim.SetBool(over, value);
 	}
 
 	public void OpenTablet(bool value)
 	{
+		bool farOpening = false;
+		if(value) farOpening = cs.CorrectState();
+        if (MenuPausa.Paused || Boton3D.globalStop || farOpening) return;
 		if (value) Rellenar();
 		anim.SetBool(open, value);
 		opened = value;
-	}
-	public void SwitchStateTablet()
+		if(opened) cs.onCameraReady.AddListener(TooFarFromTablet);
+    }
+	private void TooFarFromTablet()
 	{
-		opened = !opened;
-		if (opened) Rellenar();
-		anim.SetBool(open, opened);
-	}
+		OpenTablet(false);
+        cs.onCameraReady.RemoveListener(TooFarFromTablet);
+    }
+	public void ForceClose()
+	{
+        opened = false;
+    }
+	public void SwitchStateTablet() { OpenTablet(!opened); }
 
 
 	public void Rellenar()
@@ -55,7 +67,5 @@ public class AperturaTableta : MonoBehaviour
 			bte.Inicializar(bloque);
 			elementos.Add(bte.gameObject);
 		}
-
-		//if (contenedor.TryGetComponent(out ContentScaler cs)) cs.Actualizar();
 	}
 }

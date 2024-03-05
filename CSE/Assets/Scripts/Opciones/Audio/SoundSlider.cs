@@ -1,23 +1,45 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Audio;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class SoundSlider : MonoBehaviour
+public class SoundSlider : MonoBehaviour, ISliderValue
 {
-    public string varName = "SfxVolume";
-    [SerializeField] private AudioMixer mixer;
-    private Slider slider;
+    public int mixerChannel = 0;
+    [SerializeField] private Slider slider;
+
+    public void Load()
+    {
+        float val = SoundConfiguration.Instance.volumeArray[mixerChannel];
+        if (val != SoundConfiguration.mute)
+            val = Mathf.InverseLerp(SoundConfiguration.lowerLimit, SoundConfiguration.upperLimit, val);
+        slider.value = val;
+    }
+
+    public void Save()
+    {
+        SoundConfiguration.Instance.SetVolume(mixerChannel, slider.value);
+    }
+
+    private void Awake()
+    {
+        if (slider == null) slider = GetComponent<Slider>();
+    }
+
     void OnEnable()
     {
-        if (!slider) slider = GetComponent<Slider>();
-        if (mixer.GetFloat(varName, out float val))
-        {
-            if(val != SoundConfiguration.mute)
-                val = Mathf.InverseLerp(SoundConfiguration.lowerLimit, SoundConfiguration.upperLimit, val);
-            
-            slider.value = val;
-        }
+        slider.onValueChanged.AddListener(Changed);
+    }
+    private void OnDisable()
+    {
+        slider.onValueChanged.RemoveListener(Changed);
+    }
+
+    private void Changed(float val)
+    {
+        SoundConfiguration.Instance.SetVolume(mixerChannel, val);
+    }
+
+    public Slider GetSlider()
+    {
+        return slider;
     }
 }

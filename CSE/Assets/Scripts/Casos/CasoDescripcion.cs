@@ -1,37 +1,88 @@
 ﻿using UnityEngine;
 using TMPro;
+using System.Text;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-public class CasoDescripcion : MonoBehaviour
+namespace Hexstar.CSE
 {
-    [SerializeField] GameObject _panel;
-    [SerializeField] TextMeshProUGUI _titulo;
-    [SerializeField] TextMeshProUGUI _resumen;
-    [SerializeField] TextMeshProUGUI _efectos;
-    [SerializeField] HighScoreTable _panelPuntuaciones;
-
-    GameObject _puntuacionesParent;
-
-    private void Awake()
+    public class CasoDescripcion : MonoBehaviour, ISingleton
     {
-        _puntuacionesParent = _panelPuntuaciones.transform.parent.gameObject;
-    }
+        readonly string AgenteSpriteText = "<sprite name=\"icono_agentes\">";
+        readonly string AgenteSpriteTextRojo = "<sprite name=\"icono_agentes\" color=#FF0000>";
+        public static CasoDescripcion Instance { get; private set; }
+        [SerializeField] GameObject _panel;
+        [SerializeField] TextMeshProUGUI _titulo;
+        [SerializeField] TextMeshProUGUI _resumen;
+        [SerializeField] TextMeshProUGUI _retos;
+        [SerializeField] TextMeshProUGUI _coste;
+        public HighScoreTable panelPuntuaciones;
+        CasoMapa _casoMapaActual;
 
-    public void LeerCaso(Caso c, int idx)
-    {
-        _titulo.SetText(c.titulo);
-        _resumen.SetText(c.resumen);
+        private static Dictionary<int,Vector2Int> nPuntCasoCumulativo = new();
 
-        //Quedaría poner los efectos
-        _efectos.SetText("WIP:\n-Próximamente\n-Efectos super xulos\n-Recompensas\n\nY mucho más.");
+        private void Awake()
+        {
+            Instance = this;
+            if (_retos.spriteAsset == null)
+                _retos.spriteAsset = Resources.Load("Resources/Sprite Assets/GVars_CSE_Icons") as TMP_SpriteAsset;
+        }
 
-        int from = 0;
-        if (idx > 0) from = PuzzleManager.Instance.puntuacionesPorCaso[idx - 1];
-        _panelPuntuaciones.ShowOnlyRange(from, PuzzleManager.Instance.puntuacionesPorCaso[idx]);
-    }
+        public void LeerCaso(CasoMapa cm, Caso c, int id)
+        {
+            _casoMapaActual = cm;
+            _titulo.SetText(c.titulo);
+            _resumen.SetText(c.resumen);
+            _retos.SetText(Retos2String(c));
+            _coste.SetText(Coste2String(c.coste));
 
-    public void Abrir(bool value)
-    {
-        _panel.SetActive(value);
-        _puntuacionesParent.SetActive(value);
+            Vector2Int rango = nPuntCasoCumulativo[id];
+            panelPuntuaciones.ShowOnlyRange(rango.x, rango.y);
+        }
+
+        public async Task RellenarPuntuacionesDeCaso(int idCaso)
+        {
+            panelPuntuaciones.SetCasoID(idCaso);
+            await panelPuntuaciones.SetupScore(false);
+            nPuntCasoCumulativo.Add(idCaso, new(previousScores, panelPuntuaciones.elements.Count));
+            previousScores = panelPuntuaciones.elements.Count;
+        }
+        int previousScores = 0;
+
+
+        public void Abrir(bool value)
+        {
+            _panel.SetActive(value);
+        }
+        public void ComprarCasoMostrado() => _casoMapaActual.Comprar();
+
+        private string Retos2String(Caso c)
+        {
+            StringBuilder sb = new();
+            if (c.bounties == null) throw new NullReferenceException();
+
+            foreach (var item in c.bounties) item.AddToStringBuilder(ref sb);
+
+            if (c.bounties.Length == 0) sb.AppendLine("Sin recompensas...");
+
+            return sb.ToString();
+        }
+        private string Coste2String(int coste)
+        {
+            string txt = "";
+            for (int i = 0; i < coste; i++)
+            {
+                txt += i < ResourceManager.AgentesDisponibles ? AgenteSpriteText : AgenteSpriteTextRojo;
+            }
+            return txt;
+        }
+
+        public void ResetSingleton()
+        {
+            panelPuntuaciones.DeleteElements();
+            nPuntCasoCumulativo.Clear();
+            previousScores = 0;
+        }
     }
 }
