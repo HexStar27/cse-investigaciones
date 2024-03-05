@@ -13,6 +13,7 @@ using Hexstar.Dialogue;
 using Hexstar.CSE.SistemaEventos;
 using System.Collections;
 using CSE.Local;
+using System.Security.Cryptography;
 
 [System.Serializable] public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
 public class GameplayCycle : MonoBehaviour, ISingleton
@@ -69,7 +70,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	{
         startedCasesInDay = 0;
         completedCasesInDay = 0;
-        PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
+        //PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
         StartCoroutine(PrepareOutOfCaseTrack());
 
         if (ResourceManager.Dia == 0) //Inicio del juego
@@ -81,13 +82,12 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 
         // Carga los casos necesarios al iniciar el día
         await PuzzleManager.PrepararCasosParaInicioDia(recargarCasosDePartidaGuardada);
-
         if (recargarCasosDePartidaGuardada) recargarCasosDePartidaGuardada = false;
 		else
 		{
 			ResourceManager.ConsultasDisponibles = ResourceManager.ConsultasMaximas;
-			if (ResourceManager.Dia > 0) await DataUpdater.Instance.ShowAgentesDisponibles();
         }
+		if (ResourceManager.Dia > 0 || MenuPartidaController.continuandoPartida) await DataUpdater.Instance.ShowConsultasDisponibles();
 
         await AlmacenEventos.EncargarseDeEventosAptos();
 
@@ -97,6 +97,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
             return;
         }
 
+        CheckEndOfDay();
         //OperacionesGameplay.ActualizarDangerController();
     }
 
@@ -106,19 +107,19 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		PlayCaseTrack();
 
         AlmacenDePalabras.CargarPistasDeCasoActivo();
-		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
+		//PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
 
 		await Task.Yield();
 	}
 
 	private async Task FinCaso()
 	{
-		int nConsultas = PuzzleManager.ConsultasRealizadasActuales;
+		int nConsultas = PuzzleManager.NConsultasDuranteElCaso;
 		float tiempo = PuzzleManager.UltimoTiempoEmpleado;
         bool ganado = PuzzleManager.SolucionCorrecta;
 		if (ganado) completedCasesInDay++;
 
-		PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
+		//PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
 		await PuzzleManager.GetCasoActivo().ComprobarYAplicarBounties(ganado,nConsultas,tiempo);
 
 		StartCoroutine(PrepareOutOfCaseTrack());
@@ -128,17 +129,9 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent()) await GameOver();
 		else
 		{
-			if (ResourceManager.ConsultasDisponibles == 0)
-			{
-				EnqueueState(EstadosDelGameplay.FinDia);
+			CheckEndOfDay();
 
-				//Esperar confirmación del jugador para continuar
-				if (popupFinDia != null) popupFinDia.ActivarPopUp();
-
-				XAPI_Builder.CreateStatement_DayFinished(!ganado, completedCasesInDay, startedCasesInDay);
-			}
-
-			if (ganado && PuzzleManager.CasoActivoEsExamen())
+            if (ganado && PuzzleManager.CasoActivoEsExamen())
 			{
 				ResourceManager.DificultadActual++;
 				TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.mas_dificultad"));
@@ -149,8 +142,10 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         //Elimina las pistas del caso
 		AlmacenDePalabras.palabras[(int)TabType.Pistas].Clear();
 
-        PuzzleManager.LimpiarFlagsDeCasoActual();
-	}
+		await PuzzleManager.LoadCasosSiguientes(); // Los hijos correspondientes del caso
+        PuzzleManager.QuitarCasoActivo(); // F la referencia
+		PuzzleManager.SacarCasosDelBanquillo();	// Los no colocados
+    }
 
 	private async Task FinDia()
     {
@@ -163,14 +158,30 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		Intelisense.instance.pantalla.text ="";
 		BloqueTabletaElemento.DestruirBloquesEnMesa();
 
+		PuzzleManager.AplicarCaducidadDeCasosCargados();
+
+        XAPI_Builder.CreateStatement_DayFinished(completedCasesInDay, startedCasesInDay);
         EnqueueState(EstadosDelGameplay.InicioDia);
 	}
 
-	private void RestartCameraState()
+	private void CheckEndOfDay()
 	{
-		var mainCam = Camera.main;
-        var ilcs = mainCam.GetComponent<InscryptionLikeCameraState>();
-		var cs = mainCam.GetComponent<CameraState>();
+        if (ResourceManager.ConsultasDisponibles == 0 || PuzzleManager.CasosRestantesEnMapa() == 0)
+        {
+            //Esperar confirmación del jugador para continuar
+            if (popupFinDia != null) popupFinDia.ActivarPopUp();
+        }
+    }
+	public void Enqueue4EndOfDay() 
+	{
+		EnqueueState(EstadosDelGameplay.FinDia);
+	}
+
+    private void RestartCameraState()
+	{
+		var ilcs = InscryptionLikeCameraState.Instance;
+		if (ilcs == null) return;
+        var cs = ilcs.GetComponent<CameraState>();
 		ilcs.SetCameraState(cs);
 		ilcs.SetEstadoActual(0);
 		cs.Transition(0);
@@ -190,10 +201,11 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	private IEnumerator PrepareOutOfCaseTrack()
     {
 		if (bgmSource.clip == bgm_oficineando) yield break;
-		WaitWhile mientrasSuene = new(() => { return bgmSource.isPlaying; });
+		WaitWhile mientrasSuene = new(() => { return bgmSource.isPlaying || !gameover; });
 		yield return mientrasSuene;
-		bgmSource.clip = bgm_oficineando;
-		bgmSource.Play();
+		if (gameover) yield break;
+        bgmSource.clip = bgm_oficineando;
+        bgmSource.Play();
 	}
 	private void PlayCaseTrack()
 	{
@@ -232,7 +244,8 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 
 	public void ReintentarDesdePuntoDeGuardado()
     {
-		ResourceManager.checkpoint.CargarDatosAlSistema();
+        MenuPausa.onExitLevel?.Invoke();
+        ResourceManager.checkpoint.CargarDatosAlSistema();
 		GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
 	}
 	public void VolverAlMenuPrincipal() { 
@@ -241,7 +254,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 
     private void Awake()
 	{
-		if(Instance == null) Instance = this;
+        if (Instance == null) Instance = this;
 		EstadosPosibles = 4;
 
 		BucleExtractor();
@@ -251,24 +264,31 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		bgm_gameOver = Resources.Load<AudioClip>("Audio/Music/MT_Estas_Fuegado");
 		bgm_intro_gameOver = Resources.Load<AudioClip>("Audio/Music/MT_Ups");
     }
-
 	private async void Start()
 	{
-		await TryLoadGame();
+		int d = ResourceManager.Dia;
+		Task t = _dayCounter.InitAnimation(d - 1, d);
+        await TryLoadGame();
+		await Task.WhenAll(t);
 		EnqueueState(EstadosDelGameplay.InicioDia);
 	}
 
     public void ResetSingleton()
     {
+		// Limpiando estados del GCycle
 		estadoActual = 0;
 		gameover = false;
 
         pilaEstadosSiguientes.Clear();
 		pauseMessageDict.Clear();
+
+		// Reiniciando valores globales de clases secundarias
+		Boton3D.globalStop = false;
+		InscryptionLikeCameraState.SetBypass(false);
     }
     private void OnEnable()
 	{
-		ResourceManager.OnOutOfQueries.AddListener(OperacionesGameplay.SinConsultas);
+        ResourceManager.OnOutOfQueries.AddListener(OperacionesGameplay.SinConsultas);
 		MenuPausa.onExitLevel.AddListener(ResetSingleton);
 	}
 	private void OnDisable()
@@ -288,7 +308,8 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 
     private async void BucleExtractor()
 	{
-		while(!gameover && !terminarBucleExtractor)
+        terminarBucleExtractor = false;
+        while (!gameover && !terminarBucleExtractor)
 		{
 			if(pilaEstadosSiguientes.Count > 0)
 			{
@@ -322,8 +343,8 @@ public class GameplayCycle : MonoBehaviour, ISingleton
     private async Task TryLoadGame()
     {
 		AlmacenDePalabras.CargarPalabras();
-		recargarCasosDePartidaGuardada = ResourceManager.checkpoint.casosCargados.Length > 0;
-		await AlmacenEventos.DescargarEventosServidor(); //Lo descarga en el main thread, será un problema?
+		recargarCasosDePartidaGuardada = MenuPartidaController.continuandoPartida;
+		await AlmacenEventos.DescargarEventosServidor();
 		//A lo mejor hace falta meter una barra de carga...
 	}
 

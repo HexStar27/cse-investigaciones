@@ -2,10 +2,12 @@
 using TMPro;
 using System.Text;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Hexstar.CSE
 {
-    public class CasoDescripcion : MonoBehaviour
+    public class CasoDescripcion : MonoBehaviour, ISingleton
     {
         readonly string AgenteSpriteText = "<sprite name=\"icono_agentes\">";
         readonly string AgenteSpriteTextRojo = "<sprite name=\"icono_agentes\" color=#FF0000>";
@@ -18,6 +20,8 @@ namespace Hexstar.CSE
         public HighScoreTable panelPuntuaciones;
         CasoMapa _casoMapaActual;
 
+        private static Dictionary<int,Vector2Int> nPuntCasoCumulativo = new();
+
         private void Awake()
         {
             Instance = this;
@@ -25,7 +29,7 @@ namespace Hexstar.CSE
                 _retos.spriteAsset = Resources.Load("Resources/Sprite Assets/GVars_CSE_Icons") as TMP_SpriteAsset;
         }
 
-        public void LeerCaso(CasoMapa cm, Caso c, int idx)
+        public void LeerCaso(CasoMapa cm, Caso c, int id)
         {
             _casoMapaActual = cm;
             _titulo.SetText(c.titulo);
@@ -33,10 +37,19 @@ namespace Hexstar.CSE
             _retos.SetText(Retos2String(c));
             _coste.SetText(Coste2String(c.coste));
 
-            int from = 0;
-            if (idx > 0) from = PuzzleManager.PuntuacionesPorCaso[idx - 1];
-            panelPuntuaciones.ShowOnlyRange(from, PuzzleManager.PuntuacionesPorCaso[idx]);
+            Vector2Int rango = nPuntCasoCumulativo[id];
+            panelPuntuaciones.ShowOnlyRange(rango.x, rango.y);
         }
+
+        public async Task RellenarPuntuacionesDeCaso(int idCaso)
+        {
+            panelPuntuaciones.SetCasoID(idCaso);
+            await panelPuntuaciones.SetupScore(false);
+            nPuntCasoCumulativo.Add(idCaso, new(previousScores, panelPuntuaciones.elements.Count));
+            previousScores = panelPuntuaciones.elements.Count;
+        }
+        int previousScores = 0;
+
 
         public void Abrir(bool value)
         {
@@ -63,6 +76,13 @@ namespace Hexstar.CSE
                 txt += i < ResourceManager.AgentesDisponibles ? AgenteSpriteText : AgenteSpriteTextRojo;
             }
             return txt;
+        }
+
+        public void ResetSingleton()
+        {
+            panelPuntuaciones.DeleteElements();
+            nPuntCasoCumulativo.Clear();
+            previousScores = 0;
         }
     }
 }

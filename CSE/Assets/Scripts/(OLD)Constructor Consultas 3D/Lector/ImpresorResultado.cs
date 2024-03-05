@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
@@ -17,11 +18,17 @@ public class ImpresorResultado : MonoBehaviour
 
     public void IntroducirResultado(string r)
     {
+        StartCoroutine(ProcessQueryResult(r));
+    }
+
+    private IEnumerator ProcessQueryResult(string r)
+    {
         textoResultado.text = QueryResultBeautifierV2(r);
         if (IO_Button != null && textoResultado.transform.localScale.x == 0)
         {
             IO_Button.SendClick();
         }
+        yield return null;
     }
 
     public bool LastQueryWasNotCorrect() => badQuery;
@@ -50,7 +57,6 @@ public class ImpresorResultado : MonoBehaviour
     private string QueryResultBeautifierV2(string json)
     {
         json = "{query:[" + json + "]}";
-        print(json);
         var nodo = SimpleJSON.JSON.Parse(json);
 
         badQuery = nodo["query"].HasKey("message");

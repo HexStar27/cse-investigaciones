@@ -43,7 +43,7 @@ namespace Hexstar.CSE
             int pistaIdx = (int)TabType.Pistas;
             palabras[pistaIdx] = new List<string>();
             Caso c = PuzzleManager.GetCasoActivo();
-            foreach(var pista in c.pistas) palabras[pistaIdx].Add(pista.palabra);
+            foreach(var pista in c.pistas) palabras[pistaIdx].AddRange(pista.palabras);
         }
 
         public static void CargarPalabras()

@@ -87,14 +87,13 @@ namespace CSE
 
             statements.Add(statement.ToString());
         }
-        public static void CreateStatement_DayFinished(bool lastCaseLost, int completedCases, int triedCases)
+        public static void CreateStatement_DayFinished(int completedCases, int triedCases)
         {
             JSONNode statement = new JSONObject();
             statement.Add("actor", actor);
             statement.Add("verb", ConstructSimpleVerb("finished"));
             statement.Add("object", ConstructSimpleObject("general", "day", "The player ran out of queries"));
             JSONObject context = new();
-            context.Add("last_case_lost", lastCaseLost);
             context.Add("completed_cases", completedCases);
             context.Add("tried_cases", triedCases);
             statement.Add("context", context);

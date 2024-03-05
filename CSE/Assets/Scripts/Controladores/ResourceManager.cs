@@ -33,8 +33,8 @@ public static class ResourceManager
     }
     public static int ConsultasDisponibles
     {
-        get => consultasDisponibles; set
-        {
+        get => consultasDisponibles; 
+        set {
             consultasDisponibles = value;
             if (consultasDisponibles > consultasMaximas) consultasDisponibles = consultasMaximas;
             if (consultasDisponibles <= 0)

@@ -305,8 +305,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81fbe3d1a7301c14396bb1ffcc101e9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  indiceCaso: 0
-  coste: {fileID: 3357576506559923353}
+  idCaso: 0
+  costeTM: {fileID: 3357576506559923353}
   audioHover: {fileID: 8300000, guid: db4de31355c0b9e49a33ca8022f11a87, type: 3}
   audioSelect: {fileID: 8300000, guid: ee943ef9a8397a741affed0dcecc77ab, type: 3}
   audioError: {fileID: 8300000, guid: c8b7867965a142740afa6b5f2642623d, type: 3}

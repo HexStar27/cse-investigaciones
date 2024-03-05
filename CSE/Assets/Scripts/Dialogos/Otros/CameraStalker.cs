@@ -5,19 +5,24 @@ public class CameraStalker : MonoBehaviour
 {
     [SerializeField] InscryptionLikeCameraState cam;
     public int stateToWaitFor = 0;
+    public bool inverse = false;
+    public bool closeOnReady = true;
 
     public UnityEvent onCameraReady = new();
 
     private void FixedUpdate()
     {
-        if (cam.GetCamState().GetState() == stateToWaitFor)
+        bool detected = cam.GetCamState().GetState() == stateToWaitFor;
+        if (detected ^ inverse)
         {
             onCameraReady?.Invoke();
-            gameObject.SetActive(false);
+            if (closeOnReady) gameObject.SetActive(false);
         }
     }
     public void SetTarget(int target)
     {
         stateToWaitFor = target;
     }
+
+    public bool CorrectState() => (cam.GetCamState().GetState() == stateToWaitFor) ^ inverse;
 }

@@ -17,6 +17,8 @@ namespace Hexstar.CSE
         [SerializeField] string failStateName;
 
         [SerializeField] Sprite[] varIcons = new Sprite[0];
+        AudioSource audioS;
+        AudioClip clipBounty, clipNoBounty;
 
         private string condicionAMostrar = "";
 
@@ -34,13 +36,24 @@ namespace Hexstar.CSE
             if (win)
             {
                 Instance.anim.Play(Instance.successStateName);
-                await Task.Delay(2934); // anim = 2833, extra = 100
+                await Task.Delay(3034); // anim = 2833, extra = 200
             }
             else
             {
                 Instance.anim.Play(Instance.failStateName);
-                await Task.Delay(2767); // anim = 2666, extra = 100
+                await Task.Delay(2867); // anim = 2666, extra = 200
             }
+        }
+
+        [ContextMenu("Test Success")]
+        private void TestSuccess()
+        {
+            anim.Play(successStateName);
+        }
+        [ContextMenu("Test Failure")]
+        private void TestFailure()
+        {
+            anim.Play(failStateName);
         }
 
         /// <summary>
@@ -57,8 +70,15 @@ namespace Hexstar.CSE
             }
         }
 
+        public void PlayBountySFX() => audioS.PlayOneShot(clipBounty);
+        public void PlayNoBountySFX() => audioS.PlayOneShot(clipNoBounty);
+        
+
         private void Awake()
         {
+            audioS = GetComponent<AudioSource>();
+            clipBounty = Resources.Load<AudioClip>("Audio/SFX/SFX_Bounty");
+            clipNoBounty = Resources.Load<AudioClip>("Audio/SFX/SFX_NO_Bounty");
             Instance = this;
         }
     }

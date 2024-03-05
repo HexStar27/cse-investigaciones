@@ -14,23 +14,28 @@ using CSE.Local;
 public class PuzzleManager : MonoBehaviour, ISingleton
 {
 	private static readonly int primerCasoPrincipalDelJuego = 1;
-	public static int ConsultasRealizadasActuales { get; set; } = 0;
-	private static float tiempoInicioCaso = .0f;
-	public static int CasoActivoIndice { get; set; } = -1;
+	public static int NConsultasDuranteElCaso { get; set; } = 0;
+	private static Caso CasoActivo { get; set; } = null;
 	public static bool SolucionCorrecta { get; set; } = false;
 	public static float UltimoTiempoEmpleado { get; set; } = 0f;
+	private static float tiempoInicioCaso = .0f;
 	public static int NRetosCumplidos { get; set; } = 0;
 
 	private static PuzzleManager Instance { get; set; }
 
-	public static List<int> PuntuacionesPorCaso { get; private set; } = new List<int>();
-	private static List<Caso> casosCargados = new List<Caso>();
-	private GameObject[] casosGO = new GameObject[0];
+	
+	private readonly static Dictionary<int,Caso> casosCargados = new();
+	private readonly static Dictionary<int,CasoMapa> casosGO = new();
+	private readonly static List<int> idCasosNoColocados = new();
+
 
 	[SerializeField] RectTransform _map;
 	[SerializeField] Vector2 _cellSize = new(50, 50);
-	
-	[SerializeField] TMPro.TextMeshProUGUI textoObjetivoMision;
+	[SerializeField] Vector2 _paddingMapa = new(75, 75);
+	//Variables del mapa derivadas...
+	Vector2 offset, paddedSize, gridSize;
+
+    [SerializeField] TMPro.TextMeshProUGUI textoObjetivoMision;
 	[SerializeField] Transform fondoMapaMejoraVision;
 
 	[Header("Prefabs necesarios:")]
@@ -44,10 +49,10 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	/// <summary>
 	/// Establece el caso activo y reinicia los contadores de consulta y tiempo empleado
 	/// </summary>
-	public static void IniciarStatsCaso(int indiceCaso)
+	public static void IniciarStatsCaso(int idCaso)
     {
-		CasoActivoIndice = indiceCaso;
-		ConsultasRealizadasActuales = 0;
+		CasoActivo = casosCargados[idCaso];
+		NConsultasDuranteElCaso = 0;
         NRetosCumplidos = 0;
         tiempoInicioCaso = Time.realtimeSinceStartup;
     }
@@ -58,71 +63,96 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	public static float GetSetTiempoEmpleado() { return UltimoTiempoEmpleado = Time.realtimeSinceStartup - tiempoInicioCaso; }
 
     /// <summary>
-    /// Carga casos principales y rellena el mapa.
+    /// Carga casos principales y rellena el mapa. Para el inicio del día.
     /// </summary>
     /// <param name="buscarEnArchivoGuardado"> si verdadero, cargará los datos que encuentre en el archivo de guardado</param>
     public static async Task PrepararCasosParaInicioDia(bool buscarEnArchivoGuardado = false)
     {
-		Instance.QuitarTodos();
-
-		if(buscarEnArchivoGuardado) // Carga los casos de las ids guardadas (de casos aún no completados)
+		if(buscarEnArchivoGuardado) // Carga los casos de las ids guardadas (casos aún no completados supuestamente)
 		{
-            int n = ResourceManager.checkpoint.casosCargados.Length;
-            for (int i = 0; i < n; i++)
-                await Instance.LoadCasoEspecifico(ResourceManager.checkpoint.casosCargados[i]);
-        }
-		else //Procedimiento normal
-		{
-            //Cargar casos principales
-			if (ResourceManager.CasosCompletados.Count == 0)
+            Instance.QuitarTodos();
+            int n = Mathf.Min(ResourceManager.checkpoint.casosCargados.Length, ResourceManager.checkpoint.caducidadCasosCargados.Count);
+			for (int i = 0; i < n; i++)
 			{
-				await Instance.LoadCasoEspecifico(primerCasoPrincipalDelJuego);
+				int id = ResourceManager.checkpoint.casosCargados[i];
+                await LoadCasoEspecifico(id);
+				casosCargados[id].caducidad = ResourceManager.checkpoint.caducidadCasosCargados[i];
 			}
-			else await Instance.LoadCasosSiguientes();
         }
+		else if (ResourceManager.CasosCompletados.Count == 0)
+		{
+            // Si no ha completado ninguno, cargar el del tutorial
+            await LoadCasoEspecifico(primerCasoPrincipalDelJuego);
+		}
+        
 
-        Instance.MostrarCasosEnPantalla();
-		ObtenerPuntuacionesDeCasosCargados();
+        Instance.PrepararCasosMapa();
+		ObtenerPuntuacionesDeTodosLosCasos();
 	}
 
-	private static async void ObtenerPuntuacionesDeCasosCargados(bool dontClearJustAdd = false)
-    {
-		var puntuaciones = CasoDescripcion.Instance.panelPuntuaciones;
-		if(!dontClearJustAdd)
-        {
-            puntuaciones.DeleteElements();
-			PuntuacionesPorCaso.Clear();
+	/// <summary>
+	/// No se aplicará la caducidad a aquellos casos cargados que no estén presentes en el mapa ya que sería injusto
+	/// </summary>
+	public static void AplicarCaducidadDeCasosCargados()
+	{
+		List<int> casosAEliminar = new();
+		var e = casosCargados.Values.GetEnumerator();
+		while(e.MoveNext())
+		{
+			Caso c = e.Current;
+			if (idCasosNoColocados.Contains(c.id)) continue; // No está presente en el mapa
+			if (c.caducidad < 0) continue; // Se ignora la caducidad
+			
+			c.caducidad--;
+			if (c.caducidad <= 0)
+			{
+				casosAEliminar.Add(c.id);
+                ResourceManager.CasosCompletados.Add(c.id);
+                ResourceManager.CasosCompletados_ListaDeEstados.Add(0); //Cuenta como caso ABANDONADO
+                //No se comprueban los bounties (ni aunque perder sea uno de ellos)
+            }
 		}
-		if (casosCargados == null) return;
-		foreach(var c in casosCargados)
-        {
-            puntuaciones.SetCasoID(c.id);
-			await puntuaciones.SetupScore(false);
-			PuntuacionesPorCaso.Add(puntuaciones.elements.Count);
-		}
-    }
+		for (int i = 0; i < casosAEliminar.Count; i++) EliminarCaso(casosAEliminar[i]);
+	}
 
 	/// <summary>
-	/// Resetea los valores relacionados con el caso actual
+	/// Pide las puntuaciones de cada caso al servidor. Elimina las puntuaciones cargadas anteriormente.
 	/// </summary>
-	public static void LimpiarFlagsDeCasoActual()
+	private static async void ObtenerPuntuacionesDeTodosLosCasos()
     {
-		CasoActivoIndice = -1;
-		SolucionCorrecta = false;
+		if (casosCargados == null) return;
+
+		CasoDescripcion.Instance.ResetSingleton();
+		foreach(var c in casosCargados) await CasoDescripcion.Instance.RellenarPuntuacionesDeCaso(c.Key);
     }
 
+	public static async void InsertarCasoExtra(int idCaso)
+	{
+        await LoadCasoEspecifico(idCaso);
+		
+		Instance.InstanciarCasoMapa(casosCargados[idCaso]);
+		Instance.IntentarColorcarCasosNoColocados();
+        
+		await CasoDescripcion.Instance.RellenarPuntuacionesDeCaso(idCaso);
+    }
 
-	public static Caso GetCasoCargado(int idx) => casosCargados[idx];
-	public static int GetTotalCasosCargados() => casosCargados.Count;
-	public static Caso GetCasoActivo() => CasoActivoIndice < 0 ? null : casosCargados[CasoActivoIndice];
-    public static int GetIdCasoActivo() => CasoActivoIndice < 0 ? -1 : casosCargados[CasoActivoIndice].id;
-	public static bool CasoActivoEsExamen() => CasoActivoIndice >= 0 && casosCargados[CasoActivoIndice].examen;
-    
+	public static void QuitarCasoActivo() => CasoActivo = null;
+
+    public static Caso GetCasoCargado(int idCaso) => casosCargados[idCaso];
+	public static Caso GetCasoActivo() => CasoActivo;
+    public static int GetIdCasoActivo() => CasoActivo != null ? CasoActivo.id : -1;
+	public static bool CasoActivoEsExamen() => CasoActivo != null && CasoActivo.examen;
+    public static List<Caso> GetTodosLosCasosCargados()
+    {
+		List<Caso> cs = new();
+		foreach (var curr in casosCargados.Values) cs.Add(curr);
+		return cs;
+    }
 
     /// <summary>
     /// Pide al servidor el caso con la id especificada y lo añade a la lista
     /// </summary>
-    public async Task LoadCasoEspecifico(int idCaso)
+    public static async Task LoadCasoEspecifico(int idCaso)
     {
 		WWWForm form = new WWWForm();
 		form.AddField("authorization", SesionHandler.sessionKEY);
@@ -133,18 +163,18 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 
 	/// <summary>
 	/// Añade el (o los) siguientes casos a la lista según el resultado del último caso completado.
-	/// Debe usarse justo después de completar un caso...
+	/// Debe usarse justo después de completar un caso.
 	/// </summary>
-	public async Task LoadCasosSiguientes()
+	public static async Task LoadCasosSiguientes()
 	{
 		if (ResourceManager.CasosCompletados_ListaDeEstados.Count == 0) return;
-		int ultimaId = ResourceManager.CasosCompletados[^1];
-        int ultimoGanado = ResourceManager.CasosCompletados_ListaDeEstados[^1];
+		int id = ResourceManager.CasosCompletados[^1];
+        int ganado = ResourceManager.CasosCompletados_ListaDeEstados[^1];
 
         WWWForm form = new();
 		form.AddField("authorization", SesionHandler.sessionKEY);
-		form.AddField("id", ultimaId);
-		form.AddField("win",  ultimoGanado);
+		form.AddField("id", id);
+		form.AddField("win", ganado);
 		await ConexionHandler.APost(ConexionHandler.baseUrl + "case/next", form);
 		ParsearRawJsonACasos(ConexionHandler.download);
 	}
@@ -152,12 +182,12 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	/// <summary>
 	/// Carga en la lista todos los casos que encuentre en la respuesta del servidor
 	/// </summary>
-	private void ParsearRawJsonACasos(string download)
+	private static void ParsearRawJsonACasos(string download)
 	{
 		string json = ConexionHandler.ExtraerJson(download);
 		if (json == "{}")
 		{
-			Debug.LogError("Ha habido un error en el servidor al pedir los casos :(");
+			Debug.LogWarning("Ha habido un error en el servidor al pedir los casos :(");
 			TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".no_internet_msg_2"));
 			return;
 		}
@@ -175,77 +205,134 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	/// <summary>
 	/// Carga en la lista un caso con los datos del json especificado.
 	/// </summary>
-	private void CargarJsonComoCaso(string json) 
+	private static void CargarJsonComoCaso(string json) 
 	{
         Caso c = JsonConverter.PasarJsonAObjeto<Caso>(json);
-		if (c != null) casosCargados.Add(c);
+		if (c != null) casosCargados.TryAdd(c.id,c);
     }
 
 	public void QuitarTodos()
 	{
 		DestruirObjetosCasoMapa();
 		casosCargados.Clear();
-		LimpiarFlagsDeCasoActual();
+        QuitarCasoActivo();
 	}
 
 	public void DestruirObjetosCasoMapa()
     {
-		int n = casosGO.Length;
-		for (int i = 0; i < n; i++)
+		int n = casosGO.Count;
+		foreach(var cm in casosGO.Values)
 		{
-			Destroy(casosGO[i]);
+			Destroy(cm.gameObject);
 		}
+		casosGO.Clear();
 	}
 
-	public void MostrarCasosEnPantalla()
+	public static int CasosRestantesEnMapa()
 	{
-		//1º Calcular grid de la pantalla
-		Vector2 padding = new(75, 75); //Padding del mapa (NO de cada celda individual) 
-		Vector2 paddedSize = _map.sizeDelta - 2*padding;
-		
-		Vector2 offset = padding - _map.sizeDelta / 2;
-		Vector2 gridSize = new(
-			Mathf.Max(1f, Mathf.Floor(paddedSize.x / _cellSize.x)),
-			Mathf.Max(1f, Mathf.Floor(paddedSize.y / _cellSize.y)));
+		int r = 0;
+		var e = casosGO.Values.GetEnumerator();
+		while (e.MoveNext()) if (e.Current != null && e.Current.gameObject.activeSelf) r++;
+		return r;
+	}
 
-        int n = casosCargados.Count;
-		int maxMapCapacity = (int)(gridSize.x * gridSize.y);
-        if (n > maxMapCapacity)
-		{
-			Debug.LogError("No deberían de haber más casos cargados que posiciones disponibles en el mapa (max=" + maxMapCapacity + ") ...");
-			n = maxMapCapacity;
-        }
 
-        //2º Inicializar objetos CasoMapa (1 por caso almacenado)
+	/// <summary>
+	/// Se encarga de calcular las dimensiones del mapa, y de instanciar y colocar los casos en el mapa.<br></br>
+	/// Elimina todos los casos anteriores que habían en el mapa en el proceso...
+	/// </summary>
+    public void PrepararCasosMapa()
+	{
+		CalcularGridMapa();
+        int maxMapCapacity = (int)(gridSize.x * gridSize.y);
+
+        //Inicializando casos en mapa
         DestruirObjetosCasoMapa();
-        casosGO = new GameObject[n];
-        for (int i = 0; i < n; i++)
-        {
-			GameObject objeto;
-			if (casosCargados[i].examen) objeto = Instantiate(casoMapaEPrefab, _map);			// Caso Examen
-			else if (casosCargados[i].secundario) objeto = Instantiate(casoMapaSPrefab, _map);	// Caso Secundario
-			else objeto = Instantiate(casoMapaPrefab, _map);									// Caso Principal
-            
-			if (objeto.TryGetComponent(out CasoMapa casoM))
-            {
-				casoM.CargarDatosCaso(i);
-            }
-			//3º Posicionar
-			Vector2 gPos = gridSize.HashCaso2Pos(casosCargados[i]);
-			Vector2 mPos = gPos * _cellSize + offset;
-
-            if (AlreadyACaseThere(mPos,i)) //Evitar superposición
-            {
-				if (showMapGrid) Debug.Log("Evitando superposición");
-				Vector2 newPos = FindFreeCell(gridSize, gPos, offset, i);
-				if(newPos != -Vector2.one) mPos = newPos;
-            }
-            objeto.transform.localPosition = mPos;
-            casosGO[i] = objeto;
-        }
+		idCasosNoColocados.Clear();
+		foreach (var par in casosCargados)
+		{
+			if (casosGO.Count >= maxMapCapacity) break;
+			InstanciarCasoMapa(par.Value);
+		}
     }
 
-	private Vector2 FindFreeCell(Vector2 gridSize, Vector2 wantedCell, Vector2 mapOffset, int objectsAssgined)
+	/// <summary>
+	/// Prepara el caso "c", lo intenta posicionar y lo guarda en casosGO.
+	/// Si no encuentra espacio, no lo posiciona, lo desactiva, y lo envía a la lista de casos no colocados.
+	/// </summary>
+	private void InstanciarCasoMapa(Caso c)
+	{
+        GameObject objeto;
+        if (c.examen) objeto = Instantiate(casoMapaEPrefab, _map);          // Caso Examen
+        else if (c.secundario) objeto = Instantiate(casoMapaSPrefab, _map); // Caso Secundario
+        else objeto = Instantiate(casoMapaPrefab, _map);                    // Caso Principal
+
+		//Inicialización
+        CasoMapa casoM = objeto.GetComponent<CasoMapa>();
+        casoM.CargarDatosCaso(c.id, c.coste);
+
+        //Posicionamiento
+        Vector2 gridCasePos = gridSize.HashCaso2Pos(c);
+        Vector2 mapCasePos = gridCasePos * _cellSize + offset;
+
+        if (AlreadyACaseThere(mapCasePos)) //Evitar colisión
+        {
+            if (showMapGrid) Debug.Log("Evitando colisión");
+            Vector2 newPos = FindFreeCell(gridSize, gridCasePos, offset);
+            if (newPos != -Vector2.one) objeto.transform.localPosition = newPos;
+            else //No se pudo colocar en el mapa
+            {
+                idCasosNoColocados.Add(c.id);
+				objeto.SetActive(false);
+            }
+        }
+        else objeto.transform.localPosition = mapCasePos;
+        casosGO.Add(c.id, casoM); // IMPORTANTE añadir DESPUÉS de encontrarle una posición
+    }
+	private void CalcularGridMapa()
+	{
+        offset = _paddingMapa - _map.sizeDelta / 2;
+        paddedSize = _map.sizeDelta - 2 * _paddingMapa;
+        gridSize = new(
+            Mathf.Max(1f, Mathf.Floor(paddedSize.x / _cellSize.x)),
+            Mathf.Max(1f, Mathf.Floor(paddedSize.y / _cellSize.y)));
+    }
+
+    public static void SacarCasosDelBanquillo() => Instance.IntentarColorcarCasosNoColocados();
+    public void IntentarColorcarCasosNoColocados()
+	{
+        while (idCasosNoColocados.Count > 0)
+		{
+			int id = idCasosNoColocados[0];
+			CasoMapa casoM = casosGO[id];
+
+            Vector2 gridCasePos = gridSize.HashCaso2Pos(casosCargados[id]);
+            Vector2 posCandidate = gridCasePos * _cellSize + offset;
+			bool bloqueado = AlreadyACaseThere(posCandidate);
+            if (bloqueado) //Evitar superposición
+            {
+                if (showMapGrid) Debug.Log("Evitando superposición");
+                Vector2 newPos = FindFreeCell(gridSize, gridCasePos, offset);
+				if (newPos != -Vector2.one) { posCandidate = newPos; bloqueado = false; }
+			}
+
+			if(bloqueado) break; //Si no ha conseguido encontrar un hueco, el resto de casos tampoco lo harán...
+			else
+			{
+                idCasosNoColocados.RemoveAt(0);
+                casoM.gameObject.SetActive(true);
+                casoM.transform.localPosition = posCandidate;
+			}
+        }
+    }
+    
+	public static void EliminarCaso(int idCaso)
+	{
+		casosCargados.Remove(idCaso);
+		casosGO.Remove(idCaso);
+    }
+
+	private Vector2 FindFreeCell(Vector2 gridSize, Vector2 mapOffset, Vector2 wantedCell)
 	{
 		Vector2 cellPos,propossedCell;
 		for(int i = 1; i < gridSize.x; i++)
@@ -257,16 +344,21 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 				propossedCell.y = (wantedCell.y + j) % gridSize.y;
 
 				cellPos = propossedCell * _cellSize +mapOffset;
-				if (!AlreadyACaseThere(cellPos,objectsAssgined)) return cellPos;
+				if (!AlreadyACaseThere(cellPos)) return cellPos;
 			}
 		}
 		return -Vector2.one;
 	}
-	private bool AlreadyACaseThere(Vector3 pos, int n = 0)
+	private bool AlreadyACaseThere(Vector3 pos)
 	{
 		bool thereIs = false;
-		while (casosGO[n] != null) n++;
-		for (int i = 0; i < n && !thereIs; i++) thereIs |= casosGO[i].transform.localPosition == pos;
+		var enumerator = casosGO.Values.GetEnumerator();
+		while(enumerator.MoveNext() && !thereIs)
+		{
+			CasoMapa c = enumerator.Current;
+			if (c == null || !c.gameObject.activeSelf) continue;
+			thereIs |= c.transform.localPosition == pos;
+		}
 		return thereIs;
 	}
 
@@ -276,12 +368,12 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	/// <param name="value"></param>
 	public static void MostrarObjetivoDeCasoEnPantalla(bool value)
     {
-		bool ok = value && CasoActivoIndice >= 0;
+		bool ok = value && CasoActivo != null;
         Instance.textoObjetivoMision.text = "";
         Instance.fondoMapaMejoraVision.gameObject.SetActive(ok);
         if (ok)
 		{
-			string resumenCasoActual = casosCargados[CasoActivoIndice].resumen;
+			string resumenCasoActual = CasoActivo.resumen;
             Instance.textoObjetivoMision.text = resumenCasoActual;
         }
 	}
@@ -297,12 +389,11 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 
 	public void ResetSingleton()
 	{
-        ConsultasRealizadasActuales = 0;
+        NConsultasDuranteElCaso = 0;
 		UltimoTiempoEmpleado = 0f;
 		NRetosCumplidos = 0;
 		tiempoInicioCaso = .0f;
 		QuitarTodos();
-		PuntuacionesPorCaso.Clear();
     }
     private void OnEnable()
 	{

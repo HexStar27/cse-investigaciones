@@ -29,12 +29,16 @@ public class ControladorMenuBloqueValue : MonoBehaviour
         var pistas = caso.pistas;
         for(int i = 0; i < pistas.Length; i++)
         {
-            string pista = pistas[i].palabra;
-            GameObject o = Instantiate(elementoPrefab, contentObject);
-            elementosActivos.Add(o);
-            var elem = o.GetComponent<ElementoMenuValor>();
-            elem.SetText(pista);
-            elem.toggle.group = tGroup;
+            var palabras = pistas[i].palabras;
+            for (int j = 0; j < palabras.Length; j++)
+            {
+                string pista = palabras[j];
+                GameObject o = Instantiate(elementoPrefab, contentObject);
+                elementosActivos.Add(o);
+                var elem = o.GetComponent<ElementoMenuValor>();
+                elem.SetText(pista);
+                elem.toggle.group = tGroup;
+            }
         }
     }
 

@@ -76,6 +76,27 @@ namespace Hexstar.CSE.SistemaEventos
         }
     }
 
+    public class CondDialogE : CondDia
+    {
+        public string key = "";
+        public override bool EsValida()
+        {
+            string cad = Dialogue.ControladorDialogos.GetDialogueEventValue(key);
+            if (cad == "") return false;
+            if (int.TryParse(cad, out int contenido))
+            {
+                return operacion switch
+                {
+                    Operacion.EQ => contenido == valor,
+                    Operacion.LT => contenido < valor,
+                    Operacion.GT => contenido > valor,
+                    _ => throw new NotImplementedException(),
+                };
+            }
+            else return false;
+        }
+    }
+
     public class CondConect : CondicionEvento
     {
         public enum TipoConect { AND, OR };
@@ -127,7 +148,7 @@ namespace Hexstar.CSE.SistemaEventos
         // Nivel 3
         static readonly string num = @"(-?\d+)";
         static readonly string op = @"(=|<|>)";
-        static readonly string var = @"(CASO_COMPLETADO|CASO_PERDIDO|CASO_ABANDONADO|DIA_ACTUAL|REP_PUEBLO|REP_EMPRESA)";
+        static readonly string var = @"(CASO_COMPLETADO|CASO_PERDIDO|CASO_ABANDONADO|DIA_ACTUAL|REP_PUEBLO|REP_EMPRESA|(EVENTO_\w+))";
         static readonly string condicion_simple = @"(" +var+op+num+ @")";
         // Nivel 2
         static readonly string and = @"(AND\(.*\))";
@@ -236,31 +257,35 @@ namespace Hexstar.CSE.SistemaEventos
 
             int valor = int.Parse(pareja[1], System.Globalization.NumberStyles.Integer);
 
-            switch (variable)
+            if (variable.StartsWith("EVENTO_")) return new CondDialogE() { operacion = op, valor = valor, key = variable[7..] };
+            else
             {
-                case "CASO_COMPLETADO":
-                    if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_COMPLETADO, se usó \""+operador+"\".");
-                    return new CondCaso() { tipo = CondCaso.TipoResultado.COMPLETADO, valor = valor };
+                switch (variable)
+                {
+                    case "CASO_COMPLETADO":
+                        if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_COMPLETADO, se usó \"" + operador + "\".");
+                        return new CondCaso() { tipo = CondCaso.TipoResultado.COMPLETADO, valor = valor };
 
-                case "CASO_PERDIDO":
-                    if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_PERDIDO, se usó \"" + operador + "\".");
-                    return new CondCaso() { tipo = CondCaso.TipoResultado.PERDIDO, valor = valor };
+                    case "CASO_PERDIDO":
+                        if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_PERDIDO, se usó \"" + operador + "\".");
+                        return new CondCaso() { tipo = CondCaso.TipoResultado.PERDIDO, valor = valor };
 
-                case "CASO_ABANDONADO":
-                    if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_ABANDONADO, se usó \"" + operador + "\".");
-                    return new CondCaso() { tipo = CondCaso.TipoResultado.ABANDONADO, valor = valor };
+                    case "CASO_ABANDONADO":
+                        if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_ABANDONADO, se usó \"" + operador + "\".");
+                        return new CondCaso() { tipo = CondCaso.TipoResultado.ABANDONADO, valor = valor };
 
-                case "DIA_ACTUAL":
-                    return new CondDia() { operacion = op, valor = valor };
+                    case "DIA_ACTUAL":
+                        return new CondDia() { operacion = op, valor = valor };
 
-                case "REP_PUEBLO":
-                    return new CondRep() { operacion = op, valor = valor, tipoRep = CondRep.TipoRep.PUEBLO };
+                    case "REP_PUEBLO":
+                        return new CondRep() { operacion = op, valor = valor, tipoRep = CondRep.TipoRep.PUEBLO };
 
-                case "REP_EMPRESA":
-                    return new CondRep() { operacion = op, valor = valor, tipoRep = CondRep.TipoRep.EMPRESA };
+                    case "REP_EMPRESA":
+                        return new CondRep() { operacion = op, valor = valor, tipoRep = CondRep.TipoRep.EMPRESA };
 
-                default:
-                    throw new Exception("La variable \"" + variable + "\" no se encuentra en la lista de variables editables.");
+                    default:
+                        throw new Exception("La variable \"" + variable + "\" no se encuentra en la lista de variables editables.");
+                }
             }
         }
     }

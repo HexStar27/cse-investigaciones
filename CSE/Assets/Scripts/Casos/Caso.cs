@@ -1,4 +1,4 @@
-﻿using Hexstar.CSE;
+﻿using CSE.Local;
 using Hexstar.CSE.Informes;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,7 +8,7 @@ namespace Hexstar.CSE
     [System.Serializable]
     public class Caso
     {
-        public int id, dif, coste;
+        public int id, dif, coste, caducidad = -1;
         public bool secundario;
         public bool examen;
         public string titulo;
@@ -36,7 +36,7 @@ namespace Hexstar.CSE
     [System.Serializable]
     public struct DatosPista
     {
-        public string titulo; public string descripcion; public string palabra;
+        public string titulo; public string descripcion; public string[] palabras;
     }
 
 
@@ -70,12 +70,12 @@ namespace Hexstar.CSE
             {
                 Condicion.Ganar => ganado,
                 Condicion.Perder => !ganado,
-                Condicion.MaxConsultasT1 => consultasUsadas <= 4,
-                Condicion.MaxConsultasT2 => consultasUsadas <= 2,
-                Condicion.TiempoLimiteT1 => tiempoEmpleado <= 210f, // 3m 30s
-                Condicion.TiempoLimiteT2 => tiempoEmpleado <= 150f, // 2m 30s
-                Condicion.TiempoLimiteT3 => tiempoEmpleado <= 90f,  // 1m 30s
-                Condicion.TiempoLimiteT4 => tiempoEmpleado <= 45f,  // 45s
+                Condicion.MaxConsultasT1 => ganado && consultasUsadas <= 4,
+                Condicion.MaxConsultasT2 => ganado && consultasUsadas <= 2,
+                Condicion.TiempoLimiteT1 => ganado && tiempoEmpleado <= 210f, // 3m 30s
+                Condicion.TiempoLimiteT2 => ganado && tiempoEmpleado <= 150f, // 2m 30s
+                Condicion.TiempoLimiteT3 => ganado && tiempoEmpleado <= 90f,  // 1m 30s
+                Condicion.TiempoLimiteT4 => ganado && tiempoEmpleado <= 45f,  // 45s
                 Condicion.Siempre => true,
                 _ => true,
             };
@@ -139,9 +139,9 @@ namespace Hexstar.CSE
         {
             return cond switch
             {
-                Condicion.Siempre => "Garantizado    ",
-                Condicion.Ganar => "Gana el caso   ",
-                Condicion.Perder => "PIERDE A POSTA ",
+                Condicion.Siempre => Localizator.GetString(".condicion.siempre"),
+                Condicion.Ganar => Localizator.GetString(".condicion.ganar"),
+                Condicion.Perder => Localizator.GetString(".condicion.perder"),
                 Condicion.MaxConsultasT1 => "<sprite name=\"icono_consultas\"> <= 4      ",
                 Condicion.MaxConsultasT2 => "<sprite name=\"icono_consultas\"> <= 2      ",
                 Condicion.TiempoLimiteT1 => "<sprite name=\"icono_cronometro\"> <= 3:30  ",

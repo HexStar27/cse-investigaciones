@@ -6,6 +6,7 @@ public class MenuPartidaController : MonoBehaviour
 {
     public static bool existePartida = false;
     private static bool cerrojo = false;
+    public static bool continuandoPartida = false;
 
     // Cargar Partida
     public void CargarPartidaGuardada()
@@ -35,6 +36,7 @@ public class MenuPartidaController : MonoBehaviour
         ResourceManager.checkpoint = pg;
         pg.CargarDatosAlSistema();
         existePartida = true;
+        continuandoPartida = false;
         XAPI_Builder.CreateStatement_GameSession(true, true); // Starting session + new game
         GameManager.CargarEscena(GameManager.GameScene.ESCENA_PRINCIPAL);
     }
@@ -75,11 +77,13 @@ public class MenuPartidaController : MonoBehaviour
             {
                 pg = JsonConverter.PasarJsonAObjeto<PuntoGuardado>(json);
                 existePartida = true;
+                continuandoPartida = true;
             }
             else //Si devuelve una cadena vacía significa que no ha encontrado un archivo de guardado.
             {
                 pg = new PuntoGuardado();
                 existePartida = false;
+                continuandoPartida = false;
             }
 
             ResourceManager.checkpoint = pg;
@@ -87,6 +91,7 @@ public class MenuPartidaController : MonoBehaviour
 
             cerrojo = false;
         }
+        else continuandoPartida = true;
 
         if (loadScene)
         {
@@ -98,10 +103,11 @@ public class MenuPartidaController : MonoBehaviour
     private static async void GuardarPartidaEnServer()
     {
         cerrojo = true;
+        string archivoGuardado = JsonConverter.ConvertirAJson(ResourceManager.checkpoint);
         WWWForm form = new WWWForm();
         form.AddField("authorization", SesionHandler.sessionKEY);
         form.AddField("user", GameManager.user);
-        form.AddField("save", JsonConverter.ConvertirAJson(ResourceManager.checkpoint));
+        form.AddField("save", archivoGuardado);
         await ConexionHandler.APost(ConexionHandler.baseUrl +"save", form);
         string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
         //Debug.Log("Respuesta:\n" + json);

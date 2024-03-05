@@ -9,6 +9,7 @@ using SimpleJSON;
 
 using ResultType = UnityEngine.Networking.UnityWebRequest.Result;
 using CSE.Local;
+using System;
 
 public class OperacionesGameplay : MonoBehaviour
 {
@@ -50,15 +51,18 @@ public class OperacionesGameplay : MonoBehaviour
         if (!CheckInternetConection()) return;
         string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
         resultado = resultado[1..^1];
+            //ImpresorResultado.Instancia.IntroducirResultado(resultado));
         ImpresorResultado.Instancia.IntroducirResultado(resultado);
 
         if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
             ResourceManager.ConsultasDisponibles--;
-            PuzzleManager.ConsultasRealizadasActuales++;
+            PuzzleManager.NConsultasDuranteElCaso++;
             await DataUpdater.Instance.ShowConsultasDisponibles();
+            //await t;
             ActualizarDangerController();
         }
+        //else await t;
 
         bool correctSyntax = !ImpresorResultado.Instancia.LastQueryWasNotCorrect();
         bool isLost = ResourceManager.ConsultasDisponibles == 0;
@@ -101,7 +105,7 @@ public class OperacionesGameplay : MonoBehaviour
             
             PuzzleManager.SolucionCorrecta = completado;
 
-            PuzzleManager.ConsultasRealizadasActuales++;
+            PuzzleManager.NConsultasDuranteElCaso++;
             ResourceManager.ConsultasDisponibles--;
             await DataUpdater.Instance.ShowConsultasDisponibles();
 
@@ -110,14 +114,13 @@ public class OperacionesGameplay : MonoBehaviour
             {
                 float t = PuzzleManager.GetSetTiempoEmpleado();
                 
-                MeterCasoEnCompletadosYCargarSiguiente(1); // 1 = Ganado
+                MeterCasoEnCompletados(1); // 1 = Ganado
                 GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
 
                 await CalcularYGuardarPuntuacion();
-                if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.WIN);
 
                 CSE.XAPI_Builder.CreateStatement_TrySolveCase(true, true, caso, t,
-                    PuzzleManager.ConsultasRealizadasActuales, s_lastScore);
+                    PuzzleManager.NConsultasDuranteElCaso, s_lastScore);
                 
                 TerminarFaseCaso();
             }
@@ -131,11 +134,6 @@ public class OperacionesGameplay : MonoBehaviour
             ActualizarDangerController();
         }
         else TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.no_caso_activo"));
-    }
-    private static bool CheckTutorialPlaying()
-    {
-        string v = ControladorDialogos.GetDialogueEventValue("tutorial");
-        return v.Equals("true");
     }
 
     /// <summary>
@@ -156,10 +154,8 @@ public class OperacionesGameplay : MonoBehaviour
     public static void Rendirse()
     {
         if(GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
-        {
-            if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.SURR);
-            
-            MeterCasoEnCompletadosYCargarSiguiente(0); // 0 = Rendido
+        {            
+            MeterCasoEnCompletados(0); // 0 = Rendido
             GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
 
             TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.eliminar_caso"));
@@ -176,7 +172,7 @@ public class OperacionesGameplay : MonoBehaviour
     {
         if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
-            MeterCasoEnCompletadosYCargarSiguiente(0); // 0 = Rendido
+            MeterCasoEnCompletados(0); // 0 = Rendido
             TerminarFaseCaso();
             CSE.XAPI_Builder.CreateStatement_Surrender();
         }
@@ -188,20 +184,23 @@ public class OperacionesGameplay : MonoBehaviour
     {
         if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso && !PuzzleManager.SolucionCorrecta)
         {
-            if (CheckTutorialPlaying()) TutorialChecker.SetWinCondition(TutorialChecker.WinCondition.LOST);
-
-            MeterCasoEnCompletadosYCargarSiguiente(-1); // -1 = Perdido
+            MeterCasoEnCompletados(-1); // -1 = Perdido
             GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
             TerminarFaseCaso();
         }
     }
 
-    private static void MeterCasoEnCompletadosYCargarSiguiente(int estado)
+    private static void MeterCasoEnCompletados(int estado)
     {
         int idCaso = PuzzleManager.GetIdCasoActivo();
         if (idCaso < 0) return; //Por si acaso...
         ResourceManager.CasosCompletados.Add(idCaso);
         ResourceManager.CasosCompletados_ListaDeEstados.Add(estado);
+
+        ControladorDialogos.SetDialogueEvent("win_condition", estado switch {
+            -1 => "lose", 0 => "surrender", 1 => "win",
+            _ => throw new NotImplementedException(),
+        });
     }
 
     public static async Task CalcularYGuardarPuntuacion()
@@ -211,7 +210,7 @@ public class OperacionesGameplay : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("authorization", SesionHandler.sessionKEY);
         form.AddField("caso", id);
-        form.AddField("consultas", PuzzleManager.ConsultasRealizadasActuales);
+        form.AddField("consultas", PuzzleManager.NConsultasDuranteElCaso);
         form.AddField("tiempo", time);
         form.AddField("examen", PuzzleManager.CasoActivoEsExamen() ? 1 : 0);
         form.AddField("reto", PuzzleManager.NRetosCumplidos);
@@ -234,7 +233,7 @@ public class OperacionesGameplay : MonoBehaviour
             form.AddField("caso", id);
             form.AddField("punt", puntuacion);
             form.AddField("dif", ResourceManager.DificultadActual);
-            form.AddField("used", PuzzleManager.ConsultasRealizadasActuales);
+            form.AddField("used", PuzzleManager.NConsultasDuranteElCaso);
             form.AddField("time", time);
             await ConexionHandler.APost(ConexionHandler.baseUrl + "score/save", form);
             if (!CheckInternetConection()) return;

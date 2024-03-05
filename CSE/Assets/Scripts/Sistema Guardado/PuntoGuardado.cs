@@ -11,6 +11,7 @@ public class PuntoGuardado
 	public int dificultadActual;
 	public int dia;
 	public int[] casosCargados;
+	public List<int> caducidadCasosCargados;
 	public string[] tableCodes;
 
 	public int[] casosCompletados;
@@ -29,7 +30,8 @@ public class PuntoGuardado
 		dificultadActual = 1;
 		dia = 0;
 		casosCargados = new int[0];
-		casosCompletados_listaDeEstados = new int[0];
+		caducidadCasosCargados = new();
+        casosCompletados_listaDeEstados = new int[0];
         eventosEjecutados = new int[0];
 		tableCodes = new string[0];
 		dialogueEventList = "";
@@ -45,17 +47,20 @@ public class PuntoGuardado
 		dificultadActual = ResourceManager.DificultadActual;
 		dia = ResourceManager.Dia;
 
-		List<int> idCasos = new List<int>();
-		int n = PuzzleManager.GetTotalCasosCargados();
-        for (int i = 0; i < n; i++)
+		var casos = PuzzleManager.GetTodosLosCasosCargados();
+		List<int> idCasos = new(casos.Count);
+		foreach(var c in casos)
 		{
-			int id = PuzzleManager.GetCasoCargado(i).id;
-            if (!ResourceManager.CasosCompletados.Contains(id))
-				idCasos.Add(id);
+            int id = c.id;
+            if (!ResourceManager.CasosCompletados.Contains(c.id)) //Safety check
+            {
+                idCasos.Add(id);
+                caducidadCasosCargados.Add(c.caducidad);
+            }
         }
 		casosCargados = idCasos.ToArray();
-		
-		casosCompletados_listaDeEstados = ResourceManager.CasosCompletados_ListaDeEstados.ToArray();
+
+        casosCompletados_listaDeEstados = ResourceManager.CasosCompletados_ListaDeEstados.ToArray();
 
 		eventosEjecutados = ResourceManager.EventosEjecutados.ToArray();
 		tableCodes = ResourceManager.TableCodes.ToArray();
@@ -68,8 +73,8 @@ public class PuntoGuardado
 	public void CargarDatosAlSistema()
 	{
 		ResourceManager.AgentesDisponibles = agentesDisponibles;
+		ResourceManager.ConsultasMaximas = consultasMaximas; //IMPORTANTE QUE ESTE SE ASIGNE ANTES QUE LAS DISPONIBLES O ESTAS NO SE ASIGNARÁN BIEN
 		ResourceManager.ConsultasDisponibles = consultasDisponibles;
-		ResourceManager.ConsultasMaximas = consultasMaximas;
 
         List<int> completados = new();
 		completados.AddRange(casosCompletados);
@@ -93,7 +98,6 @@ public class PuntoGuardado
 		Hexstar.Dialogue.ControladorDialogos.SetAllEventsToList(dialogueEventList, true);
 
 		Hexstar.CSE.Informes.CarpetaInformesController.Informes.Clear();
-        for (int i = 0; i < informes.Length; i++)
-			Hexstar.CSE.Informes.CarpetaInformesController.Informes.Add(informes[i]);
+		Hexstar.CSE.Informes.CarpetaInformesController.Informes.AddRange(informes);
     }
 }

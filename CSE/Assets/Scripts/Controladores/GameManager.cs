@@ -10,7 +10,7 @@ public static class GameManager
 
     public enum GameScene { INICIO_SESION=0, MENU_PARTIDA=1, ESCENA_PRINCIPAL=2 };
 
-    public static string user;
+    public static string user =  "Unidentified User";
     private static bool isLoading;
 
     public static void CerrarAplicacion()

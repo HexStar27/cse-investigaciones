@@ -46,6 +46,7 @@ public static class Stuff
             if (v > max) max = v;
         }
 
+        if (min == max) max++;
         int nBarras = Mathf.Min(nBarrasTope, max-min);
         //Debug.Log("Nº barras a preparar: " + (nBarras));
         float[] h = new float[nBarras + 1];

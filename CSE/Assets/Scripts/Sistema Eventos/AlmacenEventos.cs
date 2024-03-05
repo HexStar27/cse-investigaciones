@@ -51,6 +51,10 @@ namespace Hexstar.CSE.SistemaEventos
         {
             var json = JSON.Parse(text);
             if (json == null) throw new NullReferenceException();
+
+            listaDeEventos.Clear();
+            eventosEjecutados.Clear();
+
             var array = json["res"];
             for(int i = 0; i < array.Count; i++)
             {
@@ -75,7 +79,7 @@ namespace Hexstar.CSE.SistemaEventos
             for(int i = 0; i < ResourceManager.EventosEjecutados.Count; i++)
             {
                 int id = ResourceManager.EventosEjecutados[i];
-                if (id >= 0 && id < listaDeEventos.Count) throw new IndexOutOfRangeException();
+                if (id < 0 && id >= listaDeEventos.Count) throw new IndexOutOfRangeException();
                 eventosEjecutados[id] = true;
             }
         }

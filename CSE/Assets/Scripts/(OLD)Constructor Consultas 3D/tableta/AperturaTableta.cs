@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Hexstar.CSE;
-using static UnityEngine.Rendering.DebugUI;
 
 public class AperturaTableta : MonoBehaviour
 {
@@ -13,12 +12,15 @@ public class AperturaTableta : MonoBehaviour
 
 	public GameObject BloqueTabletaPrefab;
 	public GameObject contenedor;
-	private List<GameObject> elementos = new List<GameObject>();
+	private List<GameObject> elementos = new();
 	public Transform zonaSpawnBloques;
+
+	private CameraStalker cs;
 
 	private void Awake()
 	{
 		if (anim == null) anim = GetComponent<Animator>();
+		cs = GetComponent<CameraStalker>();
 	}
 
 	public void OverTable(bool value)
@@ -29,11 +31,19 @@ public class AperturaTableta : MonoBehaviour
 
 	public void OpenTablet(bool value)
 	{
-		if (MenuPausa.Paused || Boton3D.globalStop) return;
+		bool farOpening = false;
+		if(value) farOpening = cs.CorrectState();
+        if (MenuPausa.Paused || Boton3D.globalStop || farOpening) return;
 		if (value) Rellenar();
 		anim.SetBool(open, value);
 		opened = value;
-	}
+		if(opened) cs.onCameraReady.AddListener(TooFarFromTablet);
+    }
+	private void TooFarFromTablet()
+	{
+		OpenTablet(false);
+        cs.onCameraReady.RemoveListener(TooFarFromTablet);
+    }
 	public void ForceClose()
 	{
         opened = false;

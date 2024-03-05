@@ -244,8 +244,8 @@
         "en":"ONLY ONE CASE AT A TIME"
     },
     ".popup.fin_dia":{
-        "es":"Ya no te quedan consultas disponibles",
-        "en":"ONLY ONE CASE AT A TIME"
+        "es":"No puedo hacer nada más por hoy",
+        "en":"That's enough for today..."
     },
     ".popup.terminar_dia":{
         "es":"Terminar día",

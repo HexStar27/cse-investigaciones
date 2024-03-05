@@ -77,6 +77,14 @@ namespace Hexstar
                     });
                     break;
 
+                case "IncluirCaso":
+                    target = int.Parse(valor.Trim());
+                    evento.AddListener(() =>
+                    {
+                        PuzzleManager.InsertarCasoExtra(target);
+                    });
+                    break;
+
                 default:
                     MensajeInstruccionNoEncontrada(f);
                     break;

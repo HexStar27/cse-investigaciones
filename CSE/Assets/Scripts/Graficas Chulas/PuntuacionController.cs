@@ -39,7 +39,7 @@ public class PuntuacionController : MonoBehaviour
 
     public void PrepararGraficaP(int[] valores) { gPuntuacion.Setup(valores, OperacionesGameplay.s_lastScore); }
     public void PrepararGraficaT(int[] valores) { gTiempo.Setup(valores, PuzzleManager.UltimoTiempoEmpleado); }
-    public void PrepararGraficaC(int[] valores) { gConsulta.Setup(valores,PuzzleManager.ConsultasRealizadasActuales); }
+    public void PrepararGraficaC(int[] valores) { gConsulta.Setup(valores,PuzzleManager.NConsultasDuranteElCaso); }
 
     private IEnumerator MostrarPunt(int objetivo)
     {

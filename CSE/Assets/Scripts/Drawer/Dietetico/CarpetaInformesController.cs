@@ -96,14 +96,14 @@ namespace Hexstar.CSE.Informes
         private void InformePaginaSiguiente()
         {
             paginaActual++;
-            if (paginaActual >= Informes.Count) paginaActual = Informes.Count - 1;
+            if (paginaActual >= Informes.Count) paginaActual = 0;
             anim.Play(cambioDePagina);
             audioS.PlayOneShot(cambioPagina,1);
         }
         private void InformePaginaAnterior()
         {
             paginaActual--;
-            if (paginaActual < 0) paginaActual = 0;
+            if (paginaActual < 0) paginaActual = Informes.Count - 1;
             anim.Play(cambioDePagina);
             audioS.PlayOneShot(cambioPagina,1);
         }
@@ -120,7 +120,7 @@ namespace Hexstar.CSE.Informes
         {
             if (Informes.Count > 0)
             {
-                paginaActual = Math.Clamp(paginaActual, 0, Informes.Count);
+                paginaActual = Math.Clamp(paginaActual, 0, Informes.Count-1);
                 var inf = Informes[paginaActual];
                 tituloCaso.SetText(inf.FormarTitulo());
                 descripcionCaso.SetText(inf.descripcion);
@@ -152,6 +152,7 @@ namespace Hexstar.CSE.Informes
                     bool casoGanado = ResourceManager.CasosCompletados_ListaDeEstados[idx] == 1;
                     sello.sprite = casoGanado ? sello_win : sello_lose;
                     float angulo = MiniHash(idCaso, -20, 20);
+                    sello.transform.localRotation = Quaternion.identity;
                     sello.transform.Rotate(new(0, 0, angulo));
                     sello.color = new(1, 1, 1, 1);
                 }
@@ -160,8 +161,8 @@ namespace Hexstar.CSE.Informes
         }
         private void ActualizarBotones()
         {
-            boton_pagAnt.interactable = Informes.Count > 0 && paginaActual > 0;
-            boton_pagSig.interactable = Informes.Count > 0 && paginaActual < Informes.Count - 1;
+            boton_pagAnt.interactable = Informes.Count > 0;// && paginaActual > 0;
+            boton_pagSig.interactable = Informes.Count > 0;// && paginaActual < Informes.Count - 1;
 
             int pag = pistasCaso.pageToDisplay;
             boton_pagPistaAnt.interactable = Informes.Count > 0 && pag > 1;
@@ -217,12 +218,12 @@ namespace Hexstar.CSE.Informes
     [System.Serializable]
     public struct Informe
     {
-        internal int id;
-        internal string titulo;
-        internal string descripcion;
-        internal Bounty[] recompensas;
-        internal bool[] recompensasCompletadas;
-        internal string[] descripcionesPistas;
+        public int id;
+        public string titulo;
+        public string descripcion;
+        public Bounty[] recompensas;
+        public bool[] recompensasCompletadas;
+        public string[] descripcionesPistas;
 
         public Informe(Caso c)
         {
@@ -249,6 +250,8 @@ namespace Hexstar.CSE.Informes
         }
         internal string FormarListaRecompensas()
         {
+            if (recompensas == null) throw new NullReferenceException();
+            if (recompensas.Length == 0) return "";
             StringBuilder sb = new();
             for(int i=0; i < recompensas.Length; i++)
             {
