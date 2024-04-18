@@ -38,63 +38,51 @@ MonoBehaviour:
     description: (Tabla)
   - name: '*'
     description: (Columna)
-  - name: altura
-    description: (Columna)
-  - name: apellidos
-    description: (Columna)
-  - name: colorPelo
-    description: (Columna)
   - name: dni
-    description: (Columna)
-  - name: edad
     description: (Columna)
   - name: nombre
     description: (Columna)
-  - name: direccion
+  - name: apellidos
     description: (Columna)
-  - name: esPiso
+  - name: edad
+    description: (Columna)
+  - name: colorPelo
+    description: (Columna)
+  - name: altura
     description: (Columna)
   - name: id
     description: (Columna)
+  - name: direccion
+    description: (Columna)
   - name: titular
     description: (Columna)
-  - name: ciudadano
+  - name: esPiso
     description: (Columna)
   - name: vivienda
     description: (Columna)
-  - name: color
-    description: (Columna)
-  - name: marca
+  - name: ciudadano
     description: (Columna)
   - name: matricula
     description: (Columna)
   - name: titular_id
     description: (Columna)
-  - name: fecha
+  - name: marca
+    description: (Columna)
+  - name: color
     description: (Columna)
   - name: id
     description: (Columna)
-  - name: log
-    description: (Columna)
   - name: propietario
+    description: (Columna)
+  - name: fecha
+    description: (Columna)
+  - name: log
     description: (Columna)
   - name: AND
     description: (Operador)
   - name: OR
     description: (Operador)
   - name: NOT
-    description: (Operador)
-  - name: BETWEEN
-    description: (Operador)
-  - name: IN
-    description: (Operador)
-  - name: LIKE
-    description: (Operador)
-  - name: ALL
-    description: (Operador)
-  - name: ANY
-    description: (Operador)
-  - name: EXIST
     description: (Operador)
   - name: SELECT
     description: (Keyword)
@@ -108,3 +96,4 @@ MonoBehaviour:
     description: (Keyword)
   - name: ORDER BY
     description: (Keyword)
+  keywordsByDif: {fileID: 11400000, guid: 8dd6d510804d6f649aa9d169d4608aa2, type: 2}

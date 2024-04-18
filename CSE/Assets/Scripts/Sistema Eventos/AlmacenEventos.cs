@@ -50,7 +50,7 @@ namespace Hexstar.CSE.SistemaEventos
         private static void CargarEventosArchivo(string text)
         {
             var json = JSON.Parse(text);
-            if (json == null) throw new NullReferenceException();
+            if (json == null || json.Equals("")) throw new NullReferenceException();
 
             listaDeEventos.Clear();
             eventosEjecutados.Clear();
@@ -58,9 +58,16 @@ namespace Hexstar.CSE.SistemaEventos
             var array = json["res"];
             for(int i = 0; i < array.Count; i++)
             {
-                Evento ev = JsonUtility.FromJson<Evento>(array[i]["data"].ToString());
-                if (ev == null) { Debug.LogWarning("Unable to parse json into Evento :("); continue; }
-                ev.ParsearCondicion();
+                //Evento ev = JsonUtility.FromJson<Evento>(array[i]["data"].Value);
+                //if (ev == null) { Debug.LogWarning("Unable to parse json into Evento :("); continue; }
+                //ev.ParsearCondicion();
+                string evJson = array[i]["data"].Value;
+                if (evJson.Contains("·"))
+                {
+                    //evJson = evJson.Replace("\\\\·", "\\\"");
+                    evJson = evJson.Replace('·', '\"');
+                }
+                Evento ev = new(JSON.Parse(evJson));
                 IncluirNuevoEvento(ev);
             }
         }
@@ -125,18 +132,48 @@ namespace Hexstar.CSE.SistemaEventos
 
         //La ID debería ser siempre igual al índice dentro de la lista.
         [HideInInspector] public int id;
-        public string titulo;
-        public bool diario;
+        public string titulo = "";
+        public bool diario = false;
         public Comprobable momentoComprobable;
-        public string condicionUnparsed;
+        public string condicionUnparsed = "";
         [NonSerialized] public CondicionEvento condicion;
         [Range(0, 100)] public int probabilidad = 100;
-        public string cinematicFile;
-        public string dialogueDataBaseFile;
-        public string tableCodesNuevos;
-        public string modVarGameplay;
+        public string cinematicFile = "";
+        public string dialogueDataBaseFile = "";
+        public string tableCodesNuevos = "";
+        public string modVarGameplay = "";
 
         public Evento(int id) { this.id = id; }
+        public Evento(JSONNode json)
+        {
+            id = json["id"].AsInt;
+            titulo = json["titulo"].Value;
+            diario = json["diario"].AsBool;
+            momentoComprobable = (Comprobable)json["momentoComprobable"].AsInt;
+            condicionUnparsed = json["condicionUnparsed"].Value;
+            ParsearCondicion();
+            probabilidad = json["probabilidad"].AsInt;
+            cinematicFile = json["cinematicFile"].ToString();
+            dialogueDataBaseFile = json["dialogueDataBaseFile"].ToString();
+            tableCodesNuevos = json["tableCodesNuevos"].Value;
+            modVarGameplay = json["modVarGameplay"].Value;
+        }
+
+        public JSONObject Serializar()
+        {
+            JSONObject json = new();
+            json.Add("id", id);
+            json.Add("titulo", titulo);
+            json.Add("diario", diario);
+            json.Add("momentoComprobable", (int)momentoComprobable);
+            json.Add("condicionUnparsed", condicionUnparsed);
+            json.Add("probabilidad", probabilidad);
+            json.Add("cinematicFile", JSON.Parse(cinematicFile));
+            json.Add("dialogueDataBaseFile", JSON.Parse(dialogueDataBaseFile));
+            json.Add("tableCodesNuevos", tableCodesNuevos);
+            json.Add("modVarGameplay", modVarGameplay);
+            return json;
+        }
 
         private static readonly char[] separadores = { ',', ' ' };
 
@@ -155,7 +192,7 @@ namespace Hexstar.CSE.SistemaEventos
             {
                 if (dialogueDataBaseFile.Length <= 0)
                     Debug.LogWarning("Se está inicializando una cinemática sin una DialogueDataBase... ¿Estás seguro de que esa era la intención?");
-                else ControladorDialogos.ddb.LoadFromString(dialogueDataBaseFile);
+                else ControladorDialogos.ddb.LoadFromJSON(dialogueDataBaseFile);
                 ControladorCinematica.Instance.InicializarCinematicaConJSON(cinematicFile);
                 
                 if(!ControladorCinematica.Instance.independiente)
@@ -288,7 +325,7 @@ namespace Hexstar.CSE.SistemaEventos
  * OR -> "OR(" LISTA ")"
  * LISTA -> CONDICION | CONDICION ',' LISTA
  * CONDICION_SIMPLE -> VAR OP INT
- * VAR -> "CASO_COMPLETADO" | "CASO_PERDIDO" | "CASO_ABANDONADO" | "DIA_ACTUAL" | "REP_PUEBLO" | "REP_EMPRESA"
+ * VAR -> "CASO_COMPLETADO" | "CASO_PERDIDO" | "CASO_ABANDONADO" | "DIA_ACTUAL" | "REP_PUEBLO" | "REP_EMPRESA | (EVENTO_\w+)"
  * OP -> "=" | "<" | ">"
 
 Ejemplo 1: (Básico)

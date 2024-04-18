@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/EscenaPrincipal.unity
     guid: a037261b2fe0f2543b3e009c7f02bad3
+  - enabled: 0
+    path: Assets/Scenes/Herramientas/Event Creator.unity
+    guid: f741c8aed985f4c40816f002760b4410
+  - enabled: 0
+    path: Assets/Scenes/Herramientas/Account Creator.unity
+    guid: bf87c898bfcdc144f83159f3a22928a4
   m_configObjects: {}

@@ -7,6 +7,7 @@ public class KeywordDB : ScriptableObject
 {
     [SerializeField] private Keyword[] kWords = new Keyword[0];
     [HideInInspector] public List<Keyword> kw = new List<Keyword>();
+    [SerializeField] private AlmacenDeBloquesSimple keywordsByDif;
 
     /// <summary>
     /// Devuelve una lista de indices de keywords con prioridad.
@@ -94,10 +95,10 @@ public class KeywordDB : ScriptableObject
         kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[0],"(Tabla)"));
         kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[1],"(Columna)",true));
         kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[2],"(Pista)"));
-        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.palabras[3],"(Función)"));
-        kw.AddRange(ConvertStringToKeywords(AlmacenDePalabras.GetOperadoresEspeciales(), "(Operador)"));
+        kw.AddRange(String2KeywordsByDiff(AlmacenDePalabras.palabras[3],"(Función)"));
+        kw.AddRange(String2KeywordsByDiff(AlmacenDePalabras.GetOperadoresEspeciales(), "(Operador)"));
 
-        for (int i = 0; i < kWords.Length; i++) kw.Add(kWords[i]);
+        for (int i = 0; i < kWords.Length; i++) if (ExisteYPuede(kWords[i].name)) kw.Add(kWords[i]);
     }
 
     private List<Keyword> ConvertStringToKeywords(List<string> lista, string tipo = "", bool filtrar = false)
@@ -108,6 +109,38 @@ public class KeywordDB : ScriptableObject
             if (filtrar && elem.Contains(':')) continue;
             keywords.Add(new Keyword(elem, tipo));
         }
+        return keywords;
+    }
+
+    /// <summary>
+    /// Will return false ONLY when the keyword is found and is locked by its difficulty
+    /// </summary>
+    private bool ExisteYPuede(string elem)
+    {
+        int diff = ResourceManager.DificultadActual;
+        int n = keywordsByDif.bloquesPrefab.Count;
+
+        for (int i = 0; i < n; i++)
+        {
+            var b = keywordsByDif.bloquesPrefab[i];
+            if (b.titulo.Equals(elem)) return b.disponibleEnDificultad <= diff;
+        }
+        return true;
+    }
+    private List<Keyword> String2KeywordsByDiff(List<string> lista, string tipo = "")
+    {
+        List<Keyword> keywords = new();
+        bool canCheck = keywordsByDif != null;
+
+        foreach (var elem in lista)
+        {
+            if (canCheck)
+            {
+                if (ExisteYPuede(elem)) keywords.Add(new Keyword(elem, tipo));
+            }
+            else keywords.Add(new Keyword(elem, tipo));
+        }
+
         return keywords;
     }
 }

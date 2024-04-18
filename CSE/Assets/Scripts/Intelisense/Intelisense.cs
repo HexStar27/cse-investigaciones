@@ -1,8 +1,8 @@
 using UnityEngine;
 using TMPro;
-using System.Collections.Generic;
+using System;
 using System.Text;
-using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class Intelisense : MonoBehaviour
 {
@@ -16,6 +16,7 @@ public class Intelisense : MonoBehaviour
     private List<int> indices = new List<int>();
 
     [SerializeField] Vector2 letterSize;
+    [SerializeField] Vector2 letterPadding;
     [SerializeField] GameObject sugerenciaPrefab;
 
     bool ms;
@@ -77,9 +78,9 @@ public class Intelisense : MonoBehaviour
 
     private void EraseCurrentCaretWord()
     {
-        int caretP = pantalla.caretPosition;
-        if (caretP == 0) return;
         int len = pantalla.text.Length;
+        int caretP = Math.Min(pantalla.caretPosition, len);
+        if (caretP == 0) return;
         int i = caretP - 1;
         for (; i > 0 && isNotSpace(pantalla.text[i]) && isNotDot(pantalla.text[i]); i--) { }
         int inicio = 0;
@@ -111,17 +112,17 @@ public class Intelisense : MonoBehaviour
                 searchingStartOfWord = isNotSpace(c) && isNotDot(c) && isNotComma(c);
             }
             int inicio = 0;
-            if (i != 0) inicio = i + 1;
+            if (i > 0) inicio = i + 1;
 
-            int j = pantalla.caretPosition;
             int len = pantalla.text.Length;
+            int j = Math.Min(pantalla.caretPosition, len - 1);
             for (; j < len && isNotSpace(pantalla.text[j]); j++) { }
             
             StringBuilder sb = new StringBuilder();
             sb.Append(pantalla.text[..inicio]);
             sb.Append(palabra);
             sb.Append(' ');
-            sb.Append(pantalla.text[j..len]);
+            if (j < len) sb.Append(pantalla.text[j..len]);
             pantalla.text = sb.ToString();
             pantalla.caretPosition = inicio + palabra.Length + 1;
         }
@@ -134,18 +135,19 @@ public class Intelisense : MonoBehaviour
         if (poolSugerencias.Count > 0)
         { //Pillar cadena y meterla en la palabra.
             string palabra = keywords.kw[indices[idx]].name;
-            int i = pantalla.caretPosition - 1;
+            int len = pantalla.text.Length;
+            int cp = Math.Min(pantalla.caretPosition, len);
+            int i = cp - 1;
             for (; i > 0 && isNotSpace(pantalla.text[i]); i--) { }
             int inicio = 0;
             if (i != 0) inicio = i + 1;
-            int j = pantalla.caretPosition;
-            int len = pantalla.text.Length;
+            int j = cp;
             for (; j < len && isNotSpace(pantalla.text[j]); j++) { }
             StringBuilder sb = new StringBuilder();
-            sb.Append(pantalla.text.Substring(0, inicio));
+            sb.Append(pantalla.text[..inicio]);
             sb.Append(palabra);
             sb.Append(' ');
-            sb.Append(pantalla.text.Substring(j, len - j));
+            sb.Append(pantalla.text[j..len]);
             pantalla.text = sb.ToString();
             pantalla.caretPosition = inicio + palabra.Length + 1;
         }
@@ -182,14 +184,19 @@ public class Intelisense : MonoBehaviour
         shouldAddCouple = false;
     }
 
+    /// <summary>
+    /// Función que actualiza las sugerencias. Se debe llamar cada vez que se modifica el texto.
+    /// </summary>
     private void Edicion(string nuevoValor)
     {
-        if (pantalla.caretPosition == 0)
+        if (pantalla.caretPosition <= 0)
         {
             moverSugerencias = false;
             return;
         }
-        char c = nuevoValor[pantalla.caretPosition - 1];
+        int i = Math.Min(pantalla.caretPosition, nuevoValor.Length) - 1;
+        //print(i+"/"+nuevoValor.Length);
+        char c = nuevoValor[i];
         if (isNotSpace(c))
         {
             moverSugerencias = true;
@@ -238,12 +245,11 @@ public class Intelisense : MonoBehaviour
     private void SugerenciasACaret()
     {
         if (!sugerencias.gameObject.activeInHierarchy) return;
-        int cp = pantalla.caretPosition - 1;
-        if (cp < 0) cp = 0;
+        int cp = Math.Max(0, Math.Min(pantalla.caretPosition, pantalla.text.Length) - 1);
         if (!isNotSpace(pantalla.text[cp])) moverSugerencias = false; 
         Vector2 pos = CaretPos();
-        pos.x *= letterSize.x;
-        pos.y = pos.y * letterSize.y + letterSize.y;
+        pos.x *= letterSize.x + letterPadding.x;
+        pos.y = pos.y * (letterSize.y + letterPadding.y) + letterSize.y;
         sugerencias.anchoredPosition = pos;
     }
 
@@ -253,7 +259,7 @@ public class Intelisense : MonoBehaviour
 
     private Vector2 CaretPos()
     {
-        string s = pantalla.text.Substring(0, pantalla.caretPosition);
+        string s = pantalla.text[..(pantalla.caretPosition-1)];
         int cp = s.LastIndexOf('\n');
         Vector2 pos;
         pos.x = pantalla.caretPosition - cp - 1;

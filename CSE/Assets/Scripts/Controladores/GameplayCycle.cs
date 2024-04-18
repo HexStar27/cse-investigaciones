@@ -13,7 +13,6 @@ using Hexstar.Dialogue;
 using Hexstar.CSE.SistemaEventos;
 using System.Collections;
 using CSE.Local;
-using System.Security.Cryptography;
 
 [System.Serializable] public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
 public class GameplayCycle : MonoBehaviour, ISingleton
@@ -70,7 +69,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	{
         startedCasesInDay = 0;
         completedCasesInDay = 0;
-        //PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
         StartCoroutine(PrepareOutOfCaseTrack());
 
         if (ResourceManager.Dia == 0) //Inicio del juego
@@ -107,7 +105,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		PlayCaseTrack();
 
         AlmacenDePalabras.CargarPistasDeCasoActivo();
-		//PuzzleManager.MostrarObjetivoDeCasoEnPantalla(true);
 
 		await Task.Yield();
 	}
@@ -119,7 +116,6 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         bool ganado = PuzzleManager.SolucionCorrecta;
 		if (ganado) completedCasesInDay++;
 
-		//PuzzleManager.MostrarObjetivoDeCasoEnPantalla(false);
 		await PuzzleManager.GetCasoActivo().ComprobarYAplicarBounties(ganado,nConsultas,tiempo);
 
 		StartCoroutine(PrepareOutOfCaseTrack());
@@ -200,9 +196,13 @@ public class GameplayCycle : MonoBehaviour, ISingleton
     }
 	private IEnumerator PrepareOutOfCaseTrack()
     {
-		if (bgmSource.clip == bgm_oficineando) yield break;
-		WaitWhile mientrasSuene = new(() => { return bgmSource.isPlaying || !gameover; });
-		yield return mientrasSuene;
+		if ((bgmSource.clip == bgm_oficineando) && bgmSource.isPlaying) yield break;
+		
+		if(bgmSource.clip != null)
+		{
+            WaitWhile mientrasSuene = new(() => { return bgmSource.isPlaying && !gameover; });
+            yield return mientrasSuene;
+        }
 		if (gameover) yield break;
         bgmSource.clip = bgm_oficineando;
         bgmSource.Play();

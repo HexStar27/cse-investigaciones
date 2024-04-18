@@ -153,9 +153,16 @@ namespace Hexstar.Dialogue {
 
                 string texto = entry.txt;
                 texto = TranslateReferences(texto);
+                
                 dialogueBox.Vaciar();
                 if (showDialogDebug) print("Introduciendo texto en la caja de diálogos");
-                dialogueBox.IntroducirTexto(texto);
+                // Introduce texto sólo si no es una cadena vacía. Esto nos permite tener entradas
+                // donde sólo hay efectos y que todas estas se ejecuten consecutivamente
+                // sin esperar el input del jugador.
+                if (texto.Equals("")) SiguienteDU();
+                else dialogueBox.IntroducirTexto(texto);
+
+                
                 if (iEntrada - 1 != primerIndiceDelGrupo) onNextEntry?.Invoke();
             }
             else
@@ -220,7 +227,7 @@ namespace Hexstar.Dialogue {
                 case DialogueFX.Tipo.Ramificar:
                     string data = GetDialogueEventValue(fx.value);
                     if (data.Equals("BREAK")) iEntrada = -1;
-                    else if (data != "") iEntrada = ddb.GetIndexOfLabel(data);
+                    else if (data != "") iEntrada = ddb.GetIndexOfLabelByGroup(iEntrada - 1, data);
                     break;
                 case DialogueFX.Tipo.DarOpciones:
                     if(controladorOpciones != null)
@@ -236,7 +243,12 @@ namespace Hexstar.Dialogue {
                             
                             string labelOrIndex = par[1].Trim();
                             if (int.TryParse(labelOrIndex, out int result)) etiquetas.Add(result);
-                            else etiquetas.Add(ddb.GetIndexOfLabel(labelOrIndex));
+                            else
+                            {
+                                int idx = ddb.GetIndexOfLabelByGroup(iEntrada - 1, labelOrIndex);
+                                if (idx < 0) Debug.LogWarning("CUIDADO, se intentó buscar SIN ÉXITO durante la creacion de opciones un índice para la etiqueta " + labelOrIndex + ".");
+                                etiquetas.Add(idx);
+                            }
                         }
                         controladorOpciones.CrearOpciones(contenido, etiquetas);
                         ControladorOpcionesDialogo.onOptionSelected.AddListener(ProcesarInfoDeOpcionEscogida);
@@ -256,7 +268,7 @@ namespace Hexstar.Dialogue {
                     }
                     else
                     {
-                        iEntrada = ddb.GetIndexOfLabel(fx.value.Trim());
+                        iEntrada = ddb.GetIndexOfLabelByGroup(iEntrada - 1, fx.value.Trim());
                     }
                     break;
                 case DialogueFX.Tipo.EstablecerEvento:

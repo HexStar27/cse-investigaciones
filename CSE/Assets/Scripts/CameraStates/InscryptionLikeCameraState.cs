@@ -17,6 +17,9 @@ public class InscryptionLikeCameraState : MonoBehaviour
         bypass = value;
     }
 
+    [ContextMenu("Debug Bypass")]
+    public void DebugBypass() => print("Bypass = " + bypass);
+
     private void Ready()
     {
         ready = true;

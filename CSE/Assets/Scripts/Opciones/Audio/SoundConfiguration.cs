@@ -45,5 +45,5 @@ public class SoundConfiguration : OptionMB
 
     public static readonly float lowerLimit = -40;
     public static readonly float mute = -80;
-    public static readonly float upperLimit = 4;
+    public static readonly float upperLimit = 0;
 }

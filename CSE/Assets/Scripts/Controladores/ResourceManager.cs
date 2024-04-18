@@ -62,7 +62,7 @@ public static class ResourceManager
         get => dificultadActual; set
         {
             dificultadActual = value;
-            if (dificultadActual < 0) dificultadActual = 0;
+            if (dificultadActual < 1) dificultadActual = 1;
         }
     }
 

@@ -10,6 +10,8 @@ public class TempMessage : MonoBehaviour
     static readonly string nombreAnimacion1 = "Mostrar";
     static readonly string nombreAnimacion2 = "Cerrar";
 
+    public int extraDuration = 0;
+
     public async void EjecutarMensaje(string mensaje)
     {
         GameplayCycle.PauseGameplayCycle(true, "TempMessage");
@@ -17,9 +19,10 @@ public class TempMessage : MonoBehaviour
 
         _anim.Play(nombreAnimacion1);
         await Task.Delay(250);
-        
+
         await ColocarLetrasConsecutivas(mensaje);
-        await Task.Delay(250);
+        await Task.Delay(250 + extraDuration);
+
 
         _anim.Play(nombreAnimacion2);
         await Task.Delay(500);

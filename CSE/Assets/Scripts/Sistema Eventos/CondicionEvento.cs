@@ -138,7 +138,7 @@ namespace Hexstar.CSE.SistemaEventos
 
      * CONDICION_SIMPLE -> VAR OP INT
      
-     * VAR -> "CASO_COMPLETADO" | "CASO_PERDIDO" | "CASO_ABANDONADO" | "DIA_ACTUAL" | "REP_PUEBLO" | "REP_EMPRESA"
+     * VAR -> "CASO_COMPLETADO" | "CASO_PERDIDO" | "CASO_ABANDONADO" | "DIA_ACTUAL" | "REP_PUEBLO" | "REP_EMPRESA | (EVENTO_\w+)"
      * OP -> "=" | "<" | ">"
      */
     public static class ParserCondiciones
@@ -170,7 +170,7 @@ namespace Hexstar.CSE.SistemaEventos
             Match m = r_S.Match(condicion);
             if (!m.Success)
             {
-                throw new Exception("La condición no se ha podido leer correctamente. No sigue la gramática.\nCondición:"+condicion);
+                throw new Exception("La condición no sigue la gramática.\nCondición:"+condicion);
             }
             CondicionEvento ast = P_cond(m.Value);
             return ast;

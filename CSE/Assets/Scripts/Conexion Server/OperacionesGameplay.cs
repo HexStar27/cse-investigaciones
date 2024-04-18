@@ -101,7 +101,23 @@ public class OperacionesGameplay : MonoBehaviour
             await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
             if (!CheckInternetConection()) return;
             string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
-            bool completado = response[0] == 't'; // "true"
+            bool completado = response[0] != '-'; // Número negativo => false
+
+            if(completado)
+            {
+                // "op" es el índice de la solución alcanzada en la lista de soluciones del caso
+                // (sólo el servidor tiene acceso a esto)
+                if (int.TryParse(response, out int op))
+                {
+                    ControladorDialogos.SetDialogueEvent("case_solution_" + caso.id, op.ToString());
+                    // ASÍ LOS EVENTOS Y CINEMÁTICAS PUEDEN REACCIONAR A QUÉ SOLUCIÓN SE ALCANZÓ!
+                }
+                else
+                {
+                    throw new Exception("Hubo un error al intenetar obtener el índice de la solución alcanzada. Se recibió: \"" 
+                        + response + "\", pero no se pudo parsear como entero.");
+                }
+            }
             
             PuzzleManager.SolucionCorrecta = completado;
 
