@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
 namespace Hexstar.CSE {
+    /// <summary>
+    /// Ejecuta la animación de abrir o cerrar el socket de consulta del escritorio.
+    /// </summary>
     public class SwitchAnimationBlock : MonoBehaviour
     {
         [SerializeField] BlockMovAndConexion controller;

@@ -13,15 +13,11 @@ using System;
 
 public class OperacionesGameplay : MonoBehaviour
 {
-    private static int eventoId = 0;
-
     [SerializeField] private GameObject dangerController;
     private static GameObject s_dangerController;
     private static AudioClip s_clip_caseBridge;
     
     public static int s_lastScore = 0;
-
-    public static int EventoId { get => eventoId; set => eventoId = value; }
 
     private void Awake()
     {
@@ -51,7 +47,6 @@ public class OperacionesGameplay : MonoBehaviour
         if (!CheckInternetConection()) return;
         string resultado = ConexionHandler.ExtraerJson(ConexionHandler.download);
         resultado = resultado[1..^1];
-            //ImpresorResultado.Instancia.IntroducirResultado(resultado));
         ImpresorResultado.Instancia.IntroducirResultado(resultado);
 
         if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
@@ -101,8 +96,10 @@ public class OperacionesGameplay : MonoBehaviour
             await ConexionHandler.APost(ConexionHandler.baseUrl + "case/solve", form);
             if (!CheckInternetConection()) return;
             string response = ConexionHandler.ExtraerJson(ConexionHandler.download);
-            bool completado = response[0] != '-'; // Número negativo => false
+            
+            if (response == "{}") return;
 
+            bool completado = response[0] != '-'; // Número negativo => false
             if(completado)
             {
                 // "op" es el índice de la solución alcanzada en la lista de soluciones del caso
@@ -112,10 +109,15 @@ public class OperacionesGameplay : MonoBehaviour
                     ControladorDialogos.SetDialogueEvent("case_solution_" + caso.id, op.ToString());
                     // ASÍ LOS EVENTOS Y CINEMÁTICAS PUEDEN REACCIONAR A QUÉ SOLUCIÓN SE ALCANZÓ!
                 }
+                else if (response == "true")
+                {
+                    ControladorDialogos.SetDialogueEvent("case_solution_" + caso.id, "0");
+                    // Por defecto se indica que se ha completado el caso con la solución base.
+                }
                 else
                 {
-                    throw new Exception("Hubo un error al intenetar obtener el índice de la solución alcanzada. Se recibió: \"" 
-                        + response + "\", pero no se pudo parsear como entero.");
+                    ControladorDialogos.SetDialogueEvent("case_solution_" + caso.id, "false");
+                    completado = false;
                 }
             }
             
@@ -132,6 +134,7 @@ public class OperacionesGameplay : MonoBehaviour
                 
                 MeterCasoEnCompletados(1); // 1 = Ganado
                 GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
+
 
                 await CalcularYGuardarPuntuacion();
 
@@ -175,6 +178,7 @@ public class OperacionesGameplay : MonoBehaviour
             GameplayCycle.Instance.PlayInstead(s_clip_caseBridge,true);
 
             TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".msg.temp.eliminar_caso"));
+            PuzzleManager.SolucionCorrecta = false;
             TerminarFaseCaso();
 
             CSE.XAPI_Builder.CreateStatement_Surrender();
@@ -189,6 +193,7 @@ public class OperacionesGameplay : MonoBehaviour
         if (GameplayCycle.GetState() == (int)EstadosDelGameplay.InicioCaso)
         {
             MeterCasoEnCompletados(0); // 0 = Rendido
+            PuzzleManager.SolucionCorrecta = false;
             TerminarFaseCaso();
             CSE.XAPI_Builder.CreateStatement_Surrender();
         }
@@ -223,20 +228,21 @@ public class OperacionesGameplay : MonoBehaviour
     {
         int id = PuzzleManager.GetIdCasoActivo();
         int time = Mathf.FloorToInt(PuzzleManager.UltimoTiempoEmpleado);
+        int retosCompletados = PuzzleManager.GetCasoActivo().PeekCompletedBounties(true, PuzzleManager.NConsultasDuranteElCaso, time);
         WWWForm form = new WWWForm();
         form.AddField("authorization", SesionHandler.sessionKEY);
         form.AddField("caso", id);
         form.AddField("consultas", PuzzleManager.NConsultasDuranteElCaso);
         form.AddField("tiempo", time);
         form.AddField("examen", PuzzleManager.CasoActivoEsExamen() ? 1 : 0);
-        form.AddField("reto", PuzzleManager.NRetosCumplidos);
+        form.AddField("reto", retosCompletados);
         form.AddField("dificultad", ResourceManager.DificultadActual);
         form.AddField("consulta", LectorConsulta.GetQuery());
         await ConexionHandler.APost(ConexionHandler.baseUrl + "score/calculate", form);
         if (!CheckInternetConection()) return;
 
         string json = ConexionHandler.ExtraerJson(ConexionHandler.download);
-        if (json == "{}") Debug.LogError("Ha habido un error en el servidor al calcular la puntuación :(");
+        if (json == "{}") Debug.LogWarning("Ha habido un error en el servidor al calcular la puntuación :(");
         else
         {
             JSONNode jNodo = JSON.Parse(ConexionHandler.download);

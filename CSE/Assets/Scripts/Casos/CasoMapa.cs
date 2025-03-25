@@ -40,6 +40,7 @@ public class CasoMapa : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void Comprar()
 	{
+		if (Caso.CheckingBounties()) return;
 		if(!SePuedeComprar())
 		{
 			TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".caso.necesitas_egentes"));

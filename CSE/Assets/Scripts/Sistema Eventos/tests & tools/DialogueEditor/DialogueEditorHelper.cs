@@ -51,6 +51,7 @@ namespace Hexstar.UI
                     ddbContent.Add(entry);
                 }
             }
+            else if (ddb.Equals("")) ddbContent.Clear();
             PopulateListWithCSVContent();
         }
         public static string GuardarTextoDDB()

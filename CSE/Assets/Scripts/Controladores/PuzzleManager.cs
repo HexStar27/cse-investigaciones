@@ -129,7 +129,8 @@ public class PuzzleManager : MonoBehaviour, ISingleton
 	public static async void InsertarCasoExtra(int idCaso)
 	{
         await LoadCasoEspecifico(idCaso);
-		
+		GameplayCycle.Instance.CheckEndOfDay();
+        
 		Instance.InstanciarCasoMapa(casosCargados[idCaso]);
 		Instance.IntentarColorcarCasosNoColocados();
         
@@ -291,8 +292,8 @@ public class PuzzleManager : MonoBehaviour, ISingleton
     }
 	private void CalcularGridMapa()
 	{
-        offset = _paddingMapa - _map.sizeDelta / 2;
-        paddedSize = _map.sizeDelta - 2 * _paddingMapa;
+        offset = _paddingMapa - _map.rect.size / 2;
+        paddedSize = _map.rect.size - 2 * _paddingMapa;
         gridSize = new(
             Mathf.Max(1f, Mathf.Floor(paddedSize.x / _cellSize.x)),
             Mathf.Max(1f, Mathf.Floor(paddedSize.y / _cellSize.y)));
@@ -313,7 +314,7 @@ public class PuzzleManager : MonoBehaviour, ISingleton
             {
                 if (showMapGrid) Debug.Log("Evitando superposición");
                 Vector2 newPos = FindFreeCell(gridSize, gridCasePos, offset);
-				if (newPos != -Vector2.one) { posCandidate = newPos; bloqueado = false; }
+                if (newPos != -Vector2.one) { posCandidate = newPos; bloqueado = false; }
 			}
 
 			if(bloqueado) break; //Si no ha conseguido encontrar un hueco, el resto de casos tampoco lo harán...
@@ -322,7 +323,7 @@ public class PuzzleManager : MonoBehaviour, ISingleton
                 idCasosNoColocados.RemoveAt(0);
                 casoM.gameObject.SetActive(true);
                 casoM.transform.localPosition = posCandidate;
-			}
+            }
         }
     }
     
@@ -456,8 +457,8 @@ public static class ListAlgorithms
     }
 
 	/// <summary>
-	/// Una simple función hash que convierte el título de un caso en una posición para el mapa. <br>
-	/// De esta forma los casos siempre tendrán la misma posición "aleatoria" cada ve que se cargue el juego.<br>
+	/// Una simple función hash que convierte el título de un caso en una posición para el mapa. <br></br>
+	/// De esta forma los casos siempre tendrán la misma posición "aleatoria" cada ve que se cargue el juego.<br></br>
 	/// </summary>
 	/// <returns>El índice en el grid para el caso</returns>
 	public static Vector2 HashCaso2Pos(this Vector2 tamGrid, Caso caso)

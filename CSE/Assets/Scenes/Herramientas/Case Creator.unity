@@ -172,7 +172,7 @@ MonoBehaviour:
   key: 
   iv: 
   texto:
-  - no
+  - password
   cifrado:
   - 
 --- !u!1 &305624359
@@ -220,43 +220,52 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bonito: 1
-  json: "{\n    \"id\": 1,\n    \"dif\": 1,\n    \"coste\": 1,\n    \"caducidad\":
-    -1,\n    \"secundario\": false,\n    \"examen\": false,\n    \"titulo\": \"Robo
-    de Mercanc\xEDa Peligrosa\",\n    \"resumen\": \"Se ha detectado una p\xE9rdida
-    de mercanc\xEDa peligrosa durante su transporte y necesitan saber el nombre y
-    apellido del responsable para poder arrestarlo.\",\n    \"pistas\": [\n       
-    {\n            \"titulo\": \"Color de pelo\",\n            \"descripcion\": \"Un
-    testigo declara haber visto a un transportista pelirrojo parar la nave en un
-    punto no autorizado durante el transporte.\",\n            \"palabras\": [\n               
-    \"pelirrojo\"\n            ]\n        },\n        {\n            \"titulo\":
-    \"Altura\",\n            \"descripcion\": \"Adem\xE1s se ha fijado en que med\xEDa
-    m\xE1s de 1,90 metros de altura.\",\n            \"palabras\": [\n               
-    \"1.9\"\n            ]\n        }\n    ],\n    \"bounties\": [\n        {\n           
-    \"condicion\": 0,\n            \"efecto\": 0,\n            \"cantidad\": 1\n       
-    }\n    ]\n}"
+  json: "{\n    \"id\": 108,\n    \"dif\": 4,\n    \"coste\": 0,\n    \"caducidad\":
+    -1,\n    \"secundario\": true,\n    \"examen\": false,\n    \"titulo\": \"Die
+    in a Fire\",\n    \"resumen\": \"El due\xF1o de Corgomatic se ha presentado en
+    tu oficina para hablarte sobre la relaci\xF3n que ten\xEDa con el due\xF1o de
+    la pizzer\xEDa. Todas las se\xF1ales apuntan a una sola cosa. Hay que encontrar
+    el quinto animatr\xF3nico en el  inventario del establecimiento.\",\n    \"pistas\":
+    [\n        {\n            \"titulo\": \"Lista de animatr\xF3nicos originales\",\n           
+    \"descripcion\": \"Si hay un quinto animatr\xF3nico deber\xEDa aquel que no tenga
+    el nombre de los originales (Hernesto el Hamster, Lucas el Lobo, Gloria la Gallina
+    y Paul el oso Polar).\",\n            \"palabras\": [\n                \"Hernesto
+    el Hamster\",\n                \"Lucas el Lobo\",\n                \"Gloria la
+    Gallina\",\n                \"Paul el oso Polar\"\n            ]\n        }\n   
+    ],\n    \"bounties\": [\n        {\n            \"condicion\": 0,\n           
+    \"efecto\": 0,\n            \"cantidad\": 1\n        },\n        {\n           
+    \"condicion\": 8,\n            \"efecto\": 1,\n            \"cantidad\": -99\n       
+    },\n        {\n            \"condicion\": 3,\n            \"efecto\": 0,\n           
+    \"cantidad\": 1\n        }\n    ]\n}"
   caso:
-    id: 1
-    dif: 1
-    coste: 1
+    id: 108
+    dif: 4
+    coste: 0
     caducidad: -1
-    secundario: 0
+    secundario: 1
     examen: 0
-    titulo: "Robo de Mercanc\xEDa Peligrosa"
-    resumen: "Se ha detectado una p\xE9rdida de mercanc\xEDa peligrosa durante su
-      transporte y necesitan saber el nombre y apellido del responsable para poder
-      arrestarlo."
+    titulo: Die in a Fire
+    resumen: "El due\xF1o de Corgomatic se ha presentado en tu oficina para hablarte
+      sobre la relaci\xF3n que ten\xEDa con el due\xF1o de la pizzer\xEDa. Todas
+      las se\xF1ales apuntan a una sola cosa. Hay que encontrar el quinto animatr\xF3nico
+      en el  inventario del establecimiento."
     pistas:
-    - titulo: Color de pelo
-      descripcion: Un testigo declara haber visto a un transportista pelirrojo parar
-        la nave en un punto no autorizado durante el transporte.
+    - titulo: "Lista de animatr\xF3nicos originales"
+      descripcion: "Si hay un quinto animatr\xF3nico deber\xEDa aquel que no tenga
+        el nombre de los originales (Hernesto el Hamster, Lucas el Lobo, Gloria la
+        Gallina y Paul el oso Polar)."
       palabras:
-      - pelirrojo
-    - titulo: Altura
-      descripcion: "Adem\xE1s se ha fijado en que med\xEDa m\xE1s de 1,90 metros
-        de altura."
-      palabras:
-      - 1.9
+      - Hernesto el Hamster
+      - Lucas el Lobo
+      - Gloria la Gallina
+      - Paul el oso Polar
     bounties:
     - condicion: 0
       efecto: 0
       cantidad: 1
+    - condicion: 8
+      efecto: 1
+      cantidad: -99
+    - condicion: 1
+      efecto: 0
+      cantidad: -4

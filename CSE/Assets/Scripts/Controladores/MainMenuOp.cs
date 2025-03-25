@@ -15,6 +15,7 @@ public class MainMenuOp : MonoBehaviour
     [SerializeField] private InputField textoContra;
     [SerializeField] private TMP_InputField textNick;
     [SerializeField] private Transform conexionFallidaMSG;
+    [SerializeField] private TMP_InputField server_selector;
 #pragma warning restore 0649
 
     [Header("Conexión a servidor")]
@@ -24,6 +25,15 @@ public class MainMenuOp : MonoBehaviour
     [System.Serializable] public class OnAlgo : UnityEvent{};
     public OnAlgo onError;
     public OnAlgo onSuccess;
+
+    private static readonly string _serverUrl = "ServerUrl";
+
+    private void Awake()
+    {
+        ConexionHandler.baseUrl = PlayerPrefs.GetString(_serverUrl, ConexionHandler.defaultBaseUrl);
+        server_selector.text = ConexionHandler.baseUrl;
+        server_selector.onEndEdit.AddListener(EstablecerServidor);
+    }
 
     private void Start()
     {
@@ -96,5 +106,15 @@ public class MainMenuOp : MonoBehaviour
     public void Salir()
     {
         GameManager.CerrarAplicacion();
+    }
+
+    private void EstablecerServidor(string url)
+    {
+        if (url == "") url = ConexionHandler.defaultBaseUrl;
+        if (!url.EndsWith('/')) url += "/";
+        if (!url.EndsWith("game/")) url += "game/";
+        ConexionHandler.baseUrl = url;
+        server_selector.SetTextWithoutNotify(url);
+        PlayerPrefs.SetString(_serverUrl, url);
     }
 }

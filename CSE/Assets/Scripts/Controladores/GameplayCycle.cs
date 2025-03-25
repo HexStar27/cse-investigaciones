@@ -138,7 +138,8 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         //Elimina las pistas del caso
 		AlmacenDePalabras.palabras[(int)TabType.Pistas].Clear();
 
-		await PuzzleManager.LoadCasosSiguientes(); // Los hijos correspondientes del caso
+		// Ya no se usa debido a que ahora los casos se cargan a través de eventos de historia.
+		//await PuzzleManager.LoadCasosSiguientes(); // Los hijos correspondientes del caso
         PuzzleManager.QuitarCasoActivo(); // F la referencia
 		PuzzleManager.SacarCasosDelBanquillo();	// Los no colocados
     }
@@ -151,22 +152,26 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 
 		//Limpieza
 		RestartCameraState();
-		Intelisense.instance.pantalla.text ="";
+		if (QueryModeController.IsQueryModeOnManual()) Intelisense.instance.pantalla.text ="";
 		BloqueTabletaElemento.DestruirBloquesEnMesa();
 
 		PuzzleManager.AplicarCaducidadDeCasosCargados();
+		PuzzleManager.SolucionCorrecta = false;
 
         XAPI_Builder.CreateStatement_DayFinished(completedCasesInDay, startedCasesInDay);
         EnqueueState(EstadosDelGameplay.InicioDia);
 	}
 
-	private void CheckEndOfDay()
+	public void CheckEndOfDay()
 	{
+		if (popupFinDia == null) return;
+		if (AlmacenEventos.EjecutandoEventos) return;
         if (ResourceManager.ConsultasDisponibles == 0 || PuzzleManager.CasosRestantesEnMapa() == 0)
         {
             //Esperar confirmación del jugador para continuar
-            if (popupFinDia != null) popupFinDia.ActivarPopUp();
+            popupFinDia.ActivarPopUp();
         }
+		else popupFinDia.Press();
     }
 	public void Enqueue4EndOfDay() 
 	{
@@ -209,6 +214,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	}
 	private void PlayCaseTrack()
 	{
+		if (bgmSource == null) return; 
 		bgmSource.Stop();
 		bgmSource.clip = bgm_resolviendoCaso;
         bgmSource.Play();
@@ -295,7 +301,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	{
         MenuPausa.onExitLevel.RemoveListener(ResetSingleton);
         ResourceManager.OnOutOfQueries.RemoveListener(OperacionesGameplay.SinConsultas);
-		terminarBucleExtractor = true;
+        terminarBucleExtractor = true;
 
     }
     private void OnApplicationQuit()

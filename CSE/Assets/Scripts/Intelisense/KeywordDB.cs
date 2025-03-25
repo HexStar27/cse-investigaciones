@@ -17,7 +17,7 @@ public class KeywordDB : ScriptableObject
     /// </summary>
     /// <param name="pattern"></param>
     /// <returns></returns>
-    public List<int> GetIndexOcurrenciesOf(string pattern)
+    public List<int> GetIndexOcurrenciesOf(string pattern, bool skipDoubles = false)
     {
         int n = kw.Count;
         int l = pattern.Length;
@@ -68,10 +68,26 @@ public class KeywordDB : ScriptableObject
             }
         }
 
+        if (skipDoubles)
+        {
+            for (int i = ocurrencies.Count-1; i >= 0; i--)
+            {
+                var toCheck = kw[ocurrencies[i]];
+                for (int j = 0; j < i; j++)
+                {
+                    if (toCheck.Equals(kw[ocurrencies[j]]))
+                    {
+                        ocurrencies.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+
         return ocurrencies;
     }
 
-    public List<int> GetIndexOfColumnsFromTable(string table, string pattern)
+    public List<int> GetIndexOfColumnsFromTable(string table, string pattern, bool skipDoubles = false)
     {
         List<int> ocurrencies = new List<int>();
         List<string> columnasABuscar = AlmacenDePalabras.GetColumnasDeTabla(table);
@@ -84,6 +100,21 @@ public class KeywordDB : ScriptableObject
             if (pattern.Length == 0) ocurrencies.Add(i);
             else if (kw[i].ContainsSection(pattern)) ocurrencies.Add(i);
             
+        }
+        if (skipDoubles)
+        {
+            for (int i = ocurrencies.Count - 1; i >= 0; i--)
+            {
+                var toCheck = kw[ocurrencies[i]];
+                for (int j = 0; j < i; j++)
+                {
+                    if (toCheck.Equals(kw[ocurrencies[j]]))
+                    {
+                        ocurrencies.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
         }
         return ocurrencies;
     }
@@ -155,6 +186,11 @@ public struct Keyword
     {
         name = n;
         description = d;
+    }
+
+    public bool Equals(Keyword other)
+    {
+        return other.name.Equals(name) && other.description.Equals(description);
     }
 
     public bool SmallerThanPattern(int pSize)

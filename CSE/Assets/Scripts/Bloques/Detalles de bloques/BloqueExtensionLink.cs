@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
 namespace Hexstar.CSE {
-    //Se encarga de colocar o quitar el bloque extension "coma"
+    //Se encarga de colocar o quitar el bloque extension "paréntesis" o derivados
     public class BloqueExtensionLink : MonoBehaviour
     {
         [SerializeField] BlockMovAndConexion controladorLink;
         [SerializeField] BlockMovAndConexion controladorExtension;
 
-        private void ReturnToLink()
+        public void ReturnToLink()
         {
             if(!controladorLink.FormaParteDelChunk(controladorExtension))
             {

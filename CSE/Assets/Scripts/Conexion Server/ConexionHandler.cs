@@ -9,7 +9,8 @@ namespace Hexstar
 {
     public static class ConexionHandler
     {
-        public readonly static string baseUrl = "https://cse.uca.es/game/";
+        public readonly static string defaultBaseUrl = "https://cse.uca.es/game/";
+        public static string baseUrl = "https://cse.uca.es/game/";
         public static bool debugMode = false;
 
         public class DownloadEvent : UnityEvent<DownloadHandler> { }
@@ -89,7 +90,7 @@ namespace Hexstar
         }
 
         public bool IsCompleted { get { return asyncOp.isDone; } }
-        public void GetResult() { }
+        public void GetResult() { } // No se usa pero es requerido por la interfaz INotifyCompletion.
         public void OnCompleted(Action continuation)
         {
             this.continuation = continuation;

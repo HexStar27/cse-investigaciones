@@ -16,7 +16,8 @@ namespace Hexstar.CSE.SistemaEventos
         /// Lista que indica si un evento de "listaDeEventos" ha sido ejecutado o no.
         /// </summary>
         private static List<bool> eventosEjecutados = new();
-        public static bool EsperandoEvento { get; set; }
+        public static bool EsperandoEvento { get; set; } // ???
+        public static bool EjecutandoEventos { get; set; }
         internal static bool EventoOcupado { get; set; }
 
         /// <summary>
@@ -34,6 +35,7 @@ namespace Hexstar.CSE.SistemaEventos
         /// </summary>
         public static async Task EncargarseDeEventosAptos()
         {
+            EjecutandoEventos = true;
             int n = listaDeEventos.Count;
             for (int i = 0; i < n; i++)
             {
@@ -42,6 +44,7 @@ namespace Hexstar.CSE.SistemaEventos
                 Evento eventoDisponible = listaDeEventos[i];
                 if (eventoDisponible.CumpleCondiciones()) await eventoDisponible.Ejecutar();
             }
+            EjecutandoEventos = false;
         }
 
         /// <summary>
@@ -64,7 +67,6 @@ namespace Hexstar.CSE.SistemaEventos
                 string evJson = array[i]["data"].Value;
                 if (evJson.Contains("·"))
                 {
-                    //evJson = evJson.Replace("\\\\·", "\\\"");
                     evJson = evJson.Replace('·', '\"');
                 }
                 Evento ev = new(JSON.Parse(evJson));
@@ -215,6 +217,7 @@ namespace Hexstar.CSE.SistemaEventos
                 string[] tc = tableCodesNuevos.Split(separadores, StringSplitOptions.RemoveEmptyEntries);
                 ResourceManager.TableCodes.AddRange(tc);
 
+                AlmacenDePalabras.CargarPalabras();
                 TempMessageController.Instancia.GenerarMensaje(Localizator.GetString(".nuevas_tablas"));
             }
 
@@ -299,6 +302,7 @@ namespace Hexstar.CSE.SistemaEventos
         {
             condicionUnparsed = nuevaCondicion;
             condicion = ParserCondiciones.Procesar_a_AST(condicionUnparsed);
+            //if (condicion != null) Debug.Log(condicion.ToString(0));
             return condicion != null;
         }
     }

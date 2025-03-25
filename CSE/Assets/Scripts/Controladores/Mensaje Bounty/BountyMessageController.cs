@@ -63,10 +63,16 @@ namespace Hexstar.CSE
         {
             float n = condicionAMostrar.Length;
             WaitForSeconds delay = new(0.5f / n); //Tiene 0.5 segundos para colocar todas las letras
+            bool is_escape = false;
             for (int i = 0; i < n; i++)
             {
-                condTMesh.text += condicionAMostrar[i];
-                yield return delay;
+                char c = condicionAMostrar[i];
+                condTMesh.text += c;
+                
+                if (c == '<') is_escape = true;
+                else if (c == '>') is_escape = false;
+                
+                if (!is_escape) yield return delay;
             }
         }
 

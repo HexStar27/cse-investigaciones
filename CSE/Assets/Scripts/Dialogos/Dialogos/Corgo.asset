@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6907522a6789f04eab0dee1d5f1317e, type: 3}
+  m_Name: Corgo
+  m_EditorClassIdentifier: 
+  portraits:
+  - {fileID: -1993733260, guid: 60dae029347802f40b21ad96abdb8174, type: 3}
+  - {fileID: -861723576, guid: 60dae029347802f40b21ad96abdb8174, type: 3}
+  - {fileID: -2039124306, guid: 60dae029347802f40b21ad96abdb8174, type: 3}
+  - {fileID: -2126125132, guid: 60dae029347802f40b21ad96abdb8174, type: 3}
+  expressions:
+  - neutro
+  - sus
+  - sus2
+  - contento

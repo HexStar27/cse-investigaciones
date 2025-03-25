@@ -110,10 +110,8 @@ namespace Hexstar
 			TextAsset data = Resources.Load("Secreto/key") as TextAsset;
 			string t = data.text;
 			int n = t.Length;
-			int corte = -1;
-			for (int i = 0; i < n; i++)
-				if (t[i] == '\n')
-					corte = i;
+			int corte = t.IndexOf('\n');
+			//for (int i = 0; i < n; i++) if (t[i] == '\n') corte = i;
 
 			ciphIv = t.Substring(corte + 1);
 			ciphKey = t.Substring(0, corte - 1);

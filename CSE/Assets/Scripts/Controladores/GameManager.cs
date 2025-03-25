@@ -23,15 +23,13 @@ public static class GameManager
         SceneManager.LoadScene((int)escena);
     }
 
-    public static IEnumerator CarganConPantallaDeCarga(int escenaId) // No se usa ???
+    public static IEnumerator CarganConPantallaDeCarga(int escenaId) // No se usa
     {
         if (!isLoading)
         {
             isLoading = true;
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(escenaId);
             yield return new WaitUntil(() => asyncLoad.isDone);
-            
-            //TODO: Poner aquí todo lo que controla la pantalla de carga
 
             isLoading = false;
         }

@@ -13,7 +13,7 @@ public static class ResourceManager
     private static int puntuacion;
     private static int dia;
 
-    public static UnityEvent OnOutOfAgents = new();
+    public static UnityEvent OnOutOfAgents = new(); // Unused, not necessary.
     public static UnityEvent OnOutOfQueries = new();
 
     /// <summary>
@@ -35,8 +35,7 @@ public static class ResourceManager
     {
         get => consultasDisponibles; 
         set {
-            consultasDisponibles = value;
-            if (consultasDisponibles > consultasMaximas) consultasDisponibles = consultasMaximas;
+            consultasDisponibles = System.Math.Min(value,consultasMaximas);
             if (consultasDisponibles <= 0)
             {
                 consultasDisponibles = 0;

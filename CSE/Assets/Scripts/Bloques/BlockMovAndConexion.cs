@@ -507,6 +507,19 @@ namespace Hexstar.CSE
             {
 				Conector.distanciaEntradasTocando.Clear();
                 XAPI_Builder.CreateStatement_BlockAction(XAPI_Builder.BlockAction.REMOVED, bd.title);
+
+				// Parche... (Busca bloques de paréntesis y los devuelve a su bloque original en vez de borrarlos)
+				BlockMovAndConexion sig = GetBloqueDerecho();
+				while(sig != null)
+				{
+					if(sig.GetBlockData().name == "parentesis")
+					{
+						if (sig.TryGetComponent(out BloqueExtensionLink bel)) bel.ReturnToLink();
+						sig = null;
+					}
+					else sig = sig.GetBloqueDerecho();
+				}
+
                 Destroy(this.gameObject);
             }
 

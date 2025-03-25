@@ -10,24 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 18dbca1ba191bf14d9beb9cd66a38a54, type: 3}
-  m_Name: coma
+  m_Name: OP ANY-ALL
   m_EditorClassIdentifier: 
   title: 
   TOP: 0
   LEFT: 1
   BOTTOM: 0
   RIGHT: 1
-  tipoPropio: {fileID: 11400000, guid: 38f9db28f159e5944891c7df6d66bdd3, type: 2}
+  tipoPropio: {fileID: 11400000, guid: 957cd2ae84805e645ab3c2363ba101c0, type: 2}
   salidaDerecha:
     tiposAceptados:
     - {fileID: 11400000, guid: b5f0719cbafa86a4283f501126fda1b6, type: 2}
-    - {fileID: 11400000, guid: 862db50c28e098949938c0c9e7cf3b7c, type: 2}
     - {fileID: 11400000, guid: 2d786f2feb601574ebbeb82c27443a6f, type: 2}
+    - {fileID: 11400000, guid: 93db409c3a82b544f8c98ab24c9afad0, type: 2}
+    - {fileID: 11400000, guid: f2c1aeff5cc953f46b5498b865f9e6a4, type: 2}
+    - {fileID: 11400000, guid: 6fd175c2ba407604fad4a3dd1104ee6b, type: 2}
   salidaAbajo:
     tiposAceptados: []
   seccionesAceptadas:
     tiposAceptados:
     - {fileID: 11400000, guid: fcdcb73a1d096c84197ba5fa9e897cdf, type: 2}
-    - {fileID: 11400000, guid: 9f05b3d25c61f1a4fb88605ebd067fba, type: 2}
-    - {fileID: 11400000, guid: 07db614f3bab3ee4b9fa7aba910aa1fc, type: 2}
-    - {fileID: 11400000, guid: 1ded4ffc202cccb49add387337276923, type: 2}
+    - {fileID: 11400000, guid: e8e9c6ce91cf6ab4185d249074ec6af0, type: 2}
+    - {fileID: 11400000, guid: 500be1f28aa8c6a4e997d53891bc89f6, type: 2}

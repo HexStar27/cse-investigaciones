@@ -23,6 +23,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 0c3c9c1629eea0644b5d61774d3db811, type: 2}
     - {fileID: 11400000, guid: e296ee8352ee7e14f99b9fc84a618f80, type: 2}
     - {fileID: 11400000, guid: f2c1aeff5cc953f46b5498b865f9e6a4, type: 2}
+    - {fileID: 11400000, guid: da8a7931fa67980468c63b0485e9b2aa, type: 2}
   salidaAbajo:
     tiposAceptados: []
   seccionesAceptadas:

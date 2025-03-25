@@ -40,13 +40,19 @@ PrefabInstance:
     - target: {fileID: 790835858031762440, guid: 2046d6e1c45c32f49ae459560cc2192d,
         type: 3}
       propertyPath: m_Name
-      value: bp_14_IN
+      value: bp_15_IN
       objectReference: {fileID: 0}
     - target: {fileID: 790835858031762444, guid: 2046d6e1c45c32f49ae459560cc2192d,
         type: 3}
       propertyPath: m_Size.x
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 790835858031762445, guid: 2046d6e1c45c32f49ae459560cc2192d,
+        type: 3}
+      propertyPath: bd
+      value: 
+      objectReference: {fileID: 11400000, guid: b48a3e490c1fac24cb818950a39c253a,
+        type: 2}
     - target: {fileID: 790835858031762447, guid: 2046d6e1c45c32f49ae459560cc2192d,
         type: 3}
       propertyPath: m_RootOrder

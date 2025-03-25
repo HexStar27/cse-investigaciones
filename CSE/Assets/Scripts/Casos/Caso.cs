@@ -17,18 +17,34 @@ namespace Hexstar.CSE
         public DatosPista[] pistas;
         public Bounty[] bounties;
 
+        private static bool checking = false;
+        public static bool CheckingBounties() => checking;
+
         /// <summary>
         /// Comprueba que se cumplan las condiciones de todos los bounties y los ejecuta.
         /// </summary>
         public async Task ComprobarYAplicarBounties(bool ganado, int consultasUsadas, float tiempoEmpleado)
         {
             if (bounties == null) return;
+            checking = true;
             int idxInforme = CarpetaInformesController.IndiceDeInformeCorrespondiente(this);
             for (int i = 0; i < bounties.Length; i++)
             {
                 bool superado = await bounties[i].ComprobarYAplicar(ganado, consultasUsadas, tiempoEmpleado);
                 CarpetaInformesController.Informes[idxInforme].SetBountyCompletion(i, superado);
             }
+            checking = false;
+        }
+
+        public int PeekCompletedBounties(bool ganado, int consultasUsadas, float tiempoEmpleado)
+        {
+            if (bounties == null) return-1;
+            int b = 0;
+            for (int i = 0; i < bounties.Length; i++)
+            {
+                if (bounties[i].SoloComprobar(ganado, consultasUsadas, tiempoEmpleado)) b++;
+            }
+            return b;
         }
     }
 

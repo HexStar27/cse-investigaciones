@@ -51,7 +51,7 @@ MonoBehaviour:
     titulo: Valor
   - prefab: {fileID: 2866258637498183560, guid: b08a820eb96d66d469fd59f29ef3a45f,
       type: 3}
-    disponibleEnDificultad: 1
+    disponibleEnDificultad: 0
     titulo: AS
   - prefab: {fileID: 1497208541678768579, guid: 842e95a02f18dfa4ea39c3f7984fdf30,
       type: 3}

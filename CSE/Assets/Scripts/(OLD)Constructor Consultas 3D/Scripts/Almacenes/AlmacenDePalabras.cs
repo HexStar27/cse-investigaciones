@@ -50,7 +50,7 @@ namespace Hexstar.CSE
         {
             for (int i = 0; i < 5; i++) palabras[i] = new List<string>();
             //1º Cargar tablas y columnas
-            string codigos = "\"ejemplo0\", \"ejemplo1\"";
+            string codigos = "\"dif1\""; // <- Tablas iniciales
             
             for(int i = 0; i < ResourceManager.TableCodes.Count; i++)
                 codigos += ", \""+ ResourceManager.TableCodes[i]+"\"";

@@ -24,6 +24,7 @@ public class ImpresorResultado : MonoBehaviour
     private IEnumerator ProcessQueryResult(string r)
     {
         textoResultado.text = QueryResultBeautifierV2(r);
+        textoResultado.maxVisibleCharacters = textoResultado.text.Length;
         if (IO_Button != null && textoResultado.transform.localScale.x == 0)
         {
             IO_Button.SendClick();
@@ -56,13 +57,12 @@ public class ImpresorResultado : MonoBehaviour
 
     private string QueryResultBeautifierV2(string json)
     {
-        json = "{query:[" + json + "]}";
-        var nodo = SimpleJSON.JSON.Parse(json);
-
-        badQuery = nodo["query"].HasKey("message");
-        if (badQuery) return nodo["query"]["message"];
-
+        string respuestaBuena = "{query:[" + json + "]}";
+        var nodo = SimpleJSON.JSON.Parse(respuestaBuena);
         var filas = nodo["query"].AsArray;
+
+        badQuery = filas[0].IsString;
+        if (badQuery) return filas[1];
 
         List<string> columnas = new();
         TableCreator tc = new();
@@ -92,6 +92,12 @@ public class ImpresorResultado : MonoBehaviour
             SimpleJSON.JSONNode fila = filas[i];
             AddSeparator(ref filasBienColocadas,tc);
             AddRowV2(ref filasBienColocadas, ref tc, ref fila, i);
+            if (i >= 511)
+            {
+                AddSeparator(ref filasBienColocadas, tc);
+                filasBienColocadas.AppendLine("...");
+                break;
+            }
         }
 
         return EncabezadoTablaV2(tc, columnas) + filasBienColocadas.ToString() + FinTablaV2(tc);

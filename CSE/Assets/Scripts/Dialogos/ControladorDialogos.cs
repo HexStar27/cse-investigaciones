@@ -124,6 +124,7 @@ namespace Hexstar.Dialogue {
             dialogueBox.AbrirTextoNuevo();
             SetGlobalStop(true);
             if (showDialogDebug) print("Empezando diálogo en el grupo " + grupoDialogoInicial + " con índice " + iEntrada);
+            MostrarRetrato(null);
             SiguienteDU();
         }
             
@@ -218,7 +219,8 @@ namespace Hexstar.Dialogue {
             {
                 case DialogueFX.Tipo.CambioPerfil:
                     var vals = fx.value.Split();
-                    MostrarRetrato(GetPortrait(vals[0], vals[1]));
+                    if (vals.Length <= 1) MostrarRetrato(null);
+                    else MostrarRetrato(GetPortrait(vals[0], vals[1]));
                     break;
                 case DialogueFX.Tipo.MostrarImagen:
                     zonaImagen.gameObject.SetActive(fx.value != "");

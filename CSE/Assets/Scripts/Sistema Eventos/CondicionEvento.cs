@@ -8,11 +8,17 @@ namespace Hexstar.CSE.SistemaEventos
     {
         public int valor;
         virtual public bool EsValida() { throw new NotImplementedException(); }
+        virtual public string ToString(int tabs)
+        {
+            string aux = "";
+            for (int i = 0; i < tabs; i++) aux += "\t";
+            return aux + valor.ToString();
+        }
     }
 
     public class CondCaso : CondicionEvento
     {
-        public enum TipoResultado { COMPLETADO, PERDIDO, ABANDONADO}
+        public enum TipoResultado { COMPLETADO, PERDIDO, ABANDONADO, INTENTADO}
         public TipoResultado tipo;
 
         public override bool EsValida()
@@ -25,8 +31,15 @@ namespace Hexstar.CSE.SistemaEventos
                 TipoResultado.COMPLETADO => ResourceManager.CasosCompletados_ListaDeEstados[idx] ==  1,
                 TipoResultado.PERDIDO =>    ResourceManager.CasosCompletados_ListaDeEstados[idx] == -1,
                 TipoResultado.ABANDONADO => ResourceManager.CasosCompletados_ListaDeEstados[idx] ==  0,
+                TipoResultado.INTENTADO =>  true,
                 _ => throw new NotImplementedException(),
             };
+        }
+        override public string ToString(int tabs)
+        {
+            string aux = "";
+            for (int i = 0; i < tabs; i++) aux += "\t";
+            return aux + "CondCaso(" + tipo + "," + valor + ")";
         }
     }
 
@@ -43,6 +56,12 @@ namespace Hexstar.CSE.SistemaEventos
                 Operacion.GT => ResourceManager.Dia > valor,
                 _ => throw new NotImplementedException(),
             };
+        }
+        override public string ToString(int tabs)
+        {
+            string aux = "";
+            for (int i = 0; i < tabs; i++) aux += "\t";
+            return aux + "CondDia(" + operacion + "," + valor + ")";
         }
     }
 
@@ -74,6 +93,12 @@ namespace Hexstar.CSE.SistemaEventos
                 };
             }
         }
+        override public string ToString(int tabs)
+        {
+            string aux = "";
+            for (int i = 0; i < tabs; i++) aux += "\t";
+            return aux + "CondRep(" + tipoRep + "," + valor + ")";
+        }
     }
 
     public class CondDialogE : CondDia
@@ -94,6 +119,12 @@ namespace Hexstar.CSE.SistemaEventos
                 };
             }
             else return false;
+        }
+        override public string ToString(int tabs)
+        {
+            string aux = "";
+            for (int i = 0; i < tabs; i++) aux += "\t";
+            return aux + "CondEv(" + key + "," + valor + ")";
         }
     }
 
@@ -125,6 +156,17 @@ namespace Hexstar.CSE.SistemaEventos
             }
             return valida;
         }
+        override public string ToString(int tabs)
+        {
+            string aux = "";
+            for (int i = 0; i < tabs; i++) aux += "\t";
+            aux += "CondConect(" + tipoConect + ")";
+            foreach(CondicionEvento condicion in condiciones)
+            {
+                aux += "\n" + condicion.ToString(tabs + 1);
+            }
+            return aux;
+        }
     }
 
     // PARTE DE LA GRAMÁTICA //
@@ -148,7 +190,7 @@ namespace Hexstar.CSE.SistemaEventos
         // Nivel 3
         static readonly string num = @"(-?\d+)";
         static readonly string op = @"(=|<|>)";
-        static readonly string var = @"(CASO_COMPLETADO|CASO_PERDIDO|CASO_ABANDONADO|DIA_ACTUAL|REP_PUEBLO|REP_EMPRESA|(EVENTO_\w+))";
+        static readonly string var = @"(CASO_COMPLETADO|CASO_PERDIDO|CASO_ABANDONADO|CASO_INTENTADO|DIA_ACTUAL|REP_PUEBLO|REP_EMPRESA|(EVENTO_\w+))";
         static readonly string condicion_simple = @"(" +var+op+num+ @")";
         // Nivel 2
         static readonly string and = @"(AND\(.*\))";
@@ -239,6 +281,7 @@ namespace Hexstar.CSE.SistemaEventos
             }
             if (mB.Success)
             {
+                if (mB.Index != 0) return;
                 string resto = contenido[(mA.Index + mA.Value.Length + 1)..];
                 P_lista(resto, ref listaDelConector);
             }
@@ -273,6 +316,10 @@ namespace Hexstar.CSE.SistemaEventos
                     case "CASO_ABANDONADO":
                         if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_ABANDONADO, se usó \"" + operador + "\".");
                         return new CondCaso() { tipo = CondCaso.TipoResultado.ABANDONADO, valor = valor };
+
+                    case "CASO_INTENTADO":
+                        if (operador != '=') throw new Exception("Sólo se puede usar el operador '=' con CASO_INTENTADO, se usó \"" + operador + "\".");
+                        return new CondCaso() { tipo = CondCaso.TipoResultado.INTENTADO, valor = valor };
 
                     case "DIA_ACTUAL":
                         return new CondDia() { operacion = op, valor = valor };

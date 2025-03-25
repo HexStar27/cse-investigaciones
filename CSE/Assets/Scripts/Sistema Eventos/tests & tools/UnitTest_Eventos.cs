@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Hexstar;
 using Hexstar.CSE.SistemaEventos;
 using SimpleJSON;
 using TMPro;

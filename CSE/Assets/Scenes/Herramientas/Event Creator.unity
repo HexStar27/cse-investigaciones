@@ -1407,7 +1407,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4728904491355775475, guid: cdc11ca3971851b41849edca057012f0,
         type: 3}
+      propertyPath: m_RegexValue
+      value: \d*
+      objectReference: {fileID: 0}
+    - target: {fileID: 4728904491355775475, guid: cdc11ca3971851b41849edca057012f0,
+        type: 3}
+      propertyPath: m_ContentType
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4728904491355775475, guid: cdc11ca3971851b41849edca057012f0,
+        type: 3}
       propertyPath: m_Navigation.m_Mode
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4728904491355775475, guid: cdc11ca3971851b41849edca057012f0,
+        type: 3}
+      propertyPath: m_CharacterValidation
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4728904491355775475, guid: cdc11ca3971851b41849edca057012f0,
@@ -1738,6 +1753,11 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6738033348846796183, guid: b71e63712e8119e4f857eae409ea4e21,
+        type: 3}
+      propertyPath: m_ScrollSensitivity
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 6738033348909891809, guid: b71e63712e8119e4f857eae409ea4e21,
         type: 3}
       propertyPath: m_Navigation.m_Mode
@@ -1771,7 +1791,7 @@ PrefabInstance:
     - target: {fileID: 6738033349342398395, guid: b71e63712e8119e4f857eae409ea4e21,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 141530.6
+      value: 212688.33
       objectReference: {fileID: 0}
     - target: {fileID: 6738033349342398396, guid: b71e63712e8119e4f857eae409ea4e21,
         type: 3}
