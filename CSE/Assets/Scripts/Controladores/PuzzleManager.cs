@@ -279,7 +279,7 @@ public class PuzzleManager : MonoBehaviour, ISingleton
         if (AlreadyACaseThere(mapCasePos)) //Evitar colisión
         {
             if (showMapGrid) Debug.Log("Evitando colisión");
-            Vector2 newPos = FindFreeCell(gridSize, gridCasePos, offset);
+            Vector2 newPos = FindFreeCell(gridSize, offset, gridCasePos);
             if (newPos != -Vector2.one) objeto.transform.localPosition = newPos;
             else //No se pudo colocar en el mapa
             {
@@ -288,7 +288,7 @@ public class PuzzleManager : MonoBehaviour, ISingleton
             }
         }
         else objeto.transform.localPosition = mapCasePos;
-        casosGO.Add(c.id, casoM); // IMPORTANTE añadir DESPUÉS de encontrarle una posición
+        casosGO.TryAdd(c.id, casoM); // IMPORTANTE añadir DESPUÉS de encontrarle una posición
     }
 	private void CalcularGridMapa()
 	{

@@ -13,6 +13,7 @@ using Hexstar.Dialogue;
 using Hexstar.CSE.SistemaEventos;
 using System.Collections;
 using CSE.Local;
+using CSE.Feedback;
 
 [System.Serializable] public enum EstadosDelGameplay { InicioDia = 0, InicioCaso = 1, FinCaso = 2, FinDia = 3 };
 public class GameplayCycle : MonoBehaviour, ISingleton
@@ -29,6 +30,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 	AudioClip bgm_gameOver;
 	AudioClip bgm_intro_gameOver;
 	[SerializeField] AwaiterUntilPressed popupFinDia;
+	[SerializeField] Transform win_screen;
 
 	static int estadoActual = 0;
 	static bool gameover = false;
@@ -96,6 +98,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
         }
 
         CheckEndOfDay();
+        InscryptionableFeedback.dictionary["ConsultasMaximas"].SilentChange(ResourceManager.ConsultasMaximas.ToString());
         //OperacionesGameplay.ActualizarDangerController();
     }
 
@@ -125,7 +128,7 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		if (ResourceManager.AgentesDisponibles <= 0 || CheckGameOverEvent()) await GameOver();
 		else
 		{
-			CheckEndOfDay();
+			if (!CheckWinEvent()) CheckEndOfDay();
 
             if (ganado && PuzzleManager.CasoActivoEsExamen())
 			{
@@ -247,6 +250,20 @@ public class GameplayCycle : MonoBehaviour, ISingleton
 		}
 		return false;
 	}
+	private static bool CheckWinEvent()
+	{
+        string v = ControladorDialogos.GetDialogueEventValue("game_over");
+        if (int.TryParse(v, System.Globalization.NumberStyles.Integer,
+            new System.Globalization.CultureInfo("es-ES"), out int res))
+        {
+			if (res == 1)
+			{
+				Instance.win_screen.gameObject.SetActive(true);
+				return true;
+			}
+        }
+		return false;
+    }
 
 	public void ReintentarDesdePuntoDeGuardado()
     {

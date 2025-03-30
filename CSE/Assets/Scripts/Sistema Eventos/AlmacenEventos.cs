@@ -45,6 +45,7 @@ namespace Hexstar.CSE.SistemaEventos
                 if (eventoDisponible.CumpleCondiciones()) await eventoDisponible.Ejecutar();
             }
             EjecutandoEventos = false;
+            GameplayCycle.Instance.CheckEndOfDay();
         }
 
         /// <summary>

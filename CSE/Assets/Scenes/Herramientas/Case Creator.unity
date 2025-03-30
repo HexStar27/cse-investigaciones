@@ -219,53 +219,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8448d68068898a46876574e63495394, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bonito: 1
-  json: "{\n    \"id\": 108,\n    \"dif\": 4,\n    \"coste\": 0,\n    \"caducidad\":
-    -1,\n    \"secundario\": true,\n    \"examen\": false,\n    \"titulo\": \"Die
-    in a Fire\",\n    \"resumen\": \"El due\xF1o de Corgomatic se ha presentado en
-    tu oficina para hablarte sobre la relaci\xF3n que ten\xEDa con el due\xF1o de
-    la pizzer\xEDa. Todas las se\xF1ales apuntan a una sola cosa. Hay que encontrar
-    el quinto animatr\xF3nico en el  inventario del establecimiento.\",\n    \"pistas\":
-    [\n        {\n            \"titulo\": \"Lista de animatr\xF3nicos originales\",\n           
-    \"descripcion\": \"Si hay un quinto animatr\xF3nico deber\xEDa aquel que no tenga
-    el nombre de los originales (Hernesto el Hamster, Lucas el Lobo, Gloria la Gallina
-    y Paul el oso Polar).\",\n            \"palabras\": [\n                \"Hernesto
-    el Hamster\",\n                \"Lucas el Lobo\",\n                \"Gloria la
-    Gallina\",\n                \"Paul el oso Polar\"\n            ]\n        }\n   
-    ],\n    \"bounties\": [\n        {\n            \"condicion\": 0,\n           
-    \"efecto\": 0,\n            \"cantidad\": 1\n        },\n        {\n           
-    \"condicion\": 8,\n            \"efecto\": 1,\n            \"cantidad\": -99\n       
-    },\n        {\n            \"condicion\": 3,\n            \"efecto\": 0,\n           
-    \"cantidad\": 1\n        }\n    ]\n}"
+  bonito: 0
+  json: 
   caso:
-    id: 108
-    dif: 4
+    id: 15
+    dif: 5
     coste: 0
     caducidad: -1
-    secundario: 1
+    secundario: 0
     examen: 0
-    titulo: Die in a Fire
-    resumen: "El due\xF1o de Corgomatic se ha presentado en tu oficina para hablarte
-      sobre la relaci\xF3n que ten\xEDa con el due\xF1o de la pizzer\xEDa. Todas
-      las se\xF1ales apuntan a una sola cosa. Hay que encontrar el quinto animatr\xF3nico
-      en el  inventario del establecimiento."
+    titulo: Hijo de la Luna
+    resumen: "El jefe de La Colmena est\xE1 muerto, se nos adelant\xF3 el gobierno,
+      pero Kripo est\xE1 nervioso, y se le ha ca\xEDdo un papel con datos que sugieren
+      que a\xFAn hay cabos sueltos."
     pistas:
-    - titulo: "Lista de animatr\xF3nicos originales"
-      descripcion: "Si hay un quinto animatr\xF3nico deber\xEDa aquel que no tenga
-        el nombre de los originales (Hernesto el Hamster, Lucas el Lobo, Gloria la
-        Gallina y Paul el oso Polar)."
+    - titulo: "Noticias (Zona de hu\xEDda)"
+      descripcion: "El jefe de La Colmena huy\xF3 hacia la bah\xEDa de transbordos
+        m\xE1s cercana a su casa."
       palabras:
-      - Hernesto el Hamster
-      - Lucas el Lobo
-      - Gloria la Gallina
-      - Paul el oso Polar
+      - Avenida Kosmi
+    - titulo: Noticias (Muerte)
+      descripcion: "Un funcionario lo reconoci\xF3 y llam\xF3 a la polic\xEDa. El
+        fujititvo reaccion\xF3 de forma agresiva y la polic\xEDa tuvo que disparar."
+      palabras:
+      - ---
+    - titulo: "Noticias (Veh\xEDculo)"
+      descripcion: "El veh\xEDculo en el que huy\xF3 fue confiscado para el futuro
+        an\xE1lisis"
+      palabras:
+      - ---
+    - titulo: Kripo (Correo)
+      descripcion: "El papel que se le cay\xF3 a Kripo ten\xEDa el supuesto correo
+        del jefe de La Colmena."
+      palabras:
+      - vikalkontrov@antmsg.exu
+    - titulo: "Kripo (Almac\xE9n Secreto)"
+      descripcion: "En el papel de Kripo hab\xEDan unidos por una l\xEDnea las palabras
+        Almac\xE9n Secreto y Par\xE1sito de la Ascensi\xF3n."
+      palabras:
+      - "Par\xE1sito de la Ascensi\xF3n"
     bounties:
     - condicion: 0
       efecto: 0
-      cantidad: 1
+      cantidad: 99
     - condicion: 8
       efecto: 1
-      cantidad: -99
-    - condicion: 1
-      efecto: 0
-      cantidad: -4
+      cantidad: -999

@@ -135,6 +135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d809fd1ff613d241bc187d1977109c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boton: {fileID: 0}
   pointing_to: 0
 --- !u!1 &6077544423477630055
 GameObject:
@@ -204,8 +205,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Nuevo Evento
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: fe4baf1e185e0ab49aa4823933c87c9d, type: 2}
-  m_sharedMaterial: {fileID: -6101466074292277747, guid: fe4baf1e185e0ab49aa4823933c87c9d,
+  m_fontAsset: {fileID: 11400000, guid: 2fb3636ca05e6814ca09a1d45e775544, type: 2}
+  m_sharedMaterial: {fileID: -6409510875824353874, guid: 2fb3636ca05e6814ca09a1d45e775544,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -236,7 +237,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535

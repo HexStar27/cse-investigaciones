@@ -537,7 +537,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Epiaf_Stare
+      name: Epitaf_Stare
       rect:
         serializedVersion: 2
         x: 0
@@ -704,6 +704,90 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: pepuv_neutro
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a233e117ae63bfb45b9ac2143c47f62d
+      internalID: -1995841350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pepuv_pensando
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 958c85720ec02b645b125bced07d7a45
+      internalID: -1043580279
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pepuv_perv
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 488fdc8cb81ac2b419eabde3650570ee
+      internalID: 680345836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: pepuv_neutro2
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7c34e65b7faff1e42ad7e68e59d426df
+      internalID: -188489517
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -722,15 +806,18 @@ TextureImporter:
       Corgo_Sus2: -2039124306
       Imp_Triste3: -538764042
       Imp_Triste1: -501460782
+      pepuv_neutro2: -188489517
       Capi_Neutro: -535031063
       Feri_4: 1715662161
       portraits_9: -37853081
       portraits_4: 1528402666
+      pepuv_neutro: -1995841350
       portraits_24: 1340851660
-      Epiaf_Stare: -1890697385
       portraits_19: -15367421
       Epitaf_Suegra: 2080748188
+      pepuv_perv: 680345836
       Kripo_Neutro2: 1688595468
+      pepuv_pensando: -1043580279
       Kevin_Sus: -516222579
       Imp_Triste2: 732122591
       Kevin_Contento: -1839417522
@@ -739,6 +826,7 @@ TextureImporter:
       Kevin_Neutro2: -1470396794
       Corgo_Contento: -2126125132
       Epitaf_Contenta: 772579209
+      Epitaf_Stare: -1890697385
       Capi_Neutro2: 1101955437
       Kripo_Neutro: -505999279
       Epitaf_Decepcionada: -279474870
